@@ -3,31 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <title>Thông tin cá nhân</title>
-  <style>
-    #successMessage {
-      display: none;
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background-color: #4caf50;
-      color: white;
-      padding: 12px 24px;
-      border-radius: 8px;
-      font-size: 14px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      z-index: 1000;
-      animation: fadeOut 3s ease forwards;
-    }
-
-    @keyframes fadeOut {
-      0% { opacity: 1; }
-      80% { opacity: 1; }
-      100% { opacity: 0; display: none; }
-    }
-  </style>
 </head>
 <body style="margin: 0; font-family: 'Segoe UI', sans-serif; background-color: #f5f7fa;">
-  <div id="successMessage">✅ Cập nhật thành công!</div>
+  <div id="successMessage" style="display: none; position: fixed; top: 20px; right: 20px; background-color: #4caf50; color: white; padding: 12px 24px; border-radius: 8px; font-size: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); z-index: 1000;">✅ Cập nhật thành công!</div>
 
   <div style="display: flex; min-height: 100vh;">
     <!-- Sidebar -->
@@ -91,7 +69,6 @@
     </div>
   </div>
 
-  <!-- Script: Toggle chỉnh sửa + hiển thị thông báo -->
   <script>
     const button = document.getElementById('editButton');
     const successBox = document.getElementById('successMessage');
@@ -110,16 +87,14 @@
       button.textContent = isEditing ? 'Lưu' : 'Chỉnh sửa';
 
       if (!isEditing) {
-        // Hiển thị thông báo sau khi lưu
         successBox.style.display = 'block';
         successBox.style.opacity = '1';
-
         setTimeout(() => {
           successBox.style.opacity = '0';
           setTimeout(() => {
             successBox.style.display = 'none';
           }, 500);
-        }, 2500); // 2.5 giây
+        }, 2500);
       }
     });
   </script>
