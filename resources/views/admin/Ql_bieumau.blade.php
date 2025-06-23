@@ -1,73 +1,50 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <title>Quản lý Biểu mẫu</title>
-</head>
-<body style="margin: 0; font-family: 'Segoe UI', sans-serif; background-color: #f5f7fa;">
-<div style="display: flex; min-height: 100vh;">
-  <!-- Sidebar -->
-  <div style="width: 220px; background: white; padding: 30px 0; border-right: 1px solid #e0e0e0; display: flex; flex-direction: column;">
-    <div style="text-align: center; font-weight: bold; font-size: 22px; margin-bottom: 40px;">Logo</div>
-    <div style="display: flex; flex-direction: column;">
-       <div onclick="window.location.href='{{ route('admin.thong-ke') }}'" style="padding: 12px 24px; display: flex; align-items: center; gap: 10px; font-size: 14px; color: #333; cursor: pointer;">🏠 Thống kê</div>
-       <div onclick="window.location.href='{{ route('admin.ql-bieumau') }}'" style="padding: 12px 24px; display: flex; align-items: center; gap: 10px; font-size: 14px; color: #0047ff; background-color: #eef3ff; font-weight: bold; cursor: pointer;">📄 Biểu mẫu</div>
-       <div onclick="window.location.href='{{ route('admin.ql-taikhoan') }}'" style="padding: 12px 24px; display: flex; align-items: center; gap: 10px; font-size: 14px; color: #333; cursor: pointer;">👤 Tài Khoản</div>
-       <div onclick="window.location.href='{{ route('admin.tt-canhan') }}'" style="padding: 12px 24px; display: flex; align-items: center; gap: 10px; font-size: 14px; color: #333; cursor: pointer;">⚙️ Thông tin cá nhân</div>
+@extends('layout/admin')
+
+@section('title', 'Quản lý biểu mẫu')
+@section('page-title', 'Quản lý biểu mẫu')
+
+@section('content')
+  <div style="background: white; border-radius: 16px; padding: 40px; max-width: 100%; width: 95%; margin: auto;">
+    <div style="margin-bottom: 12px;">
+      <input id="searchInput" style="width: 240px; border-radius: 12px; border: 1px solid #ddd; padding: 10px 14px;" type="text" placeholder="🔍 Tìm kiếm...">
     </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+      <label style="font-size: 14px; display:flex; align-items:center; gap:8px;">
+        Hiển thị:
+        <select id="rowsPerPageSelect" style="padding: 6px 12px; border-radius: 6px;">
+          <option value="7">7 dòng</option>
+          <option value="15" selected>15 dòng</option>
+          <option value="20">20 dòng</option>
+        </select>
+      </label>
+      <button id="deleteSelected" style="padding: 8px 16px; background: #f87171; border: none; color: white; border-radius: 6px; cursor: pointer;" disabled>🗑️ Xóa đã chọn</button>
+    </div>
+
+    <!-- Table -->
+    <div id="table-container" style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+        <thead>
+          <tr>
+            <th style="padding: 12px; text-align: center;"><input type="checkbox" id="selectAll"></th>
+            <th style="text-align:left; padding: 12px;">Tiêu đề</th>
+            <th style="text-align:left; padding: 12px;">Màu</th>
+            <th style="text-align:left; padding: 12px;">Ngày tạo</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div id="pagination" style="display:flex; justify-content:center; margin-top: 24px; flex-wrap: wrap; gap: 8px;"></div>
   </div>
 
-  <!-- Main Content -->
-  <div style="flex: 1; display: flex; flex-direction: column;">
-    <!-- Header -->
-    <div style="background: #7da4ff; height: 72px; padding: 0 40px; color: white; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
-      <span>Quản lý biểu mẫu</span>
-      <div style="width: 50px; height: 50px; background: #ccc; border-radius: 50%;"></div>
-    </div>
+  <!-- Success Message -->
+  <div id="success-message" style="display: none; position: fixed; top: 20px; right: 20px; background: #4ade80; color: white; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-weight: 500; z-index: 999;">✅ Xóa thành công!</div>
+@endsection
 
-    <!-- Content -->
-    <div style="padding: 40px;">
-      <div style="background: white; border-radius: 16px; padding: 40px; max-width: 100%; width: 95%; margin: auto;">
-        <div style="margin-bottom: 12px;">
-          <input id="searchInput" style="width: 240px; border-radius: 12px; border: 1px solid #ddd; padding: 10px 14px;" type="text" placeholder="🔍 Tìm kiếm...">
-        </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
-          <label style="font-size: 14px; display:flex; align-items:center; gap:8px;">
-            Hiển thị:
-            <select id="rowsPerPageSelect" style="padding: 6px 12px; border-radius: 6px;">
-              <option value="7">7 dòng</option>
-              <option value="10" selected>10 dòng</option>
-              <option value="20">20 dòng</option>
-            </select>
-          </label>
-          <button id="deleteSelected" style="padding: 8px 16px; background: #f87171; border: none; color: white; border-radius: 6px; cursor: pointer;" disabled>🗑️ Xóa đã chọn</button>
-        </div>
-
-        <!-- Table -->
-        <div id="table-container" style="overflow-x: auto;">
-          <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-            <thead>
-              <tr>
-                <th style="padding: 12px; text-align: center;"><input type="checkbox" id="selectAll"></th>
-                <th style="text-align:left; padding: 12px;">Tiêu đề</th>
-                <th style="text-align:left; padding: 12px;">Màu</th>
-                <th style="text-align:left; padding: 12px;">Ngày tạo</th>
-              </tr>
-            </thead>
-            <tbody id="table-body"></tbody>
-          </table>
-        </div>
-
-        <!-- Pagination -->
-        <div id="pagination" style="display:flex; justify-content:center; margin-top: 24px; flex-wrap: wrap; gap: 8px;"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Success Message -->
-<div id="success-message" style="display: none; position: fixed; top: 20px; right: 20px; background: #4ade80; color: white; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-weight: 500; z-index: 999;">✅ Xóa thành công!</div>
-
+@push('scripts')
 <script>
   let rowsPerPage = 10;
   let currentPage = 1;
@@ -184,5 +161,4 @@
     renderPagination();
   });
 </script>
-</body>
-</html>
+@endpush
