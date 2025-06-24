@@ -9,14 +9,14 @@
 
 <!-- Header -->
 <nav class="navbar navbar-light bg-primary text-white px-3 d-flex justify-content-between">
-  <div class="navbar-brand mb-0 h1 text-white">Logo</div>
+  <div class="navbar-brand mb-0 h1 text-white">QR Điểm Danh</div>
   <div class="d-flex align-items-center gap-3">
 
     <!-- Avatar & menu -->
     <div class="avatar-menu" onclick="toggleMenu()" style="position: relative; display: flex; align-items: center; gap: 10px; cursor: pointer;">
       @guest
         <img src="{{ asset('images/default-avatar.png') }}" alt="avatar" class="rounded-circle" width="32">
-        <span><a class="text-white text-decoration-none">Đăng nhập</a></span>
+        <span><a class="text-white text-decoration-none">Tên người dùng</a></span>
       @else
         <img src="{{ Auth::user()->avatar_url ?? asset('images/default-avatar.png') }}" alt="avatar" class="rounded-circle" width="32">
         <span class="text-white">{{ Auth::user()->name }}</span>
@@ -61,7 +61,7 @@
   <div class="d-flex flex-column align-items-center">
     <div class="d-flex align-items-center mb-2">
       <div style="width: 40px; height: 40px; background-color: #2dc5c5; color: white; border-radius: 50%; font-weight: bold; display: flex; align-items: center; justify-content: center; margin-right: 10px;">
-        LOGO
+        QR DD
       </div>
       <span class="text-white">Dự án lập trình web</span>
     </div>
