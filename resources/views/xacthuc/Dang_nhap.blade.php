@@ -11,23 +11,27 @@
     <div class="bg-white p-10 rounded-2xl shadow-md w-full max-w-md">
         <h2 class="text-2xl font-bold mb-6">Đăng nhập</h2>
 
-        <form method="POST" action="{{ route('xacthuc.dang-nhap.post') }}">
+        <form method="POST" action="{{ route('xacthuc.dang-nhap.post') }}" id="loginForm">
             @csrf
 
             {{-- Email --}}
             <label class="block mb-2 font-medium">Email</label>
-            <input type="email" name="email" value="{{ old('email') }}" class="w-full p-3 mb-4 border rounded"
-                placeholder="you@gmail.com" required>
-            @error('email')
-                <p class="text-red-500 text-sm mb-2">{{ $message }}</p>
+            <input type="email" name="mail" id="emailInput" value="{{ old('mail') }}"
+                class="w-full p-3 mb-1 border rounded @error('mail') border-red-500 @enderror"
+                placeholder="you@gmail.com">
+            <p id="emailError" class="text-red-500 text-sm mb-2 hidden"></p>
+            @error('mail')
+                <p class="text-red-500 text-sm mb-4">{{ $message }}</p>
             @enderror
 
             {{-- Mật khẩu --}}
-            <label class="block mb-2 font-medium">Mật Khẩu</label>
-            <input type="password" name="password" class="w-full p-3 mb-2 border rounded" placeholder="Nhập mật khẩu"
-                required>
-            @error('password')
-                <p class="text-red-500 text-sm mb-2">{{ $message }}</p>
+            <label class="block mb-2 font-medium">Mật khẩu</label>
+            <input type="password" name="mat_khau" id="passwordInput"
+                class="w-full p-3 mb-1 border rounded @error('mat_khau') border-red-500 @enderror"
+                placeholder="Nhập mật khẩu">
+            <p id="passwordError" class="text-red-500 text-sm mb-2 hidden"></p>
+            @error('mat_khau')
+                <p class="text-red-500 text-sm mb-4">{{ $message }}</p>
             @enderror
 
             {{-- ✅ Quên mật khẩu --}}
@@ -47,6 +51,54 @@
             <a href="{{ route('xacthuc.dang-ky') }}" class="text-blue-600 hover:underline">Đăng ký</a>
         </p>
     </div>
+
+    {{-- ✅ Script kiểm tra lỗi khi nhập --}}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const emailInput = document.getElementById("emailInput");
+            const emailError = document.getElementById("emailError");
+
+            const passwordInput = document.getElementById("passwordInput");
+            const passwordError = document.getElementById("passwordError");
+
+            emailInput.addEventListener("input", function() {
+                const emailValue = emailInput.value.trim();
+                const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+                if (!emailValue) {
+                    emailError.textContent = "Vui lòng nhập email.";
+                    emailError.classList.remove("hidden");
+                    emailInput.classList.add("border-red-500");
+                } else if (!regex.test(emailValue)) {
+                    emailError.textContent = "Email không hợp lệ.";
+                    emailError.classList.remove("hidden");
+                    emailInput.classList.add("border-red-500");
+                } else {
+                    emailError.textContent = "";
+                    emailError.classList.add("hidden");
+                    emailInput.classList.remove("border-red-500");
+                }
+            });
+
+            passwordInput.addEventListener("input", function() {
+                const passValue = passwordInput.value.trim();
+
+                if (!passValue) {
+                    passwordError.textContent = "Vui lòng nhập mật khẩu.";
+                    passwordError.classList.remove("hidden");
+                    passwordInput.classList.add("border-red-500");
+                } else if (passValue.length < 6) {
+                    passwordError.textContent = "Mật khẩu tối thiểu 6 ký tự.";
+                    passwordError.classList.remove("hidden");
+                    passwordInput.classList.add("border-red-500");
+                } else {
+                    passwordError.textContent = "";
+                    passwordError.classList.add("hidden");
+                    passwordInput.classList.remove("border-red-500");
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

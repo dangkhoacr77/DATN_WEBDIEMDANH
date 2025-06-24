@@ -55,5 +55,9 @@ Route::post('/dang-nhap', [DangNhapController::class, 'authenticate'])->name('xa
 Route::post('/dat-lai-mk', [DatlaiMkController::class, 'update'])->name('xacthuc.dat-lai-mk.post');
 Route::post('/quen-mk', [QuenMkController::class, 'sendResetCode'])->name('xacthuc.quen-mk.post');
 Route::post('/xac-thuc-ma', [QuenMkController::class, 'verifyCode'])->name('xacthuc.quen-mk.verify');
+Route::post('/dang-xuat', function () {
+    session()->forget('nguoi_dung'); // Xóa phiên đăng nhập
+    return redirect()->route('trangchu')->with('success', 'Đã đăng xuất!');
+})->name('dang-xuat');
 
 
