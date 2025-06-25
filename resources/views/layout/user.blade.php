@@ -18,7 +18,7 @@
     <!-- Navbar -->
     <!-- Header -->
     <nav class="navbar navbar-light bg-primary text-white px-3 d-flex justify-content-between">
-        <div class="navbar-brand mb-0 h1 text-white">QR Điểm Danh</div>
+        <div onclick="window.location.href='{{ route('trangchu') }}'"class="navbar-brand mb-0 h1 text-white">QR Điểm Danh</div>
         <div class="d-flex align-items-center gap-3">
 
             <!-- Avatar & menu -->
@@ -33,8 +33,6 @@
                         width="32">
                     <span><a class="text-white text-decoration-none">Khách</a></span>
                 @else
-                    <img src="{{ $user->hinh_anh ?? asset('images/default-avatar.png') }}" alt="avatar"
-                        class="rounded-circle" width="32">
                     <span class="text-white">{{ $user->ho_ten }}</span>
                 @endif
 
@@ -48,21 +46,9 @@
                             style="display: block; padding: 10px 15px; text-decoration: none; color: black;">Đăng ký</a>
                     @else
                         @if ($user->loai_tai_khoan === 'admin')
-                            <a href="{{ route('xacthuc.dang-nhap') }}"
-                                style="display: block; padding: 10px 15px; text-decoration: none; color: black;">Đăng
-                                nhập</a>
-                            <a href="{{ route('xacthuc.dang-ky') }}"
-                                style="display: block; padding: 10px 15px; text-decoration: none; color: black;">Đăng
-                                ký</a>
                             <a href="{{ route('admin.thong-ke') }}"
                                 style="display: block; padding: 10px 15px; text-decoration: none; color: black;">Admin</a>
                         @else
-                            <a href="{{ route('xacthuc.dang-nhap') }}"
-                                style="display: block; padding: 10px 15px; text-decoration: none; color: black;">Đăng
-                                nhập</a>
-                            <a href="{{ route('xacthuc.dang-ky') }}"
-                                style="display: block; padding: 10px 15px; text-decoration: none; color: black;">Đăng
-                                ký</a>
                             <a href="{{ route('nguoidung.tt-canhan') }}"
                                 style="display: block; padding: 10px 15px; text-decoration: none; color: black;">Người
                                 dùng</a>

@@ -23,7 +23,7 @@
         <!-- Sidebar -->
         <div
             style="width: 220px; background: white; padding: 30px 0; border-right: 1px solid #e0e0e0; display: flex; flex-direction: column;">
-            <div style="text-align: center; font-weight: bold; font-size: 22px; margin-bottom: 40px;">QR Điểm danh</div>
+            <div onclick="window.location.href='{{ route('trangchu') }}'"style="text-align: center; font-weight: bold; font-size: 22px; margin-bottom: 40px;">QR Điểm danh</div>
             <div style="display: flex; flex-direction: column;">
 
                 <div onclick="window.location.href='{{ route('admin.thong-ke') }}'"
@@ -69,9 +69,6 @@
                     $user = session('nguoi_dung');
                 @endphp
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <div
-                        style="width: 50px; height: 50px; background-image: url('{{ $user->hinh_anh ?? asset('images/default-avatar.png') }}'); background-size: cover; border-radius: 50%; background-position: center; background-color:#e0e0e0;">
-                    </div>
                     <span style="color: white; font-weight: normal;">{{ $user->ho_ten ?? 'Không xác định' }}</span>
                 </div>
             </div>
