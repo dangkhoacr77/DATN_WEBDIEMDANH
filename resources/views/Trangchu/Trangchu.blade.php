@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Hệ thống điểm danh QR</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script>
         tailwind.config = {
@@ -53,20 +54,18 @@
     </style>
 </head>
 
-<body class="bg-gray-50 font-sans"> 
-    <!-- Thanh điều hướng -->
+<body class="bg-gray-50 font-sans">
+    <!-- Bỏ qua phần nav và banner do không thay đổi -->
     <nav class="bg-white shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
                     <div class="flex-shrink-0 flex items-center">
                         <i class="fas fa-qrcode text-primary text-2xl mr-2"></i>
-                        <span
-                            onclick="window.location.href='{{ route('trangchu') }}'"class="text-xl font-bold text-dark">QR
-                            Điểm Danh</span>
+                        <span onclick="window.location.href='{{ route('trangchu') }}'"
+                            class="text-xl font-bold text-dark">QR Điểm Danh</span>
                     </div>
                 </div>
-                <!-- menu -->
                 <div class="avatar-menu" onclick="toggleMenu()"
                     style="position: relative; display: flex; align-items: center; gap: 10px; cursor: pointer;">
                     @php
@@ -74,9 +73,9 @@
                     @endphp
 
                     @if (!$user)
-                        <span><a href="{{ route('xacthuc.dang-nhap') }}"class="text-black text-decoration-none">Đăng
-                                nhâp /</a></span>
-                        <span><a href="{{ route('xacthuc.dang-ky') }}"class="text-black text-decoration-none">Đăng
+                        <span><a href="{{ route('xacthuc.dang-nhap') }}" class="text-black text-decoration-none">Đăng
+                                nhập /</a></span>
+                        <span><a href="{{ route('xacthuc.dang-ky') }}" class="text-black text-decoration-none">Đăng
                                 ký</a></span>
                     @else
                         <span class="text-black">{{ $user->ho_ten }}</span>
@@ -84,8 +83,7 @@
 
                     <div id="avatarDropdown"
                         style="position: absolute; right: 0; top: 50px; display: none; background: white; border: 1px solid #ccc; border-radius: 5px; z-index: 100; min-width: 120px;">
-                        @if (!$user)
-                        @else
+                        @if ($user)
                             @if ($user->loai_tai_khoan === 'admin')
                                 <a href="{{ route('admin.thong-ke') }}"
                                     style="display: block; padding: 10px 15px; text-decoration: none; color: black;">Admin</a>
@@ -94,9 +92,7 @@
                                     style="display: block; padding: 10px 15px; text-decoration: none; color: black;">Người
                                     dùng</a>
                             @endif
-
-                            {{-- Đăng xuất --}}
-                            <form method="POST" action="{{ route('dang-xuat') }}"> {{-- Bạn nên tạo route logout riêng --}}
+                            <form method="POST" action="{{ route('dang-xuat') }}">
                                 @csrf
                                 <button type="submit" class="dropdown-item"
                                     style="display: block; padding: 10px 15px; background: none; border: none; width: 100%; text-align: left; color: black;">Đăng
@@ -109,7 +105,6 @@
         </div>
     </nav>
 
-    <!-- Phần hero -->
     <div class="gradient-bg text-white">
         <div class="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
             <div class="text-center">
@@ -119,12 +114,20 @@
                 <p class="mt-6 max-w-2xl mx-auto text-xl opacity-90">
                     Quản lý điểm danh dễ dàng, nhanh chóng chỉ với mã QR.
                 </p>
+
+                @php
+                    $user = session('nguoi_dung');
+                @endphp
+
                 <div class="mt-10 flex justify-center space-x-4">
-                    <a href="{{ route('bieumau.tao') }}"
-                        class="bg-white text-primary hover:bg-gray-100 px-8 py-3 rounded-md text-base font-medium">
-                        Tạo biểu mẫu
-                    </a>
-                    <a href="#"
+                    @if ($user && in_array($user->loai_tai_khoan, ['admin', 'nguoi_tao_form']))
+                        <a href="{{ route('bieumau.tao') }}"
+                            class="bg-white text-primary hover:bg-gray-100 px-8 py-3 rounded-md text-base font-medium">
+                            Tạo biểu mẫu
+                        </a>
+                    @endif
+
+                    <a href="#qr-scanner-area"
                         class="bg-transparent border-2 border-white hover:bg-white hover:bg-opacity-10 px-8 py-3 rounded-md text-base font-medium">
                         Quét mã QR
                     </a>
@@ -133,8 +136,7 @@
         </div>
     </div>
 
-    <!-- Phần quét QR -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div id="qr-scanner-area" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div class="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
             <div class="mb-12 lg:mb-0">
                 <h2 class="text-3xl font-extrabold text-dark sm:text-4xl">
@@ -149,46 +151,40 @@
                         <div class="flex-shrink-0 bg-primary bg-opacity-10 rounded-full p-2">
                             <i class="fas fa-check text-primary"></i>
                         </div>
-                        <p class="ml-3 text-base text-gray-700">
-                            Ghi nhận điểm danh tức thì
-                        </p>
+                        <p class="ml-3 text-base text-gray-700">Ghi nhận điểm danh tức thì</p>
                     </li>
                     <li class="flex items-start">
                         <div class="flex-shrink-0 bg-primary bg-opacity-10 rounded-full p-2">
                             <i class="fas fa-check text-primary"></i>
                         </div>
-                        <p class="ml-3 text-base text-gray-700">
-                            Không cần cài thêm ứng dụng
-                        </p>
+                        <p class="ml-3 text-base text-gray-700">Không cần cài thêm ứng dụng</p>
                     </li>
                     <li class="flex items-start">
                         <div class="flex-shrink-0 bg-primary bg-opacity-10 rounded-full p-2">
                             <i class="fas fa-check text-primary"></i>
                         </div>
-                        <p class="ml-3 text-base text-gray-700">
-                            Hoạt động trên mọi điện thoại thông minh
-                        </p>
+                        <p class="ml-3 text-base text-gray-700">Hoạt động trên mọi điện thoại thông minh</p>
                     </li>
                 </ul>
             </div>
+
             <div class="relative">
-                <div class="qr-scanner w-full h-80 bg-gray-200 flex items-center justify-center">
-                    <div class="text-center">
-                        <i class="fas fa-qrcode text-6xl text-gray-400 mb-4"></i>
-                        <p class="text-gray-500">Khu vực quét QR</p>
-                    </div>
+                <div id="reader"
+                    class="qr-scanner w-full h-80 bg-gray-200 flex items-center justify-center rounded-md">
+                    <span class="text-gray-500">Khu vực quét QR</span>
                 </div>
-                <div class="mt-4 flex justify-center">
-                    <button
+                <div class="mt-4 flex justify-center flex-col items-center space-y-2">
+                    <button id="start-camera-btn"
                         class="bg-primary hover:bg-indigo-700 text-white px-6 py-2 rounded-md text-sm font-medium flex items-center">
                         <i class="fas fa-camera mr-2"></i> Mở
                     </button>
+                    <p class="text-sm text-gray-700">Kết quả: <span id="qr-result"
+                            class="font-bold text-primary"></span></p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Kêu gọi hành động -->
     <div class="bg-primary">
         <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8 lg:flex lg:items-center lg:justify-between">
             <h2 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
@@ -206,11 +202,8 @@
         </div>
     </div>
 
-    <!-- Footer -->
     <footer class="bg-dark text-white">
         <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
-            </div>
             <div class="mt-12 border-t border-gray-700 pt-8">
                 <p class="text-base text-gray-400 text-center">
                     &copy; 2023 QR Điểm Danh. Đã đăng ký bản quyền.
@@ -219,52 +212,87 @@
         </div>
     </footer>
 
+    <!-- THÊM THƯ VIỆN QR -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
+
     <script>
-        // Simple animation for feature cards on scroll
-        document.addEventListener("DOMContentLoaded", function() {
-            const featureCards = document.querySelectorAll(".feature-card");
-
-            const observer = new IntersectionObserver(
-                (entries) => {
-                    entries.forEach((entry) => {
-                        if (entry.isIntersecting) {
-                            entry.target.style.opacity = "1";
-                            entry.target.style.transform = "translateY(0)";
-                        }
-                    });
-                }, {
-                    threshold: 0.1
+    document.addEventListener("DOMContentLoaded", function () {
+        // ========== Feature Cards ==========
+        const featureCards = document.querySelectorAll(".feature-card");
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = "1";
+                    entry.target.style.transform = "translateY(0)";
                 }
-            );
-
-            featureCards.forEach((card) => {
-                card.style.opacity = "0";
-                card.style.transform = "translateY(20px)";
-                card.style.transition = "all 0.5s ease";
-                observer.observe(card);
             });
+        }, { threshold: 0.1 });
 
-            // QR Scanner button functionality
-            const scannerBtn = document.querySelector(
-                'button[aria-label="Open Scanner"]'
-            );
-            if (scannerBtn) {
-                scannerBtn.addEventListener("click", function() {
-                    alert("QR Scanner would open here in a real implementation");
-                });
-            }
+        featureCards.forEach((card) => {
+            card.style.opacity = "0";
+            card.style.transform = "translateY(20px)";
+            card.style.transition = "all 0.5s ease";
+            observer.observe(card);
         });
 
-        function toggleMenu() {
-            const menu = document.getElementById("avatarDropdown");
-            menu.style.display = menu.style.display === "block" ? "none" : "block";
-        }
-        window.onclick = function(event) {
-            if (!event.target.closest('.avatar-menu')) {
-                document.getElementById("avatarDropdown").style.display = 'none';
+        // ========== QR Scanner ==========
+        const qrResult = document.getElementById('qr-result');
+        const cameraButton = document.getElementById("start-camera-btn");
+        const html5QrCode = new Html5Qrcode("reader");
+        let isCameraRunning = false;
+        let currentCameraId = null;
+
+        function toggleQRScanner() {
+            if (isCameraRunning) {
+                html5QrCode.stop().then(() => {
+                    isCameraRunning = false;
+                    cameraButton.innerHTML = '<i class="fas fa-camera mr-2"></i> Mở';
+                }).catch(err => {
+                    console.error("Không thể tắt camera:", err);
+                });
+            } else {
+                Html5Qrcode.getCameras().then(cameras => {
+                    if (cameras && cameras.length) {
+                        currentCameraId = cameras[0].id;
+                        html5QrCode.start(
+                            currentCameraId,
+                            { fps: 10, qrbox: 250 },
+                            qrCodeMessage => {
+                                qrResult.textContent = qrCodeMessage;
+                                html5QrCode.stop(); isCameraRunning = false; cameraButton.innerHTML = '<i class="fas fa-camera mr-2"></i> Mở';
+                            },
+                            errorMessage => {
+                                // Xử lý lỗi quét ở đây nếu muốn
+                            }
+                        ).then(() => {
+                            isCameraRunning = true;
+                            cameraButton.innerHTML = '<i class="fas fa-times mr-2"></i> Tắt';
+                        }).catch(err => {
+                            console.error("Không thể mở camera:", err);
+                        });
+                    }
+                }).catch(err => {
+                    console.error("Không tìm thấy camera:", err);
+                });
             }
         }
-    </script>
+
+        cameraButton.addEventListener("click", toggleQRScanner);
+    });
+
+    // ========== Avatar Menu Toggle ==========
+    function toggleMenu() {
+        const menu = document.getElementById("avatarDropdown");
+        menu.style.display = menu.style.display === "block" ? "none" : "block";
+    }
+
+    window.onclick = function (event) {
+        if (!event.target.closest('.avatar-menu')) {
+            document.getElementById("avatarDropdown").style.display = 'none';
+        }
+    };
+</script>
+
 </body>
 
 </html>
