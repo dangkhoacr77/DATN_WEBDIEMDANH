@@ -29,31 +29,32 @@ class DangKyController extends Controller
      * Store a newly created resource in storage.
      */
      public function store(Request $request)
-    {
-        $request->validate([
-            'mail' => 'required|email|unique:TaiKhoan,mail',
-            'mat_khau' => 'required|min:6|confirmed',
-            'ho_ten' => 'required|string|max:100',
-            'ngay_sinh' => 'required|date',
-            'so_dien_thoai' => 'nullable|string|max:20',
-            'hinh_anh' => 'nullable|string|max:200',
-        ]);
+{
+    
+    $request->validate([
+        'mail' => 'required|email|unique:TaiKhoan,mail',
+        'mat_khau' => 'required|min:6|confirmed',
+        'ho_ten' => 'required|string|max:100',
+        'ngay_sinh' => 'required|date',
+        'so_dien_thoai' => 'nullable|string|max:20',
+        'hinh_anh' => 'nullable|string|max:200',
+        'loai_tai_khoan' => 'required|in:nguoi_tao_form,nguoi_diem_danh',
+    ]);
 
-        TaiKhoan::create([
-            'ma_tai_khoan' => 'TK' . time(),
-            'hinh_anh' => $request->hinh_anh,
-            'mail' => $request->mail,
-            'so_dien_thoai' => $request->so_dien_thoai,
-            'ngay_sinh' => $request->ngay_sinh,
-            'ho_ten' => $request->ho_ten,
-            'mat_khau' => Hash::make($request->mat_khau),
-            'loai_tai_khoan' => 'user',
-            'trang_thai' => 1,
-        ]);
+    TaiKhoan::create([
+        'ma_tai_khoan' => 'TK' . time(),
+        'mail' => $request->mail,
+        'so_dien_thoai' => $request->so_dien_thoai,
+        'ngay_sinh' => $request->ngay_sinh,
+        'ho_ten' => $request->ho_ten,
+        'mat_khau' => Hash::make($request->mat_khau),
+        'loai_tai_khoan' => $request->loai_tai_khoan,
+        'trang_thai' => 1,
+        'ngay_tao' => now()
+    ]);
 
-        return redirect()->route('xacthuc.dang-nhap')->with('thong_bao', 'Đăng ký thành công. Vui lòng đăng nhập.');
-    }
-
+    return redirect()->route('xacthuc.dang-nhap')->with('thong_bao', 'Đăng ký thành công. Vui lòng đăng nhập.');
+}
     /**
      * Display the specified resource.
      */

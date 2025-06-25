@@ -4,58 +4,72 @@
 <head>
     <meta charset="UTF-8">
     <title>Đăng Ký</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss/dist/tailwind.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-gray-100 flex items-center justify-center h-screen">
-    <div class="bg-white p-10 rounded-2xl shadow-md w-full max-w-md">
-        <h2 class="text-2xl font-bold mb-6">Đăng Ký</h2>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="bg-white p-8 rounded-2xl shadow-md w-full max-w-xl">
+        <h2 class="text-2xl font-bold mb-6 text-center">Đăng Ký</h2>
 
-        {{-- CSRF token --}}
-        <form method="POST" action="{{ route('xacthuc.dang-ky.post') }}">
+        <form method="POST" action="{{ route('xacthuc.dang-ky.post') }}" class="space-y-4">
             @csrf
 
-            <label class="block mb-2 font-medium">Email</label>
-            <input type="email" name="email" class="w-full p-3 mb-4 border rounded" placeholder="you@gmail.com"
-                value="{{ old('email') }}" required>
-            @error('email')
-                <p class="text-red-500 text-sm mb-2">{{ $message }}</p>
-            @enderror
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block mb-1 font-medium">Email</label>
+                    <input type="email" name="mail" value="{{ old('mail') }}" required
+                        class="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400">
+                </div>
 
-            <label class="block mb-2 font-medium">Tên</label>
-            <input type="text" name="name" class="w-full p-3 mb-4 border rounded" placeholder="Nhập tên"
-                value="{{ old('name') }}" required>
-            @error('name')
-                <p class="text-red-500 text-sm mb-2">{{ $message }}</p>
-            @enderror
+                <div>
+                    <label class="block mb-1 font-medium">Họ tên</label>
+                    <input type="text" name="ho_ten" value="{{ old('ho_ten') }}" required
+                        class="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400">
+                </div>
 
-            <label class="block mb-2 font-medium">Loại tài khoản</label>
-            <select name="account_type" class="w-full p-3 mb-4 border rounded" required>
-                <option value="">-- Chọn loại tài khoản --</option>
-                <option value="form_creator" {{ old('account_type') == 'form_creator' ? 'selected' : '' }}>Tài khoản tạo
-                    form</option>
-                <option value="attendance_checker" {{ old('account_type') == 'attendance_checker' ? 'selected' : '' }}>
-                    Tài khoản điểm danh</option>
-            </select>
-            @error('account_type')
-                <p class="text-red-500 text-sm mb-2">{{ $message }}</p>
-            @enderror
+                <div>
+                    <label class="block mb-1 font-medium">Ngày sinh</label>
+                    <input type="date" name="ngay_sinh" value="{{ old('ngay_sinh') }}" required
+                        class="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400">
+                </div>
 
-            <label class="block mb-2 font-medium">Mật Khẩu</label>
-            <input type="password" name="password" class="w-full p-3 mb-4 border rounded" placeholder="Nhập mật khẩu"
-                required>
-            @error('password')
-                <p class="text-red-500 text-sm mb-2">{{ $message }}</p>
-            @enderror
+                <div>
+                    <label class="block mb-1 font-medium">Số điện thoại</label>
+                    <input type="text" name="so_dien_thoai" value="{{ old('so_dien_thoai') }}"
+                        class="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400">
+                </div>
+            </div>
 
-            <label class="block mb-2 font-medium">Nhập Lại Mật Khẩu</label>
-            <input type="password" name="password_confirmation" class="w-full p-3 mb-6 border rounded"
-                placeholder="Nhập lại mật khẩu" required>
+            <div>
+                <label class="block mb-1 font-medium">Loại tài khoản</label>
+                <select name="loai_tai_khoan" required
+                    class="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    <option value="">-- Chọn loại tài khoản --</option>
+                    <option value="nguoi_tao_form" {{ old('loai_tai_khoan') == 'nguoi_tao_form' ? 'selected' : '' }}>
+                        Tài khoản tạo form</option>
+                    <option value="nguoi_diem_danh" {{ old('loai_tai_khoan') == 'nguoi_diem_danh' ? 'selected' : '' }}>
+                        Tài khoản điểm danh</option>
+                </select>
+            </div>
 
-            <button type="submit"
-                class="bg-blue-600 text-white font-semibold py-2 px-4 w-full rounded hover:bg-blue-700">
-                Đăng ký
-            </button>
+            <div>
+                <label class="block mb-1 font-medium">Mật khẩu</label>
+                <input type="password" name="mat_khau" required
+                    class="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400">
+            </div>
+
+            <div>
+                <label class="block mb-1 font-medium">Nhập lại mật khẩu</label>
+                <input type="password" name="mat_khau_confirmation" required
+                    class="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400">
+            </div>
+
+            <div>
+                <button type="submit"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded font-semibold transition">
+                    Đăng ký
+                </button>
+            </div>
         </form>
     </div>
 </body>

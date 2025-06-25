@@ -23,6 +23,8 @@ use App\Http\Controllers\Xacthuc\DangNhapController;
 use App\Http\Controllers\Xacthuc\DatlaiMkController;
 use App\Http\Controllers\Xacthuc\QuenMkController;
 
+
+
 // ======================= ADMIN =========================
 Route::get('/admin/ql-bieumau', [App\Http\Controllers\Admin\QLBieumauController::class, 'index'])->name('admin.ql-bieumau');
 Route::get('/admin/ql-taikhoan', [App\Http\Controllers\Admin\QLTaikhoanController::class, 'index'])->name('admin.ql-taikhoan');
@@ -32,7 +34,7 @@ Route::get('/admin/thong-tin-ca-nhan', [App\Http\Controllers\Admin\TTCanhanContr
 // ======================= BIEUMAU =========================
 Route::get('/bieumau/cai-dat', [App\Http\Controllers\Bieumau\CaiDatController::class, 'index'])->name('bieumau.cai-dat');
 Route::get('/bieumau/ds-cautraloi', [App\Http\Controllers\Bieumau\DsCautraloiController::class, 'index'])->name('bieumau.ds-cautraloi');
-Route::get('/bieumau/tao-form', [App\Http\Controllers\Bieumau\TaoFormController::class, 'index'])->name('bieumau.tao');
+Route::get('/bieumau/tao-form', [TaoFormController::class, 'index'])->name('bieumau.tao');
 
 // ======================= NGUOIDUNG =========================
 Route::get('/nguoidung/ls-diemdanh', [App\Http\Controllers\Nguoidung\LsDiemdanhController::class, 'index'])->name('nguoidung.ls-diemdanh');
@@ -45,12 +47,15 @@ Route::get('/nguoidung/thong-tin-ca-nhan', [App\Http\Controllers\Nguoidung\TTCan
 Route::get('/', [App\Http\Controllers\Trangchu\TrangchuController::class, 'index'])->name('trangchu');
 
 // ======================= XÁC THỰC =========================
-Route::get('/dang-ky', [App\Http\Controllers\Xacthuc\DangKyController::class, 'index'])->name('xacthuc.dang-ky');
+Route::middleware(['web'])->group(function () {
+    Route::get('/dang-ky', [DangKyController::class, 'index'])->name('xacthuc.dang-ky');
+    Route::post('/dang-ky', [DangKyController::class, 'store'])->name('xacthuc.dang-ky.post');
+});
 Route::get('/dang-nhap', [App\Http\Controllers\Xacthuc\DangNhapController::class, 'index'])->name('xacthuc.dang-nhap');
 Route::get('/dat-lai-mk', [App\Http\Controllers\Xacthuc\DatlaiMkController::class, 'index'])->name('xacthuc.dat-lai-mk');
 Route::get('/quen-mk', [App\Http\Controllers\Xacthuc\QuenMkController::class, 'index'])->name('xacthuc.quen-mk');
 // Xử lý form gửi lên
-Route::post('/dang-ky', [DangKyController::class, 'store'])->name('xacthuc.dang-ky.post');
+
 Route::post('/dang-nhap', [DangNhapController::class, 'authenticate'])->name('xacthuc.dang-nhap.post');
 Route::post('/dat-lai-mk', [DatlaiMkController::class, 'update'])->name('xacthuc.dat-lai-mk.post');
 Route::post('/quen-mk', [QuenMkController::class, 'sendResetCode'])->name('xacthuc.quen-mk.post');
@@ -61,3 +66,6 @@ Route::post('/dang-xuat', function () {
 })->name('dang-xuat');
 
 
+Route::get('/test-middleware', function () {
+    return "Bạn đã truy cập thành công";
+})->middleware('kiemtra.loainguoidung:admin');

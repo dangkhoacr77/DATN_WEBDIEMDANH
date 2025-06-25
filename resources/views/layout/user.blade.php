@@ -29,9 +29,6 @@
                 @endphp
 
                 @if (!$user)
-                    <img src="{{ asset('images/default-avatar.png') }}" alt="avatar" class="rounded-circle"
-                        width="32">
-                    <span><a class="text-white text-decoration-none">Khách</a></span>
                 @else
                     <span class="text-white">{{ $user->ho_ten }}</span>
                 @endif
@@ -86,7 +83,7 @@
                         </a>
 
                         {{-- Người tạo form --}}
-                        @if ($user && $user->loai_tai_khoan === 'người tạo form')
+                        @if ($user && $user->loai_tai_khoan === 'nguoi_tao_form')
                             <a href="{{ route('nguoidung.ql-bieumau') }}"
                                 style="display:block; padding:12px 16px; text-decoration:none;
                                       color:{{ request()->routeIs('nguoidung.ql-bieumau') ? '#0d6efd' : '#333' }};
@@ -106,7 +103,7 @@
                         @endif
 
                         {{-- Người điểm danh --}}
-                        @if ($user && $user->loai_tai_khoan === 'người điểm danh')
+                        @if ($user && $user->loai_tai_khoan === 'nguoi_diem_danh')
                             <a href="{{ route('nguoidung.ls-diemdanh') }}"
                                 style="display:block; padding:12px 16px; text-decoration:none;
                                       color:{{ request()->routeIs('nguoidung.ls-diemdanh') ? '#0d6efd' : '#333' }};
@@ -140,12 +137,6 @@
                 </div>
                 <span class="text-white">Dự án lập trình web</span>
             </div>
-            <p class="mt-2">Bạn có hài lòng khi sử dụng trang web?</p>
-            <form method="POST" action="#" class="d-flex justify-content-center gap-2 mb-3">
-                @csrf
-                <input type="text" name="feedback" class="form-control w-200" placeholder="Đánh giá" required>
-                <button type="submit" class="btn btn-info text-white">Gửi</button>
-            </form>
             <small>Lý Thanh Duy | Võ Thành Đăng Khoa</small><br>
             <small>Khóa học 2022 – 2025.</small>
         </div>
