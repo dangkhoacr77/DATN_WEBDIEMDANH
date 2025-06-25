@@ -16,26 +16,55 @@
     @endphp
 
     <!-- Navbar -->
+    <!-- Header -->
     <nav class="navbar navbar-light bg-primary text-white px-3 d-flex justify-content-between">
-        <div class="navbar-brand mb-0 h1 text-white">QR Điểm danh</div>
+        <div onclick="window.location.href='{{ route('trangchu') }}'"class="navbar-brand mb-0 h1 text-white">QR Điểm Danh</div>
+        <div class="d-flex align-items-center gap-3">
 
-        <div class="d-flex align-items-center gap-3 avatar-menu" onclick="toggleMenu()">
-            <img src="{{ $user->hinh_anh ?? asset('images/default-avatar.png') }}" alt="avatar" class="rounded-circle" width="32">
-            <span class="text-white">{{ $user->ho_ten ?? 'Khách' }}</span>
+            <!-- Avatar & menu -->
+            <div class="avatar-menu" onclick="toggleMenu()"
+                style="position: relative; display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                @php
+                    $user = session('nguoi_dung');
+                @endphp
 
-            <div id="avatarDropdown" class="position-absolute"
-                style="right:0; top:50px; display:none; background:#fff; border:1px solid #ccc; border-radius:5px; min-width:120px; z-index:100;">
                 @if (!$user)
-                    <a href="{{ route('xacthuc.dang-nhap') }}" class="d-block px-3 py-2 text-dark text-decoration-none">Đăng nhập</a>
-                    <a href="{{ route('xacthuc.dang-ky') }}" class="d-block px-3 py-2 text-dark text-decoration-none">Đăng ký</a>
+                    <img src="{{ asset('images/default-avatar.png') }}" alt="avatar" class="rounded-circle"
+                        width="32">
+                    <span><a class="text-white text-decoration-none">Khách</a></span>
                 @else
-                    <a href="#" class="d-block px-3 py-2 text-dark text-decoration-none">Cài đặt</a>
-                    <form method="POST" action="{{ route('dang-xuat') }}" class="m-0">
-                        @csrf
-                        <button type="submit" class="d-block w-100 text-start px-3 py-2 border-0 bg-white">Đăng xuất</button>
-                    </form>
+                    <span class="text-white">{{ $user->ho_ten }}</span>
                 @endif
+
+                <div id="avatarDropdown"
+                    style="position: absolute; right: 0; top: 50px; display: none; background: white; border: 1px solid #ccc; border-radius: 5px; z-index: 100; min-width: 120px;">
+                    @if (!$user)
+                        <a href="{{ route('xacthuc.dang-nhap') }}"
+                            style="display: block; padding: 10px 15px; text-decoration: none; color: black;">Đăng
+                            nhập</a>
+                        <a href="{{ route('xacthuc.dang-ky') }}"
+                            style="display: block; padding: 10px 15px; text-decoration: none; color: black;">Đăng ký</a>
+                    @else
+                        @if ($user->loai_tai_khoan === 'admin')
+                            <a href="{{ route('admin.thong-ke') }}"
+                                style="display: block; padding: 10px 15px; text-decoration: none; color: black;">Admin</a>
+                        @else
+                            <a href="{{ route('nguoidung.tt-canhan') }}"
+                                style="display: block; padding: 10px 15px; text-decoration: none; color: black;">Người
+                                dùng</a>
+                        @endif
+
+                        {{-- Đăng xuất --}}
+                        <form method="POST" action="{{ route('dang-xuat') }}"> {{-- Bạn nên tạo route logout riêng --}}
+                            @csrf
+                            <button type="submit" class="dropdown-item"
+                                style="display: block; padding: 10px 15px; background: none; border: none; width: 100%; text-align: left; color: black;">Đăng
+                                xuất</button>
+                        </form>
+                    @endif
+                </div>
             </div>
+
         </div>
     </nav>
 
@@ -48,7 +77,7 @@
                     <nav class="nav flex-column">
                         {{-- Thông tin cá nhân --}}
                         <a href="{{ route('nguoidung.tt-canhan') }}"
-                           style="display:block; padding:12px 16px; text-decoration:none;
+                            style="display:block; padding:12px 16px; text-decoration:none;
                                   color:{{ request()->routeIs('nguoidung.tt-canhan') ? '#0d6efd' : '#333' }};
                                   font-weight:{{ request()->routeIs('nguoidung.tt-canhan') ? 'bold' : '500' }};
                                   border-left:4px solid {{ request()->routeIs('nguoidung.tt-canhan') ? '#0d6efd' : 'transparent' }};
@@ -59,7 +88,7 @@
                         {{-- Người tạo form --}}
                         @if ($user && $user->loai_tai_khoan === 'người tạo form')
                             <a href="{{ route('nguoidung.ql-bieumau') }}"
-                               style="display:block; padding:12px 16px; text-decoration:none;
+                                style="display:block; padding:12px 16px; text-decoration:none;
                                       color:{{ request()->routeIs('nguoidung.ql-bieumau') ? '#0d6efd' : '#333' }};
                                       font-weight:{{ request()->routeIs('nguoidung.ql-bieumau') ? 'bold' : '500' }};
                                       border-left:4px solid {{ request()->routeIs('nguoidung.ql-bieumau') ? '#0d6efd' : 'transparent' }};
@@ -67,7 +96,7 @@
                                 Danh sách biểu mẫu
                             </a>
                             <a href="{{ route('nguoidung.ql-danhsach') }}"
-                               style="display:block; padding:12px 16px; text-decoration:none;
+                                style="display:block; padding:12px 16px; text-decoration:none;
                                       color:{{ request()->routeIs('nguoidung.ql-danhsach') ? '#0d6efd' : '#333' }};
                                       font-weight:{{ request()->routeIs('nguoidung.ql-danhsach') ? 'bold' : '500' }};
                                       border-left:4px solid {{ request()->routeIs('nguoidung.ql-danhsach') ? '#0d6efd' : 'transparent' }};
@@ -79,7 +108,7 @@
                         {{-- Người điểm danh --}}
                         @if ($user && $user->loai_tai_khoan === 'người điểm danh')
                             <a href="{{ route('nguoidung.ls-diemdanh') }}"
-                               style="display:block; padding:12px 16px; text-decoration:none;
+                                style="display:block; padding:12px 16px; text-decoration:none;
                                       color:{{ request()->routeIs('nguoidung.ls-diemdanh') ? '#0d6efd' : '#333' }};
                                       font-weight:{{ request()->routeIs('nguoidung.ls-diemdanh') ? 'bold' : '500' }};
                                       border-left:4px solid {{ request()->routeIs('nguoidung.ls-diemdanh') ? '#0d6efd' : 'transparent' }};
@@ -105,7 +134,8 @@
     <footer class="text-white text-center py-5" style="background: #1c1f3c;">
         <div class="d-flex flex-column align-items-center">
             <div class="d-flex align-items-center mb-2">
-                <div style="width: 40px; height: 40px; background-color: #2dc5c5; color: white; border-radius: 50%; font-weight: bold; display: flex; align-items: center; justify-content: center; margin-right: 10px;">
+                <div
+                    style="width: 40px; height: 40px; background-color: #2dc5c5; color: white; border-radius: 50%; font-weight: bold; display: flex; align-items: center; justify-content: center; margin-right: 10px;">
                     QR DD
                 </div>
                 <span class="text-white">Dự án lập trình web</span>
