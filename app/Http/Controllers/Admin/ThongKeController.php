@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\BieuMau;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class ThongKeController extends Controller
 {
@@ -12,7 +15,30 @@ class ThongKeController extends Controller
      */
     public function index()
     {
-        return view('admin.Thong_ke');
+        // Lấy lượt truy cập theo tháng
+        $thongKeLuotTruyCap = DB::table('luot_truy_cap')
+            ->selectRaw('MONTH(thoi_gian) as thang, COUNT(*) as tong')
+            ->groupByRaw('MONTH(thoi_gian)')
+            ->pluck('tong', 'thang')
+            ->toArray();
+
+        $duLieuLuotTruyCap = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $duLieuLuotTruyCap[] = $thongKeLuotTruyCap[$i] ?? 0;
+        }
+
+        // Thống kê biểu mẫu
+        $tatCaBieuMau = BieuMau::all();
+        $thongKeBieuMau = array_fill(1, 12, 0);
+        foreach ($tatCaBieuMau as $bieuMau) {
+            $thang = date('n', strtotime($bieuMau->ngay_tao));
+            $thongKeBieuMau[$thang]++;
+        }
+
+        return view('admin.Thong_ke', [
+            'visitCounts' => $duLieuLuotTruyCap,
+            'bieuMauData' => array_values($thongKeBieuMau),
+        ]);
     }
 
     /**
@@ -36,7 +62,7 @@ class ThongKeController extends Controller
      */
     public function show(string $id)
     {
-         //
+        //
     }
 
     /**
