@@ -80,7 +80,7 @@ class QLTaikhoanController extends Controller
         ]);
 
         $taiKhoan->loai_tai_khoan = $validated['loai_tai_khoan'];
-        $taiKhoan->trang_thai = $validated['trang_thai'] === 'Hoạt động' ? 1 : 0;
+        $taiKhoan->trang_thai = $validated['trang_thai'];
         $taiKhoan->save();
 
         return response()->json(['success' => true, 'message' => 'Cập nhật thành công']);
