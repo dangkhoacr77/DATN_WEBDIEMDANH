@@ -15,7 +15,8 @@ class QLBieumauController extends Controller
     {
         $bieuMaus = BieuMau::with('taiKhoan')
             ->orderByDesc('ngay_tao')
-            ->paginate(10); // mỗi trang 10 dòng
+            ->get(); // ✅ Lấy tất cả, không phân trang server-side nữa
+
         return view('admin.QL_bieumau', compact('bieuMaus'));
     }
 
