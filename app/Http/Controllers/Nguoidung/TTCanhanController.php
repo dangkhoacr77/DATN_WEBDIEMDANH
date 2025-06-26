@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Nguoidung;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\TaiKhoan;
 
 class TTCanhanController extends Controller
 {
@@ -12,7 +13,15 @@ class TTCanhanController extends Controller
      */
     public function index()
     {
-        return view('nguoidung.TT_canhan');
+        $nguoiDung = session('nguoi_dung');
+
+        if (!$nguoiDung) {
+            return redirect()->route('dang-nhap');
+        }
+
+        $taiKhoan = TaiKhoan::find($nguoiDung->ma_tai_khoan);
+
+        return view('nguoidung.TT_canhan', compact('taiKhoan'));
     }
 
     /**
@@ -52,7 +61,31 @@ class TTCanhanController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $taiKhoan = TaiKhoan::find($id);
+
+        if (!$taiKhoan) {
+            return redirect()->back()->withErrors('Không tìm thấy tài khoản');
+        }
+
+        $request->validate([
+            'ho_ten' => 'required|string|max:255',
+            'mail' => 'required|email|max:255',
+            'so_dien_thoai' => 'required|string|max:20',
+            'ngay_sinh' => 'required|date_format:d/m/Y',
+        ]);
+
+        // Chuyển ngày sinh từ d/m/Y -> Y-m-d
+        $ngaySinh = \Carbon\Carbon::createFromFormat('d/m/Y', $request->ngay_sinh)->format('Y-m-d');
+
+        $taiKhoan->update([
+            'ho_ten' => $request->ho_ten,
+            'mail' => $request->mail,
+            'so_dien_thoai' => $request->so_dien_thoai,
+            'ngay_sinh' => $ngaySinh,
+        ]);
+        session(['nguoi_dung' => $taiKhoan]);
+
+        return redirect()->route('nguoidung.tt-canhan')->with('success', 'Cập nhật thành công');
     }
 
     /**

@@ -92,12 +92,8 @@
                                     style="display: block; padding: 10px 15px; text-decoration: none; color: black;">Người
                                     dùng</a>
                             @endif
-                            <form method="POST" action="{{ route('dang-xuat') }}">
-                                @csrf
-                                <button type="submit" class="dropdown-item"
-                                    style="display: block; padding: 10px 15px; background: none; border: none; width: 100%; text-align: left; color: black;">Đăng
-                                    xuất</button>
-                            </form>
+                            <a href="{{ route('dang-xuat') }}"
+                                    style="display: block; padding: 10px 15px; text-decoration: none; color: black;">Đăng xuất</a>
                         @endif
                     </div>
                 </div>
