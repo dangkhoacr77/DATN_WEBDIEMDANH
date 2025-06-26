@@ -45,6 +45,7 @@ Route::get('/nguoidung/ql-danhsach', [App\Http\Controllers\Nguoidung\QLDanhsachC
 Route::get('/nguoidung/traloi-bieumau', [App\Http\Controllers\Nguoidung\TraloiBieumauController::class, 'index'])->name('nguoidung.traloi-bieumau');
 Route::get('/nguoidung/thong-tin-ca-nhan', [App\Http\Controllers\Nguoidung\TTCanhanController::class, 'index'])->name('nguoidung.tt-canhan');
 
+Route::put('/nguoidung/thong-tin-ca-nhan/{id}', [NguoidungTTCanhanController::class, 'update'])->middleware('web')->name('nguoidung.tt-canhan.update');
 // ======================= TRANG CHỦ =========================
 Route::get('/', [App\Http\Controllers\Trangchu\TrangchuController::class, 'index'])->name('trangchu');
 
@@ -62,12 +63,7 @@ Route::post('/dang-nhap', [DangNhapController::class, 'authenticate'])->name('xa
 Route::post('/dat-lai-mk', [DatlaiMkController::class, 'update'])->name('xacthuc.dat-lai-mk.post');
 Route::post('/quen-mk', [QuenMkController::class, 'sendResetCode'])->name('xacthuc.quen-mk.post');
 Route::post('/xac-thuc-ma', [QuenMkController::class, 'verifyCode'])->name('xacthuc.quen-mk.verify');
-Route::post('/dang-xuat', function () {
+Route::get('/dang-xuat', function () {
     session()->forget('nguoi_dung'); // Xóa phiên đăng nhập
     return redirect()->route('trangchu')->with('success', 'Đã đăng xuất!');
 })->name('dang-xuat');
-
-
-Route::get('/test-middleware', function () {
-    return "Bạn đã truy cập thành công";
-})->middleware('kiemtra.loainguoidung:admin');
