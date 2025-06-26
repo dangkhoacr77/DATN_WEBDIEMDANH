@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\BieuMau;
 
 class QLBieumauController extends Controller
 {
@@ -12,7 +13,10 @@ class QLBieumauController extends Controller
      */
     public function index()
     {
-        return view('admin.QL_bieumau');
+        $bieuMaus = BieuMau::with('taiKhoan')
+            ->orderByDesc('ngay_tao')
+            ->paginate(10); // mỗi trang 10 dòng
+        return view('admin.QL_bieumau', compact('bieuMaus'));
     }
 
     /**
@@ -36,7 +40,7 @@ class QLBieumauController extends Controller
      */
     public function show(string $id)
     {
-         //
+        //
     }
 
     /**

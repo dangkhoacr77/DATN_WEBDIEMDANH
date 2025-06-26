@@ -5,167 +5,123 @@
 @section('page-title', 'Quản lý biểu mẫu')
 
 @section('content')
-<div style="background: white; border-radius: 16px; padding: 40px; max-width: 100%; width: 95%; margin: auto;">
-    <div style="margin-bottom: 12px;">
-        <input id="searchInput"
-            style="width: 240px; border-radius: 12px; border: 1px solid #ddd; padding: 10px 14px;"
-            type="text" placeholder="🔍 Tìm kiếm...">
-    </div>
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
-        <label style="font-size: 14px; display:flex; align-items:center; gap:8px;">
-            Hiển thị:
-            <select id="rowsPerPageSelect" style="padding: 6px 12px; border-radius: 6px;">
-                <option value="7">7 dòng</option>
-                <option value="10" selected>10 dòng</option>
-                <option value="20">20 dòng</option>
-            </select>
-        </label>
-        <button id="deleteSelected"
-            style="padding: 8px 16px; background: #f87171; border: none; color: white; border-radius: 6px; cursor: pointer;"
-            disabled>🗑️ Xóa đã chọn</button>
-    </div>
+    <div style="background: white; border-radius: 16px; padding: 40px; max-width: 100%; width: 95%; margin: auto;">
+        <div style="margin-bottom: 12px;">
+            <input id="searchInput"
+                   style="width: 240px; border-radius: 12px; border: 1px solid #ddd; padding: 10px 14px;"
+                   type="text" placeholder="🔍 Tìm kiếm..." onkeyup="filterTable()">
+        </div>
 
-    <!-- Table -->
-    <div id="table-container" style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-            <thead>
-                <tr>
-                    <th style="padding: 12px; text-align: center;"><input type="checkbox" id="selectAll"></th>
+        <!-- Table -->
+        <div id="table-container" style="overflow-x: auto;">
+            <table id="form-table" style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                <thead>
+                <tr style="background: #f1f5f9;">
+                    <th style="text-align:left; padding: 12px;">#</th>
                     <th style="text-align:left; padding: 12px;">Tiêu đề</th>
                     <th style="text-align:left; padding: 12px;">Màu</th>
+                    <th style="text-align:left; padding: 12px;">Người tạo</th>
                     <th style="text-align:left; padding: 12px;">Ngày tạo</th>
                 </tr>
-            </thead>
-            <tbody id="table-body"></tbody>
-        </table>
+                </thead>
+                <tbody>
+                @foreach ($bieuMaus as $index => $bm)
+                    <tr>
+                        <td style="padding: 12px;">
+                            {{ $loop->iteration + ($bieuMaus->currentPage() - 1) * $bieuMaus->perPage() }}
+                        </td>
+                        <td style="padding: 12px;">{{ $bm->tieu_de }}</td>
+                        <td style="padding: 12px;">{{ $bm->mau }}</td>
+                        <td style="padding: 12px;">{{ $bm->taiKhoan->ho_ten ?? 'Không rõ' }}</td>
+                        <td style="padding: 12px;">
+                            {{ \Carbon\Carbon::parse($bm->ngay_tao)->format('d/m/Y') }}
+                        </td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Custom Pagination -->
+        @if ($bieuMaus->hasPages())
+            <div style="margin-top: 24px; display: flex; justify-content: center;">
+                <nav class="custom-pagination">
+                    {{-- Previous Page --}}
+                    @if ($bieuMaus->onFirstPage())
+                        <span class="page disabled">←</span>
+                    @else
+                        <a href="{{ $bieuMaus->previousPageUrl() }}" class="page">←</a>
+                    @endif
+
+                    {{-- Page Numbers --}}
+                    @foreach ($bieuMaus->getUrlRange(1, $bieuMaus->lastPage()) as $page => $url)
+                        @if ($page == $bieuMaus->currentPage())
+                            <span class="page active">{{ $page }}</span>
+                        @else
+                            <a href="{{ $url }}" class="page">{{ $page }}</a>
+                        @endif
+                    @endforeach
+
+                    {{-- Next Page --}}
+                    @if ($bieuMaus->hasMorePages())
+                        <a href="{{ $bieuMaus->nextPageUrl() }}" class="page">→</a>
+                    @else
+                        <span class="page disabled">→</span>
+                    @endif
+                </nav>
+            </div>
+        @endif
     </div>
-
-    <!-- Pagination -->
-    <div id="pagination" style="display:flex; justify-content:center; margin-top: 24px; flex-wrap: wrap; gap: 8px;"></div>
-</div>
-
-<!-- Success Message -->
-<div id="success-message"
-    style="display: none; position: fixed; top: 20px; right: 20px; background: #4ade80; color: white; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-weight: 500; z-index: 999;">
-    ✅ Xóa thành công!
-</div>
 @endsection
 
 @push('scripts')
+<style>
+    .custom-pagination {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .custom-pagination .page {
+        padding: 8px 14px;
+        border-radius: 12px;
+        background: #f1f5f9;
+        color: #1e293b;
+        font-weight: 500;
+        font-size: 14px;
+        text-decoration: none;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+        transition: all 0.2s ease-in-out;
+    }
+
+    .custom-pagination .page:hover:not(.active):not(.disabled) {
+        background: #3b82f6;
+        color: white;
+    }
+
+    .custom-pagination .page.active {
+        background: #3b82f6;
+        color: white;
+        font-weight: 600;
+    }
+
+    .custom-pagination .page.disabled {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+</style>
+
 <script>
-    let rowsPerPage = 10;
-    let currentPage = 1;
-    const forms = Array.from({ length: 23 }, (_, i) => ({
-        title: `Biểu mẫu số ${i+1}`,
-        color: ["Xanh", "Đỏ", "Tím"][i % 3],
-        date: "19/06/2025"
-    }));
+    function filterTable() {
+        const keyword = document.getElementById("searchInput").value.toLowerCase().trim();
+        const rows = document.querySelectorAll("#form-table tbody tr");
 
-    function showSuccessMessage() {
-        const msg = document.getElementById("success-message");
-        msg.style.display = "block";
-        setTimeout(() => {
-            msg.style.display = "none";
-        }, 2000);
-    }
-
-    function confirmRemoveForm(index) {
-        if (confirm("Bạn có chắc chắn muốn xóa biểu mẫu này?")) {
-            forms.splice(index, 1);
-            renderTable();
-            renderPagination();
-            showSuccessMessage();
-        }
-    }
-
-    function updateDeleteButton() {
-        const anyChecked = Array.from(document.querySelectorAll(".row-checkbox")).some(cb => cb.checked);
-        document.getElementById("deleteSelected").disabled = !anyChecked;
-    }
-
-    function updateSelectAllState() {
-        const boxes = Array.from(document.querySelectorAll(".row-checkbox"));
-        document.getElementById("selectAll").checked = boxes.length && boxes.every(cb => cb.checked);
-    }
-
-    function deleteSelected() {
-        if (confirm("Bạn có chắc chắn muốn xóa các biểu mẫu đã chọn?")) {
-            const indices = Array.from(document.querySelectorAll(".row-checkbox"))
-                .filter(cb => cb.checked)
-                .map(cb => parseInt(cb.dataset.index))
-                .sort((a, b) => b - a);
-
-            indices.forEach(idx => forms.splice(idx, 1));
-            currentPage = 1;
-            renderTable();
-            renderPagination();
-            updateDeleteButton();
-            showSuccessMessage();
-        }
-    }
-
-    function renderTable() {
-        const tbody = document.getElementById("table-body");
-        tbody.innerHTML = "";
-        const start = (currentPage - 1) * rowsPerPage;
-        const dataSlice = forms.slice(start, start + rowsPerPage);
-
-        dataSlice.forEach((f, idx) => {
-            const globalIdx = start + idx;
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                <td style="padding: 12px; text-align: center;"><input type="checkbox" class="row-checkbox" data-index="${globalIdx}"></td>
-                <td style="padding: 12px;">${f.title}</td>
-                <td style="padding: 12px;">${f.color}</td>
-                <td style="padding: 12px;">${f.date}</td>
-            `;
-            row.querySelector(".row-checkbox").onchange = () => {
-                updateSelectAllState();
-                updateDeleteButton();
-            };
-            tbody.appendChild(row);
+        rows.forEach(row => {
+            const cells = Array.from(row.querySelectorAll("td"));
+            const matches = cells.some(cell => cell.textContent.toLowerCase().includes(keyword));
+            row.style.display = matches ? "" : "none";
         });
-        updateSelectAllState();
     }
-
-    function renderPagination() {
-        const pageCount = Math.ceil(forms.length / rowsPerPage);
-        const container = document.getElementById("pagination");
-        container.innerHTML = "";
-
-        for (let i = 1; i <= pageCount; i++) {
-            const btn = document.createElement("button");
-            btn.textContent = i;
-            btn.style.padding = "6px 12px";
-            btn.style.border = "none";
-            btn.style.borderRadius = "6px";
-            btn.style.cursor = "pointer";
-            btn.style.background = i === currentPage ? "#3b82f6" : "#e5e7eb";
-            btn.style.color = i === currentPage ? "white" : "black";
-            btn.onclick = () => {
-                currentPage = i;
-                renderTable();
-                renderPagination();
-            };
-            container.appendChild(btn);
-        }
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-        document.getElementById("rowsPerPageSelect").onchange = e => {
-            rowsPerPage = parseInt(e.target.value);
-            currentPage = 1;
-            renderTable();
-            renderPagination();
-        };
-        document.getElementById("selectAll").onchange = e => {
-            const checked = e.target.checked;
-            document.querySelectorAll(".row-checkbox").forEach(cb => (cb.checked = checked));
-            updateDeleteButton();
-        };
-        document.getElementById("deleteSelected").onclick = deleteSelected;
-        renderTable();
-        renderPagination();
-    });
 </script>
 @endpush
