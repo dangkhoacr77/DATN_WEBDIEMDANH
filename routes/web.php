@@ -30,7 +30,9 @@ Route::get('/ql-bieumau', [QLBieumauController::class, 'index'])->name('admin.ql
 Route::get('/ql-taikhoan', [QLTaikhoanController::class, 'index'])->name('admin.ql-taikhoan');
 Route::get('/thong-ke', [ThongKeController::class, 'index'])->name('admin.thong-ke');
 Route::get('/thong-tin-ca-nhan', [TTCanhanController::class, 'index'])->name('admin.tt-canhan');
+
 Route::put('/admin/ql-taikhoan/{id}', [QLTaikhoanController::class, 'update'])->name('admin.ql-taikhoan.update');
+Route::put('/admin/thong-tin-ca-nhan/{id}', [TTCanhanController::class, 'update'])->name('thong-tin-ca-nhan.update');
 // ======================= BIEUMAU =========================
 Route::get('/bieumau/cai-dat', [App\Http\Controllers\Bieumau\CaiDatController::class, 'index'])->name('bieumau.cai-dat');
 Route::get('/bieumau/ds-cautraloi', [App\Http\Controllers\Bieumau\DsCautraloiController::class, 'index'])->name('bieumau.ds-cautraloi');
