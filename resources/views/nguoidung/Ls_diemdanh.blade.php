@@ -1,123 +1,140 @@
-@extends('layout/user')
+@extends('layout.user')
 
 @section('title', 'Lịch sử điểm danh')
 @section('page-title', 'Lịch sử điểm danh')
 
 @section('content')
-    <div class="table-responsive">
-        <table class="table table-bordered align-middle text-center">
-            <thead class="table-light">
+    <div style="background: white; border-radius: 16px; padding: 40px; max-width: 100%; width: 95%; margin: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <input id="searchInput"
+                   style="width: 240px; border-radius: 12px; border: 1px solid #ddd; padding: 10px 14px;"
+                   type="text" placeholder="🔍 Tìm kiếm">
+            <label style="font-size: 14px;">
+                Hiển thị:
+                <select id="rowsPerPageSelect" style="padding: 6px 12px; border-radius: 6px;">
+                    <option value="7">7 dòng</option>
+                    <option value="15" selected>15 dòng</option>
+                    <option value="20">20 dòng</option>
+                </select>
+            </label>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                <thead>
                 <tr>
-                    <th>Tiêu đề điểm danh</th>
-                    <th>Người tạo</th>
-                    <th>Thời gian</th>
-                    <th>Ngày</th>
+                    <th style="text-align:left; padding: 12px;">Tiêu đề</th>
+                    <th style="text-align:left; padding: 12px;">Người tạo</th>
+                    <th style="text-align:left; padding: 12px;">Thời gian</th>
+                    <th style="text-align:left; padding: 12px;">Ngày</th>
+                    <th style="text-align:left; padding: 12px;">Thiết bị</th>
+                    <th style="text-align:left; padding: 12px;">Định vị</th>
                 </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Điểm danh lớp sáng</td>
-                    <td>Nguyễn Văn A</td>
-                    <td>07:30</td>
-                    <td>01/06/2025</td>
-                </tr>
-                <tr>
-                    <td>Buổi học chiều</td>
-                    <td>Trần Thị B</td>
-                    <td>13:00</td>
-                    <td>02/06/2025</td>
-                </tr>
-                <tr>
-                    <td>Kiểm tra cuối kỳ</td>
-                    <td>Lê Văn C</td>
-                    <td>09:00</td>
-                    <td>03/06/2025</td>
-                </tr>
-                <tr>
-                    <td>Buổi học đặc biệt</td>
-                    <td>Phạm Văn D</td>
-                    <td>17:00</td>
-                    <td>04/06/2025</td>
-                </tr>
-                <tr>
-                    <td>Học nhóm</td>
-                    <td>Nguyễn Thị E</td>
-                    <td>20:00</td>
-                    <td>05/06/2025</td>
-                </tr>
-                <tr>
-                    <td>Buổi thuyết trình</td>
-                    <td>Trương Văn F</td>
-                    <td>10:30</td>
-                    <td>06/06/2025</td>
-                </tr>
-                <tr>
-                    <td>Buổi học nâng cao</td>
-                    <td>Ngô Thị G</td>
-                    <td>14:00</td>
-                    <td>07/06/2025</td>
-                </tr>
-                <tr>
-                    <td>Thực hành nhóm</td>
-                    <td>Phan Văn H</td>
-                    <td>16:00</td>
-                    <td>08/06/2025</td>
-                </tr>
-            </tbody>
-        </table>
+                </thead>
+                <tbody id="dd-body"></tbody>
+            </table>
+        </div>
+
+        <div id="pagination" style="display: flex; justify-content: center; gap: 8px; margin-top: 24px; flex-wrap: wrap;"></div>
     </div>
-    <nav aria-label="Phân trang">
-        <ul class="pagination justify-content-end mt-3" id="pagination"></ul>
-    </nav>
 @endsection
 
 @push('scripts')
-    <script>
-        function toggleMenu() {
-            const menu = document.getElementById("avatarDropdown");
-            menu.style.display = menu.style.display === "block" ? "none" : "block";
+<script>
+    let rawData = @json($lichSu);
+    let data = rawData.map(dd => ({
+        tieu_de: dd.bieu_mau?.tieu_de ?? '---',
+        nguoi_tao: dd.bieu_mau?.tai_khoan?.ho_ten ?? '---',
+        thoi_gian: dd.thoi_gian_diem_danh ? new Date(dd.thoi_gian_diem_danh).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '',
+        ngay: dd.thoi_gian_diem_danh ? new Date(dd.thoi_gian_diem_danh).toLocaleDateString('vi-VN') : '',
+        thiet_bi: dd.thiet_bi_diem_danh ?? '',
+        dinh_vi: dd.dinh_vi_thiet_bi ?? ''
+    }));
+
+    let rowsPerPage = 15;
+    let currentPage = 1;
+    let searchValue = '';
+    let filteredData = [...data];
+
+    function renderTable() {
+        const tbody = document.getElementById("dd-body");
+        tbody.innerHTML = "";
+        const start = (currentPage - 1) * rowsPerPage;
+        const rows = filteredData.slice(start, start + rowsPerPage);
+
+        if (rows.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:12px;">Không tìm thấy dữ liệu</td></tr>`;
+            return;
         }
 
-        window.onclick = function(event) {
-            if (!event.target.closest('.avatar-menu')) {
-                const menu = document.getElementById("avatarDropdown");
-                if (menu) menu.style.display = "none";
-            }
-        }
+        rows.forEach(row => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td style='padding:12px;'>${row.tieu_de}</td>
+                <td style='padding:12px;'>${row.nguoi_tao}</td>
+                <td style='padding:12px;'>${row.thoi_gian}</td>
+                <td style='padding:12px;'>${row.ngay}</td>
+                <td style='padding:12px;'>${row.thiet_bi}</td>
+                <td style='padding:12px;'>${row.dinh_vi}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
 
-        // Phân trang
-        const rowsPerPage = 7;
-        const table = document.getElementById("attendanceTable");
-        const tbody = table.querySelector("tbody");
+    function renderPagination() {
         const pagination = document.getElementById("pagination");
+        pagination.innerHTML = "";
+        const pageCount = Math.ceil(filteredData.length / rowsPerPage);
 
-        function displayPage(page) {
-            const rows = tbody.querySelectorAll("tr");
-            const totalPages = Math.ceil(rows.length / rowsPerPage);
-            const start = (page - 1) * rowsPerPage;
-            const end = start + rowsPerPage;
+        for (let i = 1; i <= pageCount; i++) {
+            const btn = document.createElement("button");
+            btn.textContent = i;
+            btn.style.border = "none";
+            btn.style.background = i === currentPage ? "#4f46e5" : "#f3f3f3";
+            btn.style.color = i === currentPage ? "white" : "black";
+            btn.style.padding = "6px 12px";
+            btn.style.borderRadius = "6px";
+            btn.style.cursor = "pointer";
+            btn.style.fontSize = "14px";
 
-            rows.forEach((row, index) => {
-                row.style.display = index >= start && index < end ? "" : "none";
+            btn.addEventListener("click", () => {
+                currentPage = i;
+                renderTable();
+                renderPagination();
             });
 
-            pagination.innerHTML = "";
-            for (let i = 1; i <= totalPages; i++) {
-                const li = document.createElement("li");
-                li.className = `page-item ${i === page ? "active" : ""}`;
-                const a = document.createElement("a");
-                a.className = "page-link";
-                a.href = "#";
-                a.textContent = i;
-                a.onclick = function(e) {
-                    e.preventDefault();
-                    displayPage(i);
-                };
-                li.appendChild(a);
-                pagination.appendChild(li);
-            }
+            pagination.appendChild(btn);
         }
+    }
 
-        displayPage(1);
-    </script>
+    function applySearch(keyword) {
+        searchValue = keyword.toLowerCase();
+        filteredData = data.filter(row =>
+            row.tieu_de.toLowerCase().includes(searchValue) ||
+            row.nguoi_tao.toLowerCase().includes(searchValue) ||
+            row.thiet_bi.toLowerCase().includes(searchValue) ||
+            row.dinh_vi.toLowerCase().includes(searchValue) ||
+            row.ngay.includes(searchValue)
+        );
+        currentPage = 1;
+        renderTable();
+        renderPagination();
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("rowsPerPageSelect").addEventListener("change", (e) => {
+            rowsPerPage = parseInt(e.target.value);
+            currentPage = 1;
+            renderTable();
+            renderPagination();
+        });
+
+        document.getElementById("searchInput").addEventListener("input", (e) => {
+            applySearch(e.target.value);
+        });
+
+        renderTable();
+        renderPagination();
+    });
+</script>
 @endpush
