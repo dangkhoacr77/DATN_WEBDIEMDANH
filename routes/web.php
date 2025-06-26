@@ -26,11 +26,11 @@ use App\Http\Controllers\Xacthuc\QuenMkController;
 
 
 // ======================= ADMIN =========================
-Route::get('/admin/ql-bieumau', [App\Http\Controllers\Admin\QLBieumauController::class, 'index'])->name('admin.ql-bieumau');
-Route::get('/admin/ql-taikhoan', [App\Http\Controllers\Admin\QLTaikhoanController::class, 'index'])->name('admin.ql-taikhoan');
-Route::get('/admin/thong-ke', [App\Http\Controllers\Admin\ThongKeController::class, 'index'])->name('admin.thong-ke');
-Route::get('/admin/thong-tin-ca-nhan', [App\Http\Controllers\Admin\TTCanhanController::class, 'index'])->name('admin.tt-canhan');
-
+Route::get('/ql-bieumau', [QLBieumauController::class, 'index'])->name('admin.ql-bieumau');
+Route::get('/ql-taikhoan', [QLTaikhoanController::class, 'index'])->name('admin.ql-taikhoan');
+Route::get('/thong-ke', [ThongKeController::class, 'index'])->name('admin.thong-ke');
+Route::get('/thong-tin-ca-nhan', [TTCanhanController::class, 'index'])->name('admin.tt-canhan');
+Route::put('/admin/ql-taikhoan/{id}', [QLTaikhoanController::class, 'update'])->name('admin.ql-taikhoan.update');
 // ======================= BIEUMAU =========================
 Route::get('/bieumau/cai-dat', [App\Http\Controllers\Bieumau\CaiDatController::class, 'index'])->name('bieumau.cai-dat');
 Route::get('/bieumau/ds-cautraloi', [App\Http\Controllers\Bieumau\DsCautraloiController::class, 'index'])->name('bieumau.ds-cautraloi');
