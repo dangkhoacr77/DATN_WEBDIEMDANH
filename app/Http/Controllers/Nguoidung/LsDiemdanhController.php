@@ -4,17 +4,28 @@ namespace App\Http\Controllers\Nguoidung;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\DiemDanh;
 
 class LsDiemdanhController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        return view('nguoidung.Ls_diemdanh');
+    public function index(Request $request)
+{
+    $nguoiDung = session('nguoi_dung');
+
+    if (!$nguoiDung) {
+        return redirect()->route('xacthuc.dang-nhap');
     }
 
+    $lichSu = DiemDanh::with(['bieuMau.taiKhoan'])
+        ->where('tai_khoan_ma', $nguoiDung['ma_tai_khoan'])
+        ->orderByDesc('thoi_gian_diem_danh')
+        ->get(); // ❌ paginate ➜ ✅ get toàn bộ để lọc client-side
+
+    return view('nguoidung.Ls_diemdanh', compact('lichSu'));
+}
     /**
      * Show the form for creating a new resource.
      */
