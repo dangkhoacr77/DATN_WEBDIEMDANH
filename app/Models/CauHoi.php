@@ -25,11 +25,6 @@ class CauHoi extends Model
 
     public $timestamps = false;
 
-    protected $casts = [
-        'noi_dung' => 'array', // Tự động chuyển JSON -> array và ngược lại
-        'cau_hoi_bat_buoc' => 'boolean'
-    ];
-
     public function bieuMau()
     {
         return $this->belongsTo(BieuMau::class, 'bieu_mau_ma');
