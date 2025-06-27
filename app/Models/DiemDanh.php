@@ -13,8 +13,13 @@ class DiemDanh extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'ma_diem_danh', 'thoi_gian_diem_danh', 'thiet_bi_diem_danh', 'dinh_vi_thiet_bi',
-        'bieu_mau_ma', 'tai_khoan_ma', 'danh_sach_ma'
+        'ma_diem_danh',
+        'thoi_gian_diem_danh',
+        'thiet_bi_diem_danh',
+        'dinh_vi_thiet_bi',
+        'bieu_mau_ma',
+        'tai_khoan_ma',
+        'danh_sach_ma'
     ];
 
     public $timestamps = false;
@@ -31,7 +36,8 @@ class DiemDanh extends Model
 
     public function danhSach()
     {
-        return $this->belongsTo(DanhSachDiemDanh::class, 'danh_sach_ma');
+        return $this->hasOne(DanhSachDiemDanh::class, 'ma_danh_sach', 'danh_sach_ma')
+            ->whereColumn('bieu_mau_ma', 'bieu_mau_ma');
     }
 
     public function cauTraLoi()
@@ -39,4 +45,3 @@ class DiemDanh extends Model
         return $this->hasMany(CauTraLoi::class, 'diem_danh_ma');
     }
 }
-

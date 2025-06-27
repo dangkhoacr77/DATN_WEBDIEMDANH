@@ -48,6 +48,8 @@ Route::delete('/nguoidung/ql-danhsach/delete', [QLDanhsachController::class, 'de
 Route::get('/nguoidung/ql-danhsach/export/{id}', [QLDanhsachController::class, 'export'])->name('nguoidung.ql-danhsach.export');
 
 Route::get('/nguoidung/traloi-bieumau', [App\Http\Controllers\Nguoidung\TraloiBieumauController::class, 'index'])->name('nguoidung.traloi-bieumau');
+Route::get('/traloi-bieumau/{id}', [TraloiBieumauController::class, 'show'])->name('traloi-bieumau.show');
+Route::post('/traloi-bieumau', [TraloiBieumauController::class, 'store'])->name('traloi-bieumau.store');
 
 Route::get('/nguoidung/thong-tin-ca-nhan', [App\Http\Controllers\Nguoidung\TTCanhanController::class, 'index'])->name('nguoidung.tt-canhan');
 Route::put('/nguoidung/thong-tin-ca-nhan/{id}', [NguoidungTTCanhanController::class, 'update'])->middleware('web')->name('nguoidung.tt-canhan.update');
