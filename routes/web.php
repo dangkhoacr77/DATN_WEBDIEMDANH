@@ -23,7 +23,6 @@ use App\Http\Controllers\Xacthuc\DangKyController;
 use App\Http\Controllers\Xacthuc\DangNhapController;
 use App\Http\Controllers\Xacthuc\DatlaiMkController;
 use App\Http\Controllers\Xacthuc\QuenMkController;
-use App\Http\Controllers\Api\BieuMauController;
 
 
 
@@ -69,10 +68,3 @@ Route::post('/dang-xuat', function () {
     session()->forget('nguoi_dung'); // Xóa phiên đăng nhập
     return redirect()->route('trangchu')->with('success', 'Đã đăng xuất!');
 })->name('dang-xuat');
-
-
-Route::get('/test-middleware', function () {
-    return "Bạn đã truy cập thành công";
-})->middleware('kiemtra.loainguoidung:admin');
-
-Route::post('/forms', [BieuMauController::class, 'store']);
