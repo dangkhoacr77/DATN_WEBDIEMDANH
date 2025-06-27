@@ -43,5 +43,11 @@ class BieuMau extends Model
     {
         return $this->hasMany(CauHoi::class, 'bieu_mau_ma');
     }
+    public function questions()
+{
+    return $this->hasMany(CauHoi::class);
+}
+    
+    
 }
 
