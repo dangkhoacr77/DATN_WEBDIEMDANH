@@ -41,6 +41,7 @@ Route::get('/bieumau/tao-form', [TaoFormController::class, 'index'])->name('bieu
 // ======================= NGUOIDUNG =========================
 Route::get('/nguoidung/ls-diemdanh', [App\Http\Controllers\Nguoidung\LsDiemdanhController::class, 'index'])->name('nguoidung.ls-diemdanh');
 Route::get('/nguoidung/ql-bieumau', [App\Http\Controllers\Nguoidung\QLBieumauController::class, 'index'])->name('nguoidung.ql-bieumau');
+Route::delete('/nguoidung/bieumau/xoa-da-chon', [App\Http\Controllers\Nguoidung\QLBieumauController::class, 'xoaDaChon'])->name('nguoidung.bieumau.xoaDaChon');
 
 Route::get('/nguoidung/ql-danhsach', [App\Http\Controllers\Nguoidung\QLDanhsachController::class, 'index'])->name('nguoidung.ql-danhsach');
 Route::delete('/nguoidung/ql-danhsach/delete', [QLDanhsachController::class, 'destroy'])->name('nguoidung.ql-danhsach.destroy');

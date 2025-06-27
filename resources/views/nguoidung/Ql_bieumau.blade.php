@@ -4,6 +4,8 @@
 @section('page-title', 'Danh sách biểu mẫu')
 
 @section('content')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    
     <div class="d-flex align-items-center justify-content-between mb-3">
         <input type="text" class="form-control" id="searchInput" onkeyup="searchForm()"
             placeholder="🔍 Tìm kiếm biểu mẫu..."
@@ -18,25 +20,18 @@
                     <th><input type="checkbox" id="selectAll" onclick="toggleAll(this)"></th>
                     <th>Tiêu đề</th>
                     <th>Màu</th>
-                    <th>Hình ảnh</th>
                     <th>Ngày tạo</th>
                 </tr>
             </thead>
             <tbody>
-                @for ($i = 1; $i <= 8; $i++)
+                @foreach ($bieumau as $bm)
                     <tr>
-                        <td><input type="checkbox" class="row-checkbox"></td>
-                        <td>Biểu mẫu {{ $i }}</td>
-                        <td>
-                            @php
-                                $colors = ['Xanh', 'Đỏ', 'Vàng', 'Tím', 'Xanh lá', 'Cam', 'Hồng', 'Xám'];
-                            @endphp
-                            {{ $colors[$i - 1] }}
-                        </td>
-                        <td>Hình ảnh</td>
-                        <td>{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}/01/2025</td>
+                        <td><input type="checkbox" class="row-checkbox" value="{{ $bm->ma_bieu_mau }}"></td>
+                        <td>{{ $bm->tieu_de }}</td>
+                        <td>{{ $bm->mau }}</td>
+                        <td>{{ \Carbon\Carbon::parse($bm->ngay_tao)->format('d/m/Y') }}</td>
                     </tr>
-                @endfor
+                @endforeach
             </tbody>
         </table>
     </div>
@@ -48,36 +43,38 @@
 
 @push('scripts')
 <script>
-    // Hiện/ẩn dropdown avatar
-    function toggleMenu() {
-        const menu = document.getElementById("avatarDropdown");
-        menu.style.display = menu.style.display === "block" ? "none" : "block";
-    }
-    window.onclick = event => {
-        if (!event.target.closest('.avatar-menu')) {
-            const menu = document.getElementById("avatarDropdown");
-            if (menu) menu.style.display = "none";
-        }
-    };
-
-    // Chọn/bỏ chọn tất cả
     function toggleAll(master) {
         document.querySelectorAll(".row-checkbox").forEach(cb => cb.checked = master.checked);
     }
 
-    // Xóa các dòng đã chọn
     function deleteSelectedRows() {
         const selected = document.querySelectorAll(".row-checkbox:checked");
         if (!selected.length) {
             return alert("Bạn chưa chọn dòng nào để xóa.");
         }
-        if (confirm("Bạn có chắc chắn muốn xóa các dòng đã chọn không?")) {
-            selected.forEach(cb => cb.closest("tr").remove());
-            displayPage(1);
+
+        if (confirm("Bạn có chắc chắn muốn xóa các biểu mẫu đã chọn không?")) {
+            const ids = Array.from(selected).map(cb => cb.value);
+
+            fetch("{{ route('nguoidung.bieumau.xoaDaChon') }}", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": document.querySelector('meta[name=\"csrf-token\"]').getAttribute("content")
+                },
+                body: JSON.stringify({ ids })
+            })
+            .then(response => response.json())
+            .then(data => {
+                location.reload();
+            })
+            .catch(error => {
+                console.error("Lỗi khi xóa:", error);
+                alert("Đã xảy ra lỗi!");
+            });
         }
     }
 
-    // Tìm kiếm
     function searchForm() {
         const q = document.getElementById("searchInput").value.toLowerCase();
         document.querySelectorAll("#formTable tbody tr").forEach(row => {
@@ -85,7 +82,6 @@
         });
     }
 
-    // Phân trang
     const rowsPerPage = 7;
     const tbody = document.querySelector("#formTable tbody");
     const pagination = document.getElementById("pagination");
@@ -114,6 +110,8 @@
         }
     }
 
-    displayPage(1);
+    document.addEventListener("DOMContentLoaded", function () {
+        displayPage(1);
+    });
 </script>
 @endpush
