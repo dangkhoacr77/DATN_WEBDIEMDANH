@@ -41,10 +41,14 @@ Route::get('/bieumau/tao-form', [TaoFormController::class, 'index'])->name('bieu
 // ======================= NGUOIDUNG =========================
 Route::get('/nguoidung/ls-diemdanh', [App\Http\Controllers\Nguoidung\LsDiemdanhController::class, 'index'])->name('nguoidung.ls-diemdanh');
 Route::get('/nguoidung/ql-bieumau', [App\Http\Controllers\Nguoidung\QLBieumauController::class, 'index'])->name('nguoidung.ql-bieumau');
-Route::get('/nguoidung/ql-danhsach', [App\Http\Controllers\Nguoidung\QLDanhsachController::class, 'index'])->name('nguoidung.ql-danhsach');
-Route::get('/nguoidung/traloi-bieumau', [App\Http\Controllers\Nguoidung\TraloiBieumauController::class, 'index'])->name('nguoidung.traloi-bieumau');
-Route::get('/nguoidung/thong-tin-ca-nhan', [App\Http\Controllers\Nguoidung\TTCanhanController::class, 'index'])->name('nguoidung.tt-canhan');
 
+Route::get('/nguoidung/ql-danhsach', [App\Http\Controllers\Nguoidung\QLDanhsachController::class, 'index'])->name('nguoidung.ql-danhsach');
+Route::delete('/nguoidung/ql-danhsach/delete', [QLDanhsachController::class, 'destroy'])->name('nguoidung.ql-danhsach.destroy');
+Route::get('/nguoidung/ql-danhsach/export/{id}', [QLDanhsachController::class, 'export'])->name('nguoidung.ql-danhsach.export');
+
+Route::get('/nguoidung/traloi-bieumau', [App\Http\Controllers\Nguoidung\TraloiBieumauController::class, 'index'])->name('nguoidung.traloi-bieumau');
+
+Route::get('/nguoidung/thong-tin-ca-nhan', [App\Http\Controllers\Nguoidung\TTCanhanController::class, 'index'])->name('nguoidung.tt-canhan');
 Route::put('/nguoidung/thong-tin-ca-nhan/{id}', [NguoidungTTCanhanController::class, 'update'])->middleware('web')->name('nguoidung.tt-canhan.update');
 // ======================= TRANG CHỦ =========================
 Route::get('/', [App\Http\Controllers\Trangchu\TrangchuController::class, 'index'])->name('trangchu');
@@ -67,3 +71,6 @@ Route::get('/dang-xuat', function () {
     session()->forget('nguoi_dung'); // Xóa phiên đăng nhập
     return redirect()->route('trangchu')->with('success', 'Đã đăng xuất!');
 })->name('dang-xuat');
+Route::get('/test-middleware', function () {
+    return "Bạn đã truy cập thành công";
+})->middleware('kiemtra.loainguoidung:admin');
