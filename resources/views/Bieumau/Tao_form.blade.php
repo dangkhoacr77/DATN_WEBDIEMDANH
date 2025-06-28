@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Tạo Biểu Mẫu - Google Forms Clone</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -26,7 +27,6 @@
             background-color: #e0e7ff;
         }
 
-        /* QR Popup styles */
         .qr-popup {
             position: fixed;
             top: 0;
@@ -60,457 +60,391 @@
     </style>
 </head>
 
-<body class="bg-gray-50 min-h-screen">
-    <div class="flex flex-col min-h-screen">
-        <!-- Header -->
-        <header class="bg-white shadow-sm py-4 px-6 flex items-center justify-between border-b">
-            <div class="flex items-center space-x-4">
+<body id="main-body" class="bg-gray-50 min-h-screen">
+    <div id="theme-panel"
+        class="fixed top-0 right-0 w-80 max-w-full h-full bg-white shadow-lg border-l transform translate-x-full transition-transform duration-300 z-50 overflow-y-auto">
+        <div class="p-4 border-b flex justify-between items-center">
+            <h2 class="text-lg font-medium">Giao diện</h2>
+            <button id="close-theme-btn" class="text-gray-500 hover:text-gray-700">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+        <div class="p-6 space-y-6">
+            <!-- Kiểu văn bản -->
+            <!-- Màu -->
+            <div>
+                <h3 class="font-medium mb-4">Màu</h3>
+                <div class="grid grid-cols-6 gap-3">
+                    <div class="w-6 h-6 bg-red-500 rounded-full cursor-pointer" data-color="#ef4444"></div>
+                    <div class="w-6 h-6 bg-purple-600 rounded-full ring-2 ring-indigo-500" data-color="#7c3aed"></div>
+                    <div class="w-6 h-6 bg-blue-700 rounded-full cursor-pointer" data-color="#1d4ed8"></div>
+                    <div class="w-6 h-6 bg-blue-500 rounded-full cursor-pointer" data-color="#3b82f6"></div>
+                    <div class="w-6 h-6 bg-sky-400 rounded-full cursor-pointer" data-color="#38bdf8"></div>
+                    <div class="w-6 h-6 bg-cyan-400 rounded-full cursor-pointer" data-color="#22d3ee"></div>
+                    <div class="w-6 h-6 bg-orange-500 rounded-full cursor-pointer" data-color="#f97316"></div>
+                    <div class="w-6 h-6 bg-amber-400 rounded-full cursor-pointer" data-color="#fbbf24"></div>
+                    <div class="w-6 h-6 bg-teal-500 rounded-full cursor-pointer" data-color="#14b8a6"></div>
+                    <div class="w-6 h-6 bg-green-500 rounded-full cursor-pointer" data-color="#22c55e"></div>
+                    <div class="w-6 h-6 bg-gray-600 rounded-full cursor-pointer" data-color="#4b5563"></div>
+                    <div class="w-6 h-6 bg-gray-400 rounded-full cursor-pointer" data-color="#9ca3af"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    <!-- Nút Reset -->
+
+
+    <body id="main-body" class="bg-gray-50 min-h-screen">
+        <div class="flex flex-col min-h-screen">
+            <!-- Header -->
+            <header class="bg-white shadow-sm py-4 px-6 flex items-center justify-between border-b">
                 <h1 class="text-xl font-medium text-gray-800">Tạo Biểu Mẫu</h1>
-            </div>
-            <div class="flex items-center space-x-4">
-                <button class="text-gray-600 hover:text-indigo-600" title="Thay đổi giao diện">
-                    <span class="material-icons">palette</span>
-                </button>
-                <button class="text-gray-600 hover:text-indigo-600 mr-2" title="Mã QR" id="show-qr-btn">
-                    <span class="material-icons">qr_code</span>
-                </button>
-                <button class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 flex items-center">
-                    <span class="material-icons mr-2">publish</span>
-                    Xuất bản
-                </button>
-                <button class="text-gray-600 hover:text-indigo-600" title="Tài khoản">
-                    <span class="material-icons">account_circle</span>
-                </button>
-            </div>
-        </header>
+                <div class="flex items-center space-x-4">
+                    <button class="text-gray-600 hover:text-indigo-600" title="Cài đặt">
+                        <span class="material-icons">settings</span>
+                    </button>
+                    <button class="text-gray-600 hover:text-indigo-600" title="Thay đổi giao diện">
+                        <span class="material-icons">palette</span>
+                    </button>
+                    <button class="text-gray-600 hover:text-indigo-600" title="Mã QR" id="show-qr-btn">
+                        <span class="material-icons">qr_code</span>
+                    </button>
+                    <button id="publish-btn"
+                        class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 flex items-center">
+                        <span class="material-icons mr-2">publish</span>Xuất bản
+                    </button>
+                </div>
+            </header>
+            <div id="settings-panel"
+                class="fixed top-0 right-0 w-80 max-w-full h-full bg-white shadow-lg border-l transform translate-x-full transition-transform duration-300 z-50 overflow-y-auto">
+                <div class="p-4 border-b flex justify-between items-center">
+                    <h2 class="text-lg font-medium">Cài đặt biểu mẫu</h2>
+                    <button id="close-settings-btn" class="text-gray-500 hover:text-gray-700">
+                        <span class="material-icons">close</span>
+                    </button>
+                </div>
 
-        <div class="flex flex-1 overflow-hidden">
-            <!-- Sidebar -->
-            <div class="w-16 bg-white shadow-md flex flex-col items-center py-4 space-y-6">
-                <button
-                    onclick="window.location.href='{{ route('bieumau.tao') }}'"class="text-indigo-600 bg-indigo-50 p-2 rounded-full"
-                    title="Biểu mẫu">
-                    <span class="material-icons">view_headline</span>
-                </button>
-                <button onclick="window.location.href='{{ route('bieumau.ds-cautraloi') }}'"
-                    class="text-gray-700 hover:text-indigo-600 p-2 rounded-full hover:bg-indigo-50" title="Câu Trả lời">
-                    <span class="material-icons">description</span>
-                </button>
-                <button onclick="window.location.href='{{ route('bieumau.cai-dat') }}'"
-                    class="text-gray-700 hover:text-indigo-600 p-2 rounded-full hover:bg-indigo-50" title="Cài đặt">
-                    <span class="material-icons">settings</span>
-                </button>
-            </div>
-
-            <!-- Main Content -->
-            <div class="flex-1 overflow-auto p-8">
-                <div class="max-w-3xl mx-auto">
-                    <!-- Form Header -->
-                    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-                        <div class="relative">
-                            <input type="text"
-                                class="w-full text-2xl font-medium border-b-2 border-transparent focus:border-indigo-500 focus:outline-none py-2 px-1"
-                                value="Biểu mẫu không tiêu đề" id="form-title">
-                        </div>
-                        <input type="text"
-                            class="w-full text-gray-500 border-b-2 border-transparent focus:border-indigo-500 focus:outline-none py-2 px-1 mt-2"
-                            placeholder="Mô tả biểu mẫu" id="form-description">
+                <!-- ✅ Thêm thẻ DIV bị thiếu ở đây -->
+                <div class="p-4 space-y-4">
+                    <!-- Giới hạn thời gian -->
+                    <div>
+                        <label class="block font-medium mb-2">Giới hạn thời gian (phút)</label>
+                        <input type="range" id="setting-time-limit" min="0" max="60" value="30"
+                            class="w-full accent-indigo-600">
+                        <p class="text-sm text-gray-600 mt-1">Đang chọn: <span id="time-limit-value">30</span> phút</p>
                     </div>
 
-                    <!-- Questions Container -->
-                    <div id="questions-container" class="space-y-4">
-                        <!-- Sample Question -->
-                        <div class="question-box bg-white rounded-lg shadow-sm p-6 relative group" draggable="true">
-                            <div class="flex items-start">
-                                <div class="mr-4 flex flex-col items-center pt-2 drag-handle cursor-move">
-                                    <span class="material-icons text-gray-400">drag_indicator</span>
-                                </div>
-                                <div class="flex-1">
-                                    <div class="flex items-center justify-between">
+                    <!-- Giới hạn số người -->
+                    <div>
+                        <label class="block font-medium mb-2">Giới hạn số người</label>
+                        <input type="range" id="setting-participant-limit" min="0" max="200"
+                            value="100" class="w-full accent-indigo-600">
+                        <p class="text-sm text-gray-600 mt-1">Đang chọn: <span id="participant-limit-value">100</span>
+                            người</p>
+                    </div>
+                </div> <!-- ✅ Thẻ đóng đúng -->
+
+            </div>
+
+
+            <div class="flex flex-1 overflow-hidden">
+                <!-- Sidebar -->
+                <div class="w-16 bg-white shadow-md flex flex-col items-center py-4 space-y-6">
+                    <button onclick="window.location.href='{{ route('bieumau.tao') }}'"
+                        class="text-indigo-600 bg-indigo-50 p-2 rounded-full" title="Biểu mẫu">
+                        <span class="material-icons">view_headline</span>
+                    </button>
+                    <button onclick="window.location.href='{{ route('bieumau.ds-cautraloi') }}'"
+                        class="text-gray-700 hover:text-indigo-600 p-2 rounded-full hover:bg-indigo-50"
+                        title="Câu Trả lời">
+                        <span class="material-icons">description</span>
+                    </button>
+                </div>
+
+                <!-- Main Content -->
+                <div class="flex-1 overflow-auto p-8">
+                    <div class="max-w-3xl mx-auto">
+                        <!-- Form Header -->
+                        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+                            <input type="text" id="form-title"
+                                class="form-title w-full text-2xl font-medium border-b-2 border-transparent focus:border-indigo-500 focus:outline-none py-2 px-1"
+                                value="Biểu mẫu không tiêu đề">
+                            <input type="text" id="form-description"
+                                class="w-full text-gray-500 border-b-2 border-transparent focus:border-indigo-500 focus:outline-none py-2 px-1 mt-2"
+                                placeholder="Mô tả biểu mẫu">
+                        </div>
+
+                        <!-- Questions -->
+                        <div id="questions-container" class="space-y-4">
+                            <!-- Câu hỏi mẫu -->
+                            <div class="question-box bg-white rounded-lg shadow-sm p-6 relative group"
+                                draggable="true">
+                                <div class="flex items-start">
+                                    <div class="mr-4 flex flex-col items-center pt-2 drag-handle cursor-move">
+                                        <span class="material-icons text-gray-400">drag_indicator</span>
+                                    </div>
+                                    <div class="flex-1">
                                         <input type="text"
-                                            class="w-full font-medium border-b-2 border-transparent focus:border-indigo-500 focus:outline-none py-1 px-1 mb-2"
+                                            class="question-title w-full font-medium border-b-2 border-transparent focus:border-indigo-500 focus:outline-none py-1 px-1 mb-2"
                                             value="Tiêu đề câu hỏi" placeholder="Câu hỏi">
-                                        <select
-                                            class="text-sm border rounded-md px-3 py-1 focus:outline-none focus:ring-1 focus:ring-indigo-500">
-                                            <option>Trả lời ngắn</option>
-                                            <option>Trắc nghiệm</option>
-                                            <option>Hộp kiểm</option>
-                                        </select>
-                                    </div>
-                                    <div class="mt-4">
-                                        <input type="text"
-                                            class="w-full border-b border-gray-300 py-2 focus:outline-none text-gray-500"
-                                            placeholder="Văn bản trả lời ngắn" disabled>
+                                        <div class="mt-4">
+                                            <input type="text"
+                                                class="w-full border-b border-gray-300 py-2 focus:outline-none text-gray-500"
+                                                placeholder="Văn bản trả lời ngắn" disabled>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="question-toolbar flex items-center justify-between mt-4 pt-4 border-t">
-                                <div class="flex space-x-2">
+                                <div class="question-toolbar flex items-center justify-between mt-4 pt-4 border-t">
                                     <button
                                         class="text-gray-500 hover:text-indigo-600 p-1 rounded-full hover:bg-indigo-50"
-                                        title="Xóa câu hỏi">
+                                        title="Xoá câu hỏi">
                                         <span class="material-icons">delete</span>
                                     </button>
-                                </div>
-                                <div class="flex items-center space-x-2 text-sm text-gray-500">
-                                    <button class="px-3 py-1 hover:bg-gray-100 rounded-md">
-                                        Bắt buộc
-                                        <input type="checkbox" class="ml-2">
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Another Question Type -->
-                        <div class="question-box bg-white rounded-lg shadow-sm p-6 relative group" draggable="true">
-                            <div class="flex items-start">
-                                <div class="mr-4 flex flex-col items-center pt-2 drag-handle cursor-move">
-                                    <span class="material-icons text-gray-400">drag_indicator</span>
-                                </div>
-                                <div class="flex-1">
-                                    <div class="flex items-center justify-between">
-                                        <input type="text"
-                                            class="w-full font-medium border-b-2 border-transparent focus:border-indigo-500 focus:outline-none py-1 px-1 mb-2"
-                                            value="Trắc nghiệm" placeholder="Câu hỏi">
-                                        <select
-                                            class="text-sm border rounded-md px-3 py-1 focus:outline-none focus:ring-1 focus:ring-indigo-500">
-                                            <option>Trả lời ngắn</option>
-                                            <option selected>Trắc nghiệm</option>
-                                            <option>Hộp kiểm</option>
-                                        </select>
-                                    </div>
-                                    <div class="mt-4 space-y-2">
-                                        <div class="flex items-center">
-                                            <span
-                                                class="material-icons text-gray-400 mr-2">radio_button_unchecked</span>
-                                            <input type="text"
-                                                class="flex-1 border-b border-gray-300 py-1 focus:outline-none"
-                                                value="Lựa chọn 1">
-                                            <button class="text-gray-400 hover:text-gray-600 ml-2">
-                                                <span class="material-icons">close</span>
-                                            </button>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <span
-                                                class="material-icons text-gray-400 mr-2">radio_button_unchecked</span>
-                                            <input type="text"
-                                                class="flex-1 border-b border-gray-300 py-1 focus:outline-none"
-                                                value="Lựa chọn 2">
-                                            <button class="text-gray-400 hover:text-gray-600 ml-2">
-                                                <span class="material-icons">close</span>
-                                            </button>
-                                        </div>
-                                        <div class="flex items-center pl-8">
-                                            <button
-                                                class="text-indigo-600 hover:text-indigo-800 flex items-center text-sm">
-                                                <span class="material-icons mr-1">add</span>
-                                                Thêm lựa chọn
-                                            </button>
-                                        </div>
+                                    <div class="flex items-center space-x-2 text-sm text-gray-500">
+                                        <label class="px-3 py-1 hover:bg-gray-100 rounded-md">
+                                            Bắt buộc
+                                            <input type="checkbox" class="ml-2">
+                                        </label>
                                     </div>
                                 </div>
                             </div>
-                            <div class="question-toolbar flex items-center justify-between mt-4 pt-4 border-t">
-                                <div class="flex space-x-2">
-                                    <button
-                                        class="text-gray-500 hover:text-indigo-600 p-1 rounded-full hover:bg-indigo-50">
-                                        <span class="material-icons">delete</span>
-                                    </button>
-                                </div>
-                                <div class="flex items-center space-x-2 text-sm text-gray-500">
-                                    <button class="px-3 py-1 hover:bg-gray-100 rounded-md">
-                                        Bắt buộc
-                                        <input type="checkbox" checked class="ml-2">
-                                    </button>
-                                </div>
-                            </div>
                         </div>
-                    </div>
 
-                    <!-- Add Question Button -->
-                    <div class="mt-6 flex justify-center">
-                        <button id="add-question"
-                            class="flex items-center text-indigo-600 hover:text-indigo-800 font-medium py-3 px-6 border-2 border-dashed border-indigo-200 rounded-lg hover:bg-indigo-50">
-                            <span class="material-icons mr-2">add</span>
-                            Thêm câu hỏi
-                        </button>
-                    </div>
-
-                    <!-- Form Footer -->
-                    <div class="mt-8 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                        <button class="flex items-center text-gray-600 hover:text-gray-800">
-                            <span class="material-icons mr-1">preview</span>
-                            Xem trước
-                        </button>
-                    </div>
-
-                    <!-- QR Popup -->
-                    <div id="qr-popup" class="qr-popup">
-                        <div class="qr-popup-content">
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-lg font-medium">Mã QR Biểu Mẫu</h3>
-                                <button id="close-qr-btn" class="text-gray-500 hover:text-gray-700">
-                                    <span class="material-icons">close</span>
-                                </button>
-                            </div>
-                            <div class="flex flex-col items-center">
-                                <div id="qr-code"
-                                    class="w-64 h-64 bg-gray-100 flex items-center justify-center mb-4">
-                                    <span class="text-gray-400">Mã QR sẽ hiển thị ở đây</span>
-                                </div>
-                                <button class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
-                                    Tải xuống
-                                </button>
-                            </div>
+                        <!-- Thêm câu hỏi -->
+                        <div class="mt-6 flex justify-center">
+                            <button id="add-question"
+                                class="flex items-center text-indigo-600 hover:text-indigo-800 font-medium py-3 px-6 border-2 border-dashed border-indigo-200 rounded-lg hover:bg-indigo-50">
+                                <span class="material-icons mr-2">add</span>Thêm câu hỏi
+                            </button>
                         </div>
+
+                        <!-- QR Popup -->
+                        <!-- ✅ Đặt ở cuối body, ngay trước </body> -->
+<div id="qr-popup" class="fixed inset-0 bg-black bg-opacity-40 hidden flex items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-lg w-80">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-medium">Mã QR Biểu Mẫu</h3>
+            <button id="close-qr-btn" class="text-gray-500 hover:text-gray-700">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+        <div id="qr-code"
+             class="w-64 h-64 bg-gray-100 flex items-center justify-center mb-4 mx-auto">
+            <span class="text-gray-400">Mã QR sẽ hiển thị ở đây</span>
+        </div>
+        <button class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 w-full">Tải xuống</button>
+    </div>
+</div>
+
                     </div>
                 </div>
             </div>
-
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    // Thêm câu hỏi mới
-                    document.getElementById('add-question').addEventListener('click', function() {
-                        const questionHTML = `
-                <div class="question-box bg-white rounded-lg shadow-sm p-6 relative group" draggable="true">
-                    <div class="flex items-start">
-                        <div class="mr-4 flex flex-col items-center pt-2 drag-handle cursor-move">
-                            <span class="material-icons text-gray-400">drag_indicator</span>
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex items-center justify-between">
-                                <input type="text" class="w-full font-medium border-b-2 border-transparent focus:border-indigo-500 focus:outline-none py-1 px-1 mb-2"
-                                    placeholder="Câu hỏi">
-                                <select class="text-sm border rounded-md px-3 py-1 focus:outline-none focus:ring-1 focus:ring-indigo-500">
-                                    <option>Trả lời ngắn</option>                                   
-                                    <option>Trắc nghiệm</option>
-                                    <option>Hộp kiểm</option>
-                                </select>
-                            </div>
-                            <div class="mt-4">
-                                <input type="text" class="w-full border-b border-gray-300 py-2 focus:outline-none text-gray-500"
-                                    placeholder="Văn bản trả lời ngắn" disabled>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="question-toolbar flex items-center justify-between mt-4 pt-4 border-t">
-                        <div class="flex space-x-2">
-                            <button class="text-gray-500 hover:text-indigo-600 p-1 rounded-full hover:bg-indigo-50">
-                                <span class="material-icons">delete</span>
-                            </button>
-                        </div>
-                        <div class="flex items-center space-x-2 text-sm text-gray-500">
-                            <button class="px-3 py-1 hover:bg-gray-100 rounded-md">
-                                Bắt buộc
-                                <input type="checkbox" class="ml-2">
-                            </button>
-                        </div>
+        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Thêm câu hỏi mới
+                document.getElementById('add-question').addEventListener('click', function() {
+                    const questionHTML = `
+        <div class="question-box bg-white rounded-lg shadow-sm p-6 relative group" draggable="true">
+            <div class="flex items-start">
+                <div class="mr-4 flex flex-col items-center pt-2 drag-handle cursor-move">
+                    <span class="material-icons text-gray-400">drag_indicator</span>
+                </div>
+                <div class="flex-1">
+                    <input type="text" class="question-title w-full font-medium border-b-2 border-transparent focus:border-indigo-500 focus:outline-none py-1 px-1 mb-2"
+                           value="Tiêu đề câu hỏi" placeholder="Câu hỏi">
+                    <div class="mt-4">
+                        <input type="text" class="w-full border-b border-gray-300 py-2 focus:outline-none text-gray-500"
+                               placeholder="Văn bản trả lời ngắn" disabled>
                     </div>
                 </div>
-                `;
-
-                        const container = document.getElementById('questions-container');
-                        const newQuestion = document.createElement('div');
-                        newQuestion.innerHTML = questionHTML;
-                        container.appendChild(newQuestion);
-
-                        // Cuộn đến câu hỏi mới
-                        newQuestion.scrollIntoView({
-                            behavior: 'smooth'
-                        });
-
-                        // Thêm sự kiện thay đổi loại câu hỏi
-                        addQuestionTypeChangeHandler(newQuestion);
-                    });
-
-                    // Kéo thả câu hỏi
+            </div>
+            <div class="question-toolbar flex items-center justify-between mt-4 pt-4 border-t">
+                <button class="text-gray-500 hover:text-indigo-600 p-1 rounded-full hover:bg-indigo-50" title="Xoá câu hỏi">
+                    <span class="material-icons">delete</span>
+                </button>
+                <div class="flex items-center space-x-2 text-sm text-gray-500">
+                    <label class="px-3 py-1 hover:bg-gray-100 rounded-md">
+                        Bắt buộc
+                        <input type="checkbox" class="ml-2">
+                    </label>
+                </div>
+            </div>
+        </div>`;
                     const container = document.getElementById('questions-container');
-                    let draggedItem = null;
-
-                    container.addEventListener('dragstart', function(e) {
-                        if (e.target.classList.contains('question-box') || e.target.closest('.question-box')) {
-                            const questionBox = e.target.classList.contains('question-box') ? e.target : e.target
-                                .closest('.question-box');
-                            draggedItem = questionBox;
-                            setTimeout(() => {
-                                questionBox.classList.add('dragging');
-                            }, 0);
-                        }
+                    const newQuestion = document.createElement('div');
+                    newQuestion.innerHTML = questionHTML;
+                    container.appendChild(newQuestion);
+                    newQuestion.scrollIntoView({
+                        behavior: 'smooth'
                     });
+                });
 
-                    container.addEventListener('dragend', function(e) {
-                        if (draggedItem) {
-                            draggedItem.classList.remove('dragging');
-                            draggedItem = null;
-                        }
-                    });
+                // Kéo thả sắp xếp câu hỏi
+                const container = document.getElementById('questions-container');
+                let draggedItem = null;
 
-                    container.addEventListener('dragover', function(e) {
-                        e.preventDefault();
-                        const afterElement = getDragAfterElement(container, e.clientY);
-                        const currentItem = document.querySelector('.dragging');
+                container.addEventListener('dragstart', function(e) {
+                    const box = e.target.closest('.question-box');
+                    if (box) {
+                        draggedItem = box;
+                        box.classList.add('dragging');
+                    }
+                });
 
-                        if (!currentItem) return;
+                container.addEventListener('dragend', function() {
+                    if (draggedItem) {
+                        draggedItem.classList.remove('dragging');
+                        draggedItem = null;
+                    }
+                });
 
-                        if (afterElement == null) {
-                            container.appendChild(currentItem);
+                container.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    const afterElement = getDragAfterElement(container, e.clientY);
+                    const dragging = document.querySelector('.dragging');
+                    if (!dragging) return;
+                    if (afterElement == null) {
+                        container.appendChild(dragging);
+                    } else {
+                        container.insertBefore(dragging, afterElement);
+                    }
+                });
+
+                function getDragAfterElement(container, y) {
+                    const elements = [...container.querySelectorAll('.question-box:not(.dragging)')];
+                    return elements.reduce((closest, child) => {
+                        const box = child.getBoundingClientRect();
+                        const offset = y - box.top - box.height / 2;
+                        if (offset < 0 && offset > closest.offset) {
+                            return {
+                                offset: offset,
+                                element: child
+                            };
                         } else {
-                            container.insertBefore(currentItem, afterElement);
+                            return closest;
                         }
-                    });
+                    }, {
+                        offset: Number.NEGATIVE_INFINITY
+                    }).element;
+                }
 
-                    function getDragAfterElement(container, y) {
-                        const draggableElements = [...container.querySelectorAll('.question-box:not(.dragging)')];
-
-                        return draggableElements.reduce((closest, child) => {
-                            const box = child.getBoundingClientRect();
-                            const offset = y - box.top - box.height / 2;
-
-                            if (offset < 0 && offset > closest.offset) {
-                                return {
-                                    offset: offset,
-                                    element: child
-                                };
-                            } else {
-                                return closest;
-                            }
-                        }, {
-                            offset: Number.NEGATIVE_INFINITY
-                        }).element;
+                // Xóa câu hỏi
+                container.addEventListener('click', function(e) {
+                    if (e.target.closest('.material-icons')?.textContent === 'delete') {
+                        const questionBox = e.target.closest('.question-box');
+                        if (confirm('Xóa câu hỏi này?')) {
+                            questionBox.remove();
+                        }
                     }
+                });
 
-                    // Xử lý công tắc bật/tắt
-                    document.querySelectorAll('.toggle-checkbox').forEach(checkbox => {
-                        checkbox.addEventListener('change', function() {
-                            const label = this.nextElementSibling;
-                            if (this.checked) {
-                                label.classList.remove('bg-gray-300');
-                                label.classList.add('bg-indigo-500');
-                            } else {
-                                label.classList.remove('bg-indigo-500');
-                                label.classList.add('bg-gray-300');
-                            }
+                // Mở/đóng panel giao diện
+                document.querySelector('button[title="Thay đổi giao diện"]').addEventListener('click', () => {
+                    document.getElementById('theme-panel').classList.remove('translate-x-full');
+                });
+
+                document.getElementById('close-theme-btn').addEventListener('click', () => {
+                    document.getElementById('theme-panel').classList.add('translate-x-full');
+                });
+
+                // Đổi màu giao diện
+                document.querySelectorAll('#theme-panel [data-color]').forEach(colorBtn => {
+                    colorBtn.addEventListener('click', () => {
+                        const color = colorBtn.getAttribute('data-color');
+                        document.getElementById('main-body').style.backgroundColor = color;
+
+                        // highlight
+                        document.querySelectorAll('#theme-panel [data-color]').forEach(btn => {
+                            btn.classList.remove('ring-2', 'ring-indigo-500');
                         });
-                    });
-
-                    // Xử lý thay đổi loại câu hỏi
-                    function addQuestionTypeChangeHandler(questionBox) {
-                        const select = questionBox.querySelector('select');
-                        if (select) {
-                            select.addEventListener('change', function() {
-                                changeQuestionType(questionBox, this.value);
-                            });
-                        }
-                    }
-
-                    // Thay đổi loại câu hỏi
-                    function changeQuestionType(questionBox, selectedType) {
-                        const inputArea = questionBox.querySelector('.flex-1 > div:last-child');
-                        let inputHTML = '';
-
-                        if (selectedType === 'Trả lời ngắn') {
-                            inputHTML =
-                                `<input type="text" class="w-full border-b border-gray-300 py-2 focus:outline-none text-gray-500" placeholder="Văn bản trả lời ngắn" disabled>`;
-                        } else if (selectedType === 'Trắc nghiệm') {
-                            inputHTML = `
-                        <div class="mt-4 space-y-2">
-                            <div class="flex items-center">
-                                <span class="material-icons text-gray-400 mr-2">radio_button_unchecked</span>
-                                <input type="text" class="flex-1 border-b border-gray-300 py-1 focus:outline-none" value="Lựa chọn 1">
-                                <button class="text-gray-400 hover:text-gray-600 ml-2">
-                                    <span class="material-icons">close</span>
-                                </button>
-                            </div>
-                            <div class="flex items-center">
-                                <span class="material-icons text-gray-400 mr-2">radio_button_unchecked</span>
-                                <input type="text" class="flex-1 border-b border-gray-300 py-1 focus:outline-none" value="Lựa chọn 2">
-                                <button class="text-gray-400 hover:text-gray-600 ml-2">
-                                    <span class="material-icons">close</span>
-                                </button>
-                            </div>
-                            <div class="flex items-center pl-8">
-                                <button class="text-indigo-600 hover:text-indigo-800 flex items-center text-sm">
-                                    <span class="material-icons mr-1">add</span>
-                                    Thêm lựa chọn
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                        } else if (selectedType === 'Hộp kiểm') {
-                            inputHTML = `
-                        <div class="mt-4 space-y-2">
-                            <div class="flex items-center">
-                                <span class="material-icons text-gray-400 mr-2">check_box_outline_blank</span>
-                                <input type="text" class="flex-1 border-b border-gray-300 py-1 focus:outline-none" value="Lựa chọn 1">
-                                <button class="text-gray-400 hover:text-gray-600 ml-2">
-                                    <span class="material-icons">close</span>
-                                </button>
-                            </div>
-                            <div class="flex items-center">
-                                <span class="material-icons text-gray-400 mr-2">check_box_outline_blank</span>
-                                <input type="text" class="flex-1 border-b border-gray-300 py-1 focus:outline-none" value="Lựa chọn 2">
-                                <button class="text-gray-400 hover:text-gray-600 ml-2">
-                                    <span class="material-icons">close</span>
-                                </button>
-                            </div>
-                            <div class="flex items-center pl-8">
-                                <button class="text-indigo-600 hover:text-indigo-800 flex items-center text-sm">
-                                    <span class="material-icons mr-1">add</span>
-                                    Thêm lựa chọn
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                        }
-                        inputArea.innerHTML = inputHTML;
-                    }
-
-                    // Xử lý xóa câu hỏi
-                    container.addEventListener('click', function(e) {
-                        if (e.target.classList.contains('material-icons') && e.target.textContent === 'delete') {
-                            const questionBox = e.target.closest('.question-box');
-                            if (confirm('Xóa câu hỏi này?')) {
-                                questionBox.remove();
-                            }
-                        }
-                    });
-
-                    // Thêm trình xử lý thay đổi loại câu hỏi cho các câu hỏi hiện có
-                    document.querySelectorAll('.question-box').forEach(questionBox => {
-                        addQuestionTypeChangeHandler(questionBox);
+                        colorBtn.classList.add('ring-2', 'ring-indigo-500');
                     });
                 });
 
-                // QR Code functionality
-                const showQrBtn = document.getElementById('show-qr-btn');
-                const closeQrBtn = document.getElementById('close-qr-btn');
-                const qrPopup = document.getElementById('qr-popup');
+                // Panel cài đặt
+                const settingsBtn = document.querySelector('button[title="Cài đặt"]');
+                const settingsPanel = document.getElementById('settings-panel');
+                const closeSettingsBtn = document.getElementById('close-settings-btn');
+                settingsBtn.addEventListener('click', () => settingsPanel.classList.remove('translate-x-full'));
+                closeSettingsBtn.addEventListener('click', () => settingsPanel.classList.add('translate-x-full'));
 
-                showQrBtn.addEventListener('click', function() {
-                    qrPopup.classList.add('active');
+                // Thanh trượt thời gian và số người
+                const timeSlider = document.getElementById('setting-time-limit');
+                const timeValue = document.getElementById('time-limit-value');
+                const participantSlider = document.getElementById('setting-participant-limit');
+                const participantValue = document.getElementById('participant-limit-value');
 
-                    // In a real app, you would generate QR code here using a library like QRious
-                    // For example:
-                    // const qr = new QRious({
-                    //     element: document.getElementById('qr-code'),
-                    //     value: window.location.href,
-                    //     size: 200
-                    // });
-                });
+                timeSlider?.addEventListener('input', () => timeValue.textContent = timeSlider.value);
+                participantSlider?.addEventListener('input', () => participantValue.textContent = participantSlider
+                    .value);
 
-                closeQrBtn.addEventListener('click', function() {
-                    qrPopup.classList.remove('active');
-                });
+                // Nút xuất bản
+                document.getElementById('publish-btn')?.addEventListener('click', async () => {
+                    const title = document.getElementById('form-title')?.value || 'Biểu mẫu không tiêu đề';
+                    const description = document.getElementById('form-description')?.value || '';
+                    const time_limit = parseInt(document.getElementById('setting-time-limit')?.value || 0);
+                    const participant_limit = parseInt(document.getElementById('setting-participant-limit')
+                        ?.value || 0);
 
-                // Close popup when clicking outside
-                qrPopup.addEventListener('click', function(e) {
-                    if (e.target === qrPopup) {
-                        qrPopup.classList.remove('active');
+                    const questions = Array.from(document.querySelectorAll('.question-box')).map(box => {
+                        const title = box.querySelector('.question-title')?.value || '';
+                        const required = box.querySelector('input[type="checkbox"]')?.checked ||
+                            false;
+                        return {
+                            title,
+                            type: 'Trả lời ngắn',
+                            required,
+                            options: null
+                        };
+                    });
+
+                    try {
+                        const res = await fetch('/bieumau', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                    .content
+                            },
+                            body: JSON.stringify({
+                                title,
+                                description,
+                                time_limit,
+                                participant_limit,
+                                questions
+                            })
+                        });
+
+
+                        const data = await res.json();
+                        if (data.success) {
+                            alert('🎉 Biểu mẫu đã được xuất bản thành công!');
+                            window.location.href = '/bieumau/xem-truoc/' + data.ma_bieu_mau;
+                        } else {
+                            alert('❌ Xuất bản thất bại. Vui lòng thử lại!');
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        alert('Đã có lỗi xảy ra khi gửi dữ liệu.');
                     }
                 });
-            </script>
-            <!-- Uncomment to use QR code library in production -->
-            <!-- <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script> -->
-</body>
+            });
+            // Mở popup QR
+document.getElementById('show-qr-btn')?.addEventListener('click', () => {
+    document.getElementById('qr-popup')?.classList.remove('hidden');
+});
+
+// Đóng popup QR
+document.getElementById('close-qr-btn')?.addEventListener('click', () => {
+    document.getElementById('qr-popup')?.classList.add('hidden');
+});
+
+            
+        </script>
+        <!-- Uncomment to use QR code library in production -->
+        <!-- <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script> -->
+    </body>
 
 </html>
