@@ -35,10 +35,10 @@
             @enderror
 
             {{-- ✅ Quên mật khẩu --}}
-            <div class="mb-6 text-right">
+            {{-- <div class="mb-6 text-right">
                 <a href="{{ route('xacthuc.quen-mk') }}" class="text-sm text-blue-600 hover:underline">Quên mật
                     khẩu?</a>
-            </div>
+            </div> --}}
 
             <button type="submit"
                 class="bg-blue-600 text-white font-semibold py-2 px-4 w-full rounded hover:bg-blue-700">

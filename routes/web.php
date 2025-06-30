@@ -34,8 +34,8 @@ Route::get('/thong-tin-ca-nhan', [TTCanhanController::class, 'index'])->name('ad
 Route::put('/admin/ql-taikhoan/{id}', [QLTaikhoanController::class, 'update'])->name('admin.ql-taikhoan.update');
 Route::put('/admin/thong-tin-ca-nhan/{id}', [TTCanhanController::class, 'update'])->name('thong-tin-ca-nhan.update');
 // ======================= BIEUMAU =========================
-Route::get('/bieumau/cai-dat', [App\Http\Controllers\Bieumau\CaiDatController::class, 'index'])->name('bieumau.cai-dat');
-Route::get('/bieumau/ds-cautraloi', [App\Http\Controllers\Bieumau\DsCautraloiController::class, 'index'])->name('bieumau.ds-cautraloi');
+
+Route::get('/bieumau/ds-cautraloi', [DsCautraloiController::class, 'index'])->name('bieumau.ds-cautraloi');
 Route::get('/bieumau/tao-form', [TaoFormController::class, 'index'])->name('bieumau.tao');
 Route::put('/bieumau/{ma_bieu_mau}', [TaoFormController::class, 'update'])->name('bieumau.update');
 Route::middleware(['web'])->group(function () {
@@ -44,31 +44,31 @@ Route::middleware(['web'])->group(function () {
 
 
 // ======================= NGUOIDUNG =========================
-Route::get('/nguoidung/ls-diemdanh', [App\Http\Controllers\Nguoidung\LsDiemdanhController::class, 'index'])->name('nguoidung.ls-diemdanh');
-Route::get('/nguoidung/ql-bieumau', [App\Http\Controllers\Nguoidung\QLBieumauController::class, 'index'])->name('nguoidung.ql-bieumau');
-Route::delete('/nguoidung/bieumau/xoa-da-chon', [App\Http\Controllers\Nguoidung\QLBieumauController::class, 'xoaDaChon'])->name('nguoidung.bieumau.xoaDaChon');
+Route::get('/nguoidung/ls-diemdanh', [LsDiemdanhController::class, 'index'])->name('nguoidung.ls-diemdanh');
+Route::get('/nguoidung/ql-bieumau', [NguoidungQLBieumauController::class, 'index'])->name('nguoidung.ql-bieumau');
+Route::delete('/nguoidung/bieumau/xoa-da-chon', [NguoidungQLBieumauController::class, 'xoaDaChon'])->name('nguoidung.bieumau.xoaDaChon');
 
-Route::get('/nguoidung/ql-danhsach', [App\Http\Controllers\Nguoidung\QLDanhsachController::class, 'index'])->name('nguoidung.ql-danhsach');
+Route::get('/nguoidung/ql-danhsach', [QLDanhsachController::class, 'index'])->name('nguoidung.ql-danhsach');
 Route::delete('/nguoidung/ql-danhsach/delete', [QLDanhsachController::class, 'destroy'])->name('nguoidung.ql-danhsach.destroy');
 Route::get('/nguoidung/ql-danhsach/export/{id}', [QLDanhsachController::class, 'export'])->name('nguoidung.ql-danhsach.export');
 
-Route::get('/nguoidung/traloi-bieumau', [App\Http\Controllers\Nguoidung\TraloiBieumauController::class, 'index'])->name('nguoidung.traloi-bieumau');
+Route::get('/nguoidung/traloi-bieumau', [TraloiBieumauController::class, 'index'])->name('nguoidung.traloi-bieumau');
 Route::get('/traloi-bieumau/{id}', [TraloiBieumauController::class, 'show'])->name('traloi-bieumau.show');
 Route::post('/traloi-bieumau', [TraloiBieumauController::class, 'store'])->name('traloi-bieumau.store');
 
-Route::get('/nguoidung/thong-tin-ca-nhan', [App\Http\Controllers\Nguoidung\TTCanhanController::class, 'index'])->name('nguoidung.tt-canhan');
+Route::get('/nguoidung/thong-tin-ca-nhan', [NguoidungTTCanhanController::class, 'index'])->name('nguoidung.tt-canhan');
 Route::put('/nguoidung/thong-tin-ca-nhan/{id}', [NguoidungTTCanhanController::class, 'update'])->middleware('web')->name('nguoidung.tt-canhan.update');
 // ======================= TRANG CHỦ =========================
-Route::get('/', [App\Http\Controllers\Trangchu\TrangchuController::class, 'index'])->name('trangchu');
+Route::get('/', [TrangchuController::class, 'index'])->name('trangchu');
 
 // ======================= XÁC THỰC =========================
 Route::middleware(['web'])->group(function () {
     Route::get('/dang-ky', [DangKyController::class, 'index'])->name('xacthuc.dang-ky');
     Route::post('/dang-ky', [DangKyController::class, 'store'])->name('xacthuc.dang-ky.post');
 });
-Route::get('/dang-nhap', [App\Http\Controllers\Xacthuc\DangNhapController::class, 'index'])->name('xacthuc.dang-nhap');
-Route::get('/dat-lai-mk', [App\Http\Controllers\Xacthuc\DatlaiMkController::class, 'index'])->name('xacthuc.dat-lai-mk');
-Route::get('/quen-mk', [App\Http\Controllers\Xacthuc\QuenMkController::class, 'index'])->name('xacthuc.quen-mk');
+Route::get('/dang-nhap', [DangNhapController::class, 'index'])->name('xacthuc.dang-nhap');
+Route::get('/dat-lai-mk', [DatlaiMkController::class, 'index'])->name('xacthuc.dat-lai-mk');
+Route::get('/quen-mk', [QuenMkController::class, 'index'])->name('xacthuc.quen-mk');
 // Xử lý form gửi lên
 
 Route::post('/dang-nhap', [DangNhapController::class, 'authenticate'])->name('xacthuc.dang-nhap.post');
@@ -80,11 +80,3 @@ Route::get('/dang-xuat', function () {
     return redirect()->route('trangchu')->with('success', 'Đã đăng xuất!');
 })->name('dang-xuat');
 
-
-Route::get('/test-session', function () {
-    return response()->json([
-        'ma_tai_khoan' => session('ma_tai_khoan'),
-        'nguoi_dung' => session('nguoi_dung'),
-        'all' => session()->all()
-    ]);
-});
