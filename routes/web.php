@@ -37,10 +37,9 @@ Route::put('/admin/thong-tin-ca-nhan/{id}', [TTCanhanController::class, 'update'
 Route::get('/bieumau/cai-dat', [App\Http\Controllers\Bieumau\CaiDatController::class, 'index'])->name('bieumau.cai-dat');
 Route::get('/bieumau/ds-cautraloi', [App\Http\Controllers\Bieumau\DsCautraloiController::class, 'index'])->name('bieumau.ds-cautraloi');
 Route::get('/bieumau/tao-form', [TaoFormController::class, 'index'])->name('bieumau.tao');
-Route::post('/bieumau', [TaoFormController::class, 'store'])->name('bieumau.store');
 Route::put('/bieumau/{ma_bieu_mau}', [TaoFormController::class, 'update'])->name('bieumau.update');
 Route::middleware(['web'])->group(function () {
-    Route::post('/bieumau/xuat-ban', [TaoFormController::class, 'publish']);
+    Route::post('/bieumau/xuat-ban', [TaoFormController::class, 'store']);
 });
 
 

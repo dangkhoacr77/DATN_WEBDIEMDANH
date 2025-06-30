@@ -26,41 +26,12 @@ class TaoFormController extends Controller
     }
 
     /**
-     * Lưu biểu mẫu ở dạng nháp (nếu cần)
-     */
-    public function store(Request $request)
-    {
-        $taiKhoanMa = session('nguoi_dung')['ma_tai_khoan'] ?? session('ma_tai_khoan');
-
-        if (!$taiKhoanMa) {
-            return response()->json(['success' => false, 'message' => 'Chưa đăng nhập']);
-        }
-
-        $maBieuMau = 'BM' . Str::uuid()->toString();
-
-        BieuMau::create([
-            'ma_bieu_mau' => $maBieuMau,
-            'tieu_de' => $request->title,
-            'mo_ta_tieu_de' => $request->description,
-            'mau' => $request->theme_color ?? '#ffffff',
-            'thoi_luong_diem_danh' => $request->time_limit ?? 0,
-            'gioi_han_diem_danh' => $request->participant_limit ?? 0,
-            'so_luong_da_diem_danh' => 0,
-            'trang_thai' => 0, // 0 = nháp
-            'ngay_tao' => Carbon::now(),
-            'tai_khoan_ma' => $taiKhoanMa,
-        ]);
-
-        return response()->json(['success' => true, 'message' => 'Lưu nháp thành công']);
-    }
-
-    /**
      * Xuất bản biểu mẫu chính thức
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-   public function publish(Request $request)
+   public function store(Request $request)
 {
     \Log::info('Dữ liệu gửi lên:', $request->all());
     $maTaiKhoan = session('ma_tai_khoan');
@@ -116,7 +87,7 @@ MaQR::create([
                 'cau_hoi' => $q['title'],
                 'cau_hoi_bat_buoc' => $q['required'] ?? false,
                 'noi_dung' => '',
-                'loai_cau_hoi' => $q['type'],
+                'loai_cau_hoi' => null,
                 'bieu_mau_ma' => $maBieuMau
             ]);
         }
