@@ -410,7 +410,9 @@
           options: null
         };
       });
-
+const canvas = document.querySelector('#qr-code canvas');
+  const base64Image = canvas ? canvas.toDataURL() : null;
+  console.log('QR Base64:', base64Image); // Kiểm tra
       try {
         const res = await fetch('/bieumau/xuat-ban', {
           method: 'POST',
@@ -419,13 +421,14 @@
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
           },
           body: JSON.stringify({
-            title,
-            description,
-            time_limit,
-            participant_limit,
-            theme_color: selectedColor,
-            questions
-          })
+    title,
+    description,
+    time_limit,
+    participant_limit,
+    theme_color: selectedColor,
+    questions,                // ✅ thêm dấu phẩy ở đây
+    qr_image: base64Image     // ✅ gửi hình QR base64 lên server
+})
         });
 
         const data = await res.json();
@@ -455,6 +458,7 @@
         level: 'H'
       });
 
+
       document.getElementById('qr-popup').classList.remove('hidden');
     });
 
@@ -464,6 +468,7 @@
 
     document.getElementById('download-qr').addEventListener('click', () => {
       const canvas = document.querySelector('#qr-code canvas');
+      const base64Image = canvas.toDataURL();
       if (canvas) {
         const link = document.createElement('a');
         link.download = `${currentFormCode}.png`;

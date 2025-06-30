@@ -11,6 +11,7 @@ use App\Models\BieuMau;
 use App\Models\CauHoi;
 use App\Models\DanhSachDiemDanh;
 use Illuminate\Support\Facades\Log;
+use App\Models\MaQR;
 
 
 
@@ -96,6 +97,15 @@ class TaoFormController extends Controller
             'ngay_tao' => now(),
             'tai_khoan_ma' => $maTaiKhoan,
         ]);
+// ✅ Tạo bản ghi mã QR ứng với biểu mẫu
+MaQR::create([
+    'ma_qr' => (string) Str::uuid(),
+    'hinh_anh' => null,
+    'duong_dan' => url('/traloi-bieumau/' . $maBieuMau),
+    'trang_thai' => 1,
+    'ngay_tao' => now(),
+    'bieu_mau_ma' => $maBieuMau
+]);
 
         // Lưu câu hỏi
         foreach ($request->questions as $q) {
