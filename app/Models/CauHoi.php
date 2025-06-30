@@ -19,7 +19,6 @@ class CauHoi extends Model
         'cau_hoi',
         'cau_hoi_bat_buoc',
         'noi_dung',
-        'loai_cau_hoi',
         'bieu_mau_ma'
     ];
 

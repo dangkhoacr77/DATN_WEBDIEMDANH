@@ -39,18 +39,22 @@ class TraloiBieumauController extends Controller
         }
 
         $maDiemDanh = Str::uuid()->toString();
-
-        // Lấy tài khoản từ session 
         $taiKhoanMa = session('ma_tai_khoan');
+
+        // Lấy thông tin thiết bị
         $agent = new Agent();
-        $device = $agent->device();         // Tên thiết bị (nếu có)
-        $platform = $agent->platform();     // Hệ điều hành
-        $browser = $agent->browser();       // Trình duyệt
-
+        $device = $agent->device();
+        $platform = $agent->platform();
+        $browser = $agent->browser();
         $thietBiDiemDanh = "$device - $platform - $browser";
-        $bieuMau = BieuMau::with('danhSach')->where('ma_bieu_mau', $bieuMauMa)->first();
-        $maDanhSach = optional($bieuMau->danhSach)->ma_danh_sach;
 
+        // Lấy biểu mẫu và danh sách liên quan
+        $bieuMau = BieuMau::with('danhSach')->where('ma_bieu_mau', $bieuMauMa)->first();
+        if (!$bieuMau) {
+            return redirect()->back()->withErrors(['message' => 'Biểu mẫu không tồn tại.']);
+        }
+
+        $maDanhSach = optional($bieuMau->danhSach)->ma_danh_sach;
 
         // Tạo điểm danh
         DiemDanh::create([
@@ -63,32 +67,23 @@ class TraloiBieumauController extends Controller
             'danh_sach_ma' => $maDanhSach,
         ]);
 
-        // Lưu các câu trả lời
+        // Lưu từng câu trả lời (mặc định là dạng trả lời ngắn)
         $traLoiData = $request->input('cau_tra_loi', []);
         foreach ($traLoiData as $maCauHoi => $traLoi) {
-            if (is_array($traLoi)) {
-                foreach ($traLoi as $tl) {
-                    CauTraLoi::create([
-                        'ma_cau_tra_loi' => Str::uuid()->toString(),
-                        'cau_tra_loi' => $tl,
-                        'cau_hoi_ma' => $maCauHoi,
-                        'diem_danh_ma' => $maDiemDanh,
-                    ]);
-                }
-            } else {
-                CauTraLoi::create([
-                    'ma_cau_tra_loi' => Str::uuid()->toString(),
-                    'cau_tra_loi' => $traLoi,
-                    'cau_hoi_ma' => $maCauHoi,
-                    'diem_danh_ma' => $maDiemDanh,
-                ]);
-            }
+            CauTraLoi::create([
+                'ma_cau_tra_loi' => Str::uuid()->toString(),
+                'cau_tra_loi' => is_array($traLoi) ? implode(', ', $traLoi) : $traLoi,
+                'cau_hoi_ma' => $maCauHoi,
+                'diem_danh_ma' => $maDiemDanh,
+            ]);
         }
 
-        return redirect()->route(session('ma_tai_khoan') ? 'nguoidung.ql-bieumau' : 'trangchu')
-                 ->with('success', 'Đã gửi câu trả lời thành công!');
+        return view('nguoidung.Traloi_bieumau', [
+            'bieuMau' => $bieuMau,
+            'success' => 'Đã gửi câu trả lời thành công!',
+            'hideQuestions' => true,
+        ]);
     }
-
     /**
      * Display the specified resource.
      */

@@ -60,6 +60,7 @@
     </style>
 </head>
 <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+
 <body id="main-body" class="bg-gray-50 min-h-screen">
     <div id="theme-panel"
         class="fixed top-0 right-0 w-80 max-w-full h-full bg-white shadow-lg border-l transform translate-x-full transition-transform duration-300 z-50 overflow-y-auto">
@@ -74,38 +75,30 @@
             <!-- Màu -->
             <div>
                 <h3 class="font-medium mb-4">Màu</h3>
-                <div class="grid grid-cols-6 gap-3">
-                    <div class="w-6 h-6 bg-white border rounded-full cursor-pointer ring-2 ring-indigo-500"
+                <div class="flex flex-wrap gap-4">
+                    <div class="w-6 h-6 bg-[#ffffff] border rounded-full cursor-pointer ring-2 ring-indigo-500"
                         data-color="Trắng" data-code="#ffffff"></div>
-                    <div class="w-6 h-6 bg-red-500 rounded-full cursor-pointer" data-color="Đỏ" data-code="#ef4444">
+                    <div class="w-6 h-6 bg-[#fca5a5] rounded-full cursor-pointer" data-color="Đỏ" data-code="#fca5a5">
                     </div>
-                    <div class="w-6 h-6 bg-purple-600 rounded-full cursor-pointer" data-color="Tím" data-code="#7c3aed">
+                    <div class="w-6 h-6 bg-[#c4b5fd] rounded-full cursor-pointer" data-color="Tím" data-code="#c4b5fd">
                     </div>
-                    <div class="w-6 h-6 bg-blue-700 rounded-full cursor-pointer" data-color="Xanh dương đậm"
-                        data-code="#1d4ed8"></div>
-                    <div class="w-6 h-6 bg-blue-500 rounded-full cursor-pointer" data-color="Xanh dương"
-                        data-code="#3b82f6"></div>
-                    <div class="w-6 h-6 bg-sky-400 rounded-full cursor-pointer" data-color="Xanh trời"
-                        data-code="#38bdf8"></div>
-                    <div class="w-6 h-6 bg-cyan-400 rounded-full cursor-pointer" data-color="Xanh cyan"
-                        data-code="#22d3ee"></div>
-                    <div class="w-6 h-6 bg-orange-500 rounded-full cursor-pointer" data-color="Cam" data-code="#f97316">
+                    <div class="w-6 h-6 bg-[#93c5fd] rounded-full cursor-pointer" data-color="Xanh dương đậm"
+                        data-code="#93c5fd"></div>
+                    <div class="w-6 h-6 bg-[#a5f3fc] rounded-full cursor-pointer" data-color="Xanh trời"
+                        data-code="#a5f3fc"></div>
+                    <div class="w-6 h-6 bg-[#fdba74] rounded-full cursor-pointer" data-color="Cam" data-code="#fdba74">
                     </div>
-                    <div class="w-6 h-6 bg-amber-400 rounded-full cursor-pointer" data-color="Vàng đậm"
-                        data-code="#fbbf24"></div>
-                    <div class="w-6 h-6 bg-teal-500 rounded-full cursor-pointer" data-color="Xanh ngọc"
-                        data-code="#14b8a6"></div>
-                    <div class="w-6 h-6 bg-green-500 rounded-full cursor-pointer" data-color="Xanh lá"
-                        data-code="#22c55e"></div>
-                    <div class="w-6 h-6 bg-gray-600 rounded-full cursor-pointer" data-color="Xám đậm"
-                        data-code="#4b5563"></div>
-                    <div class="w-6 h-6 bg-gray-400 rounded-full cursor-pointer" data-color="Xám nhạt"
-                        data-code="#9ca3af"></div>
+                    <div class="w-6 h-6 bg-[#fde68a] rounded-full cursor-pointer" data-color="Vàng đậm"
+                        data-code="#fde68a"></div>
+                    <div class="w-6 h-6 bg-[#99f6e4] rounded-full cursor-pointer" data-color="Xanh ngọc"
+                        data-code="#99f6e4"></div>
+                    <div class="w-6 h-6 bg-[#86efac] rounded-full cursor-pointer" data-color="Xanh lá"
+                        data-code="#86efac"></div>
+                    <div class="w-6 h-6 bg-[#d1d5db] rounded-full cursor-pointer" data-color="Xám nhạt"
+                        data-code="#d1d5db"></div>
                 </div>
-
             </div>
         </div>
-    </div>
     </div>
     <!-- Nút Reset -->
 
@@ -116,6 +109,10 @@
             <header class="bg-white shadow-sm py-4 px-6 flex items-center justify-between border-b">
                 <h1 class="text-xl font-medium text-gray-800">Tạo Biểu Mẫu</h1>
                 <div class="flex items-center space-x-4">
+                    <button onclick="window.location.href='{{ route('trangchu') }}'" class="text-gray-600 hover:text-indigo-600"
+                        title="Trang chủ">
+                        <span class="material-icons">home</span>
+                    </button>
                     <button class="text-gray-600 hover:text-indigo-600" title="Cài đặt">
                         <span class="material-icons">settings</span>
                     </button>
@@ -202,7 +199,7 @@
                                     <div class="flex-1">
                                         <input type="text"
                                             class="question-title w-full font-medium border-b-2 border-transparent focus:border-indigo-500 focus:outline-none py-1 px-1 mb-2"
-                                            value="Tiêu đề câu hỏi" placeholder="Câu hỏi">
+                                            value="" placeholder="Câu hỏi">
                                         <div class="mt-4">
                                             <input type="text"
                                                 class="w-full border-b border-gray-300 py-2 focus:outline-none text-gray-500"
@@ -245,13 +242,10 @@
                                         <span class="material-icons">close</span>
                                     </button>
                                 </div>
-                               <div id="qr-code"
+                                <div id="qr-code"
                                     class="w-64 h-64 bg-gray-100 flex items-center justify-center mb-4 mx-auto">
-                                        <canvas></canvas>
-</div>
-                                <button
-                                    class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 w-full">Tải
-                                    xuống</button>
+                                    <canvas></canvas>
+                                </div>
                             </div>
                         </div>
 
@@ -271,7 +265,7 @@
                 </div>
                 <div class="flex-1">
                     <input type="text" class="question-title w-full font-medium border-b-2 border-transparent focus:border-indigo-500 focus:outline-none py-1 px-1 mb-2"
-                           value="Tiêu đề câu hỏi" placeholder="Câu hỏi">
+                           value="" placeholder="Câu hỏi">
                     <div class="mt-4">
                         <input type="text" class="w-full border-b border-gray-300 py-2 focus:outline-none text-gray-500"
                                placeholder="Văn bản trả lời ngắn" disabled>
@@ -285,12 +279,13 @@
                 <div class="flex items-center space-x-2 text-sm text-gray-500">
                     <label class="px-3 py-1 hover:bg-gray-100 rounded-md">
                         Bắt buộc
-                        <input type="checkbox" class="ml-2">
+                        <input type="checkbox" class="question-required ml-2">
                     </label>
                 </div>
             </div>
         </div>`;
-                     document.getElementById('questions-container').insertAdjacentHTML('beforeend', questionHTML);
+                    document.getElementById('questions-container').insertAdjacentHTML('beforeend',
+                        questionHTML);
                 });
 
                 // Kéo thả sắp xếp câu hỏi
@@ -396,87 +391,87 @@
                     .value);
 
                 // Nút xuất bản
-                  document.getElementById('publish-btn').addEventListener('click', async () => {
-      const title = document.getElementById('form-title')?.value || '';
-      const description = document.getElementById('form-description')?.value || '';
-      const time_limit = parseInt(document.getElementById('setting-time-limit')?.value || 0);
-      const participant_limit = parseInt(document.getElementById('setting-participant-limit')?.value || 0);
+                document.getElementById('publish-btn').addEventListener('click', async () => {
+                    const title = document.getElementById('form-title')?.value || '';
+                    const description = document.getElementById('form-description')?.value || '';
+                    const time_limit = parseInt(document.getElementById('setting-time-limit')?.value || 0);
+                    const participant_limit = parseInt(document.getElementById('setting-participant-limit')
+                        ?.value || 0);
 
-      const questions = Array.from(document.querySelectorAll('.question-box')).map(box => {
-        return {
-          title: box.querySelector('.question-title')?.value || '',
-          type: 'Trả lời ngắn',
-          required: box.querySelector('.question-required')?.checked || false,
-          options: null
-        };
-      });
-const canvas = document.querySelector('#qr-code canvas');
-  const base64Image = canvas ? canvas.toDataURL() : null;
-  console.log('QR Base64:', base64Image); // Kiểm tra
-      try {
-        const res = await fetch('/bieumau/xuat-ban', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-          },
-          body: JSON.stringify({
-    title,
-    description,
-    time_limit,
-    participant_limit,
-    theme_color: selectedColor,
-    questions,                // ✅ thêm dấu phẩy ở đây
-    qr_image: base64Image     // ✅ gửi hình QR base64 lên server
-})
-        });
+                    const questions = Array.from(document.querySelectorAll('.question-box')).map(box => {
+                        return {
+                            title: box.querySelector('.question-title')?.value || '',
+                            required: box.querySelector('.question-required')?.checked || false,
+                        };
+                    });
+                    const canvas = document.querySelector('#qr-code canvas');
+                    const base64Image = canvas ? canvas.toDataURL() : null;
+                    console.log('QR Base64:', base64Image); // Kiểm tra
+                    try {
+                        const res = await fetch('/bieumau/xuat-ban', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                    .content
+                            },
+                            body: JSON.stringify({
+                                title,
+                                description,
+                                time_limit,
+                                participant_limit,
+                                theme_color: selectedColor,
+                                questions, // ✅ thêm dấu phẩy ở đây
+                                qr_image: base64Image // ✅ gửi hình QR base64 lên server
+                            })
+                        });
 
-        const data = await res.json();
-        if (data.success) {
-          alert('🎉 Biểu mẫu đã được xuất bản thành công!');
-          currentFormCode = data.ma_bieu_mau;
-        } else {
-          alert('❌ Xuất bản thất bại. Vui lòng thử lại!');
-        }
-      } catch (err) {
-        console.error(err);
-        alert('Đã có lỗi xảy ra khi gửi dữ liệu.');
-      }
-    });
-            // Hiện QR
-    document.getElementById('show-qr-btn').addEventListener('click', () => {
-      if (!currentFormCode) {
-        alert('⚠️ Bạn cần xuất bản trước khi tạo mã QR!');
-        return;
-      }
-      const qrUrl = `${window.location.origin}/traloi-bieumau/${currentFormCode}`;
-      const canvas = document.querySelector('#qr-code canvas');
-      const qr = new QRious({
-        element: canvas,
-        value: qrUrl,
-        size: 256,
-        level: 'H'
-      });
+                        const data = await res.json();
+                        if (data.success) {
+                            alert('🎉 Biểu mẫu đã được xuất bản thành công!');
+                            currentFormCode = data.ma_bieu_mau;
+                        } else {
+                            alert('❌ Xuất bản thất bại. Vui lòng thử lại!');
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        alert('Đã có lỗi xảy ra khi gửi dữ liệu.');
+                    }
+                });
+                // Hiện QR
+                document.getElementById('show-qr-btn').addEventListener('click', () => {
+                    if (!currentFormCode) {
+                        alert('⚠️ Bạn cần xuất bản trước khi tạo mã QR!');
+                        return;
+                    }
+                    const qrUrl = `${window.location.origin}/traloi-bieumau/${currentFormCode}`;
+                    const canvas = document.querySelector('#qr-code canvas');
+                    const qr = new QRious({
+                        element: canvas,
+                        value: qrUrl,
+                        size: 256,
+                        level: 'H'
+                    });
 
 
-      document.getElementById('qr-popup').classList.remove('hidden');
-    });
+                    document.getElementById('qr-popup').classList.remove('hidden');
+                });
 
-    document.getElementById('close-qr-btn').addEventListener('click', () => {
-      document.getElementById('qr-popup').classList.add('hidden');
-    });
+                document.getElementById('close-qr-btn').addEventListener('click', () => {
+                    document.getElementById('qr-popup').classList.add('hidden');
+                });
 
-    document.getElementById('download-qr').addEventListener('click', () => {
-      const canvas = document.querySelector('#qr-code canvas');
-      const base64Image = canvas.toDataURL();
-      if (canvas) {
-        const link = document.createElement('a');
-        link.download = `${currentFormCode}.png`;
-        link.href = canvas.toDataURL();
-        link.click();
-      }
-    });
-        });
+                document.getElementById('download-qr').addEventListener('click', () => {
+                    const canvas = document.querySelector('#qr-code canvas');
+                    const base64Image = canvas.toDataURL();
+                    if (canvas) {
+                        const link = document.createElement('a');
+                        link.download = `${currentFormCode}.png`;
+                        link.href = canvas.toDataURL();
+                        link.click();
+                    }
+                });
+            });
         </script>
         <!-- Uncomment to use QR code library in production -->
         <!-- <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script> -->

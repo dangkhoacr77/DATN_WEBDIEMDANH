@@ -33,11 +33,10 @@ Route::get('/thong-tin-ca-nhan', [TTCanhanController::class, 'index'])->name('ad
 
 Route::put('/admin/ql-taikhoan/{id}', [QLTaikhoanController::class, 'update'])->name('admin.ql-taikhoan.update');
 Route::put('/admin/thong-tin-ca-nhan/{id}', [TTCanhanController::class, 'update'])->name('thong-tin-ca-nhan.update');
-// ======================= BIEUMAU =========================
 
+// ======================= BIEUMAU =========================
 Route::get('/bieumau/ds-cautraloi', [DsCautraloiController::class, 'index'])->name('bieumau.ds-cautraloi');
 Route::get('/bieumau/tao-form', [TaoFormController::class, 'index'])->name('bieumau.tao');
-Route::put('/bieumau/{ma_bieu_mau}', [TaoFormController::class, 'update'])->name('bieumau.update');
 Route::middleware(['web'])->group(function () {
     Route::post('/bieumau/xuat-ban', [TaoFormController::class, 'store']);
 });
