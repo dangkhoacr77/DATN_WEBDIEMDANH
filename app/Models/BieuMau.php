@@ -13,9 +13,10 @@ class BieuMau extends Model
     protected $keyType = 'string';
 
     protected $fillable = [
-        'ma_bieu_mau', 'tieu_de', 'hinh_anh', 'mau', 'thoi_luong_diem_danh',
-        'gioi_han_diem_danh', 'so_luong_da_diem_danh', 'trang_thai', 'ngay_tao', 'tai_khoan_ma'
-    ];
+    'ma_bieu_mau', 'tieu_de', 'mo_ta_tieu_de', 'hinh_anh', 'mau',
+    'thoi_luong_diem_danh', 'gioi_han_diem_danh', 'so_luong_da_diem_danh',
+    'trang_thai', 'ngay_tao', 'tai_khoan_ma'
+];
 
     public $timestamps = false;
 
