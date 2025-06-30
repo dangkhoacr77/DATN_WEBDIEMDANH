@@ -38,10 +38,7 @@
                     title="Câu Trả lời">
                     <span class="material-icons">description</span>
                 </a>
-                <button onclick="window.location.href='{{ route('bieumau.cai-dat') }}'"
-                    class="text-gray-700 hover:text-indigo-600 p-2 rounded-full hover:bg-indigo-50" title="Cài đặt">
-                    <span class="material-icons">settings</span>
-                </button>
+                
             </div>
 
             <!-- Nội dung chính -->

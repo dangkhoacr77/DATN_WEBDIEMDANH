@@ -35,7 +35,8 @@
             </table>
         </div>
 
-        <div id="pagination" style="display: flex; justify-content: center; gap: 8px; margin-top: 24px; flex-wrap: wrap;"></div>
+        <div id="pagination" style="display: flex; justify-content: center; gap: 8px; margin-top: 24px; flex-wrap: wrap;">
+        </div>
     </div>
 
     <div id="alertBox"
@@ -63,12 +64,14 @@
         let rowsPerPage = 15;
         let currentPage = 1;
         let searchValue = '';
-
-        const loaiTaiKhoanList = ['admin', 'nguoi_tao_form', 'nguoi_diem_danh'];
+const loaiTaiKhoanList = ['admin', 'nguoi_tao_form', 'nguoi_diem_danh'];
         const trangThaiList = ['Hoạt động', 'Khóa'];
 
         let data = @json($mappedTaiKhoans);
-        data = data.map(tk => ({ ...tk, isEditing: false }));
+        data = data.map(tk => ({
+            ...tk,
+            isEditing: false
+        }));
         let filteredData = [...data];
 
         function renderTable() {
@@ -114,7 +117,7 @@
                         <td style='padding:12px 16px;'>${row.so_dien_thoai}</td>
                         <td style='padding:12px 16px;'>${row.mail}</td>
                         <td style='padding:12px 16px;'>${row.ngay_tao}</td>
-                        <td style='padding:12px 16px;'>${row.trang_thai}</td>
+<td style='padding:12px 16px;'>${row.trang_thai}</td>
                         <td style='padding:12px 16px;'>
                             <button onclick='editRow(${globalIdx})' style='padding: 6px 12px; background: #60a5fa; border: none; border-radius: 6px; color: white; cursor: pointer;'>Sửa</button>
                         </td>
@@ -139,33 +142,33 @@
             const statusValue = statusEl.value === 'Hoạt động' ? 1 : 0;
 
             fetch(`/admin/ql-taikhoan/${maTaiKhoan}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify({
-                    loai_tai_khoan: roleEl.value,
-                    trang_thai: statusValue
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        loai_tai_khoan: roleEl.value,
+                        trang_thai: statusValue
+                    })
                 })
-            })
-            .then(res => res.json())
-            .then(res => {
-                if (res.success) {
-                    data[index].loai_tai_khoan = roleEl.value;
-                    data[index].trang_thai = statusEl.value;
-                    data[index].isEditing = false;
-                    showAlert("✅ Cập nhật thành công!");
-                    renderTable();
-                } else {
-                    showAlert("❌ Cập nhật thất bại!");
-                }
-            })
-            .catch(error => {
-                console.error("Lỗi:", error);
-                showAlert("❌ Có lỗi xảy ra khi gửi dữ liệu!");
-            });
+                .then(res => res.json())
+                .then(res => {
+                    if (res.success) {
+                        data[index].loai_tai_khoan = roleEl.value;
+                        data[index].trang_thai = statusEl.value;
+                        data[index].isEditing = false;
+                        showAlert("✅ Cập nhật thành công!");
+                        renderTable();
+                    } else {
+                        showAlert("❌ Cập nhật thất bại!");
+                    }
+                })
+                .catch(error => {
+                    console.error("Lỗi:", error);
+                    showAlert("❌ Có lỗi xảy ra khi gửi dữ liệu!");
+                });
         }
 
         function showAlert(message, duration = 3000) {
@@ -184,7 +187,7 @@
                 const btn = document.createElement("button");
                 btn.textContent = i;
                 btn.style.border = "none";
-                btn.style.background = i === currentPage ? "#4f46e5" : "#f3f3f3";
+btn.style.background = i === currentPage ? "#4f46e5" : "#f3f3f3";
                 btn.style.color = i === currentPage ? "white" : "black";
                 btn.style.padding = "6px 12px";
                 btn.style.borderRadius = "6px";
@@ -206,8 +209,10 @@
             filteredData = data.filter(row =>
                 row.ho_ten.toLowerCase().includes(searchValue) ||
                 row.mail.toLowerCase().includes(searchValue) ||
+                row.so_dien_thoai.toLowerCase().includes(searchValue) ||
+                row.loai_tai_khoan.toLowerCase().includes(searchValue) || // ✅ thêm dòng này
                 row.trang_thai.toLowerCase().includes(searchValue) ||
-                row.ngay_tao.includes(searchValue)
+                row.ngay_tao.toLowerCase().includes(searchValue)
             );
             currentPage = 1;
             renderTable();

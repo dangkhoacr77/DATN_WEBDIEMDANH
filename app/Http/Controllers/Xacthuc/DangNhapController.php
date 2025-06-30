@@ -52,7 +52,11 @@ class DangNhapController extends Controller
         }
 
         // ✅ Đăng nhập thành công
-        session(['nguoi_dung' => $nguoi_dung]);
+        session([
+    'nguoi_dung' => $nguoi_dung,
+    'ma_tai_khoan' => $nguoi_dung->ma_tai_khoan,
+    'ho_ten' => $nguoi_dung->ho_ten,
+]);
         return redirect()->route('trangchu')->with('success', 'Đăng nhập thành công!');
     }
 

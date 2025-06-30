@@ -37,6 +37,11 @@ Route::put('/admin/thong-tin-ca-nhan/{id}', [TTCanhanController::class, 'update'
 Route::get('/bieumau/cai-dat', [App\Http\Controllers\Bieumau\CaiDatController::class, 'index'])->name('bieumau.cai-dat');
 Route::get('/bieumau/ds-cautraloi', [App\Http\Controllers\Bieumau\DsCautraloiController::class, 'index'])->name('bieumau.ds-cautraloi');
 Route::get('/bieumau/tao-form', [TaoFormController::class, 'index'])->name('bieumau.tao');
+Route::put('/bieumau/{ma_bieu_mau}', [TaoFormController::class, 'update'])->name('bieumau.update');
+Route::middleware(['web'])->group(function () {
+    Route::post('/bieumau/xuat-ban', [TaoFormController::class, 'store']);
+});
+
 
 // ======================= NGUOIDUNG =========================
 Route::get('/nguoidung/ls-diemdanh', [App\Http\Controllers\Nguoidung\LsDiemdanhController::class, 'index'])->name('nguoidung.ls-diemdanh');
@@ -74,3 +79,12 @@ Route::get('/dang-xuat', function () {
     session()->forget('nguoi_dung'); // Xóa phiên đăng nhập
     return redirect()->route('trangchu')->with('success', 'Đã đăng xuất!');
 })->name('dang-xuat');
+
+
+Route::get('/test-session', function () {
+    return response()->json([
+        'ma_tai_khoan' => session('ma_tai_khoan'),
+        'nguoi_dung' => session('nguoi_dung'),
+        'all' => session()->all()
+    ]);
+});
