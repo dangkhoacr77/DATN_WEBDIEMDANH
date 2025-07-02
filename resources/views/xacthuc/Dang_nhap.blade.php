@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Đăng nhập</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss/dist/tailwind.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="bg-gray-100 flex items-center justify-center h-screen">
@@ -20,9 +20,15 @@
                 class="w-full p-3 mb-1 border rounded @error('mail') border-red-500 @enderror"
                 placeholder="you@gmail.com">
             <p id="emailError" class="text-red-500 text-sm mb-2 hidden"></p>
-            @error('mail')
-                <p class="text-red-500 text-sm mb-4">{{ $message }}</p>
-            @enderror
+            @if ($errors->has('mail'))
+                <script>
+                    document.addEventListener("DOMContentLoaded", () => {
+                        document.getElementById("emailError").textContent = "{{ $errors->first('mail') }}";
+                        document.getElementById("emailError").classList.remove("hidden");
+                        document.getElementById("emailInput").classList.add("border-red-500");
+                    });
+                </script>
+            @endif
 
             {{-- Mật khẩu --}}
             <label class="block mb-2 font-medium">Mật khẩu</label>
@@ -30,15 +36,15 @@
                 class="w-full p-3 mb-1 border rounded @error('mat_khau') border-red-500 @enderror"
                 placeholder="Nhập mật khẩu">
             <p id="passwordError" class="text-red-500 text-sm mb-2 hidden"></p>
-            @error('mat_khau')
-                <p class="text-red-500 text-sm mb-4">{{ $message }}</p>
-            @enderror
-
-            {{-- ✅ Quên mật khẩu --}}
-            {{-- <div class="mb-6 text-right">
-                <a href="{{ route('xacthuc.quen-mk') }}" class="text-sm text-blue-600 hover:underline">Quên mật
-                    khẩu?</a>
-            </div> --}}
+            @if ($errors->has('mat_khau'))
+                <script>
+                    document.addEventListener("DOMContentLoaded", () => {
+                        document.getElementById("passwordError").textContent = "{{ $errors->first('mat_khau') }}";
+                        document.getElementById("passwordError").classList.remove("hidden");
+                        document.getElementById("passwordInput").classList.add("border-red-500");
+                    });
+                </script>
+            @endif
 
             <button type="submit"
                 class="bg-blue-600 text-white font-semibold py-2 px-4 w-full rounded hover:bg-blue-700">
@@ -52,16 +58,16 @@
         </p>
     </div>
 
-    {{-- ✅ Script kiểm tra lỗi khi nhập --}}
+    {{-- ✅ Real-time validation --}}
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             const emailInput = document.getElementById("emailInput");
             const emailError = document.getElementById("emailError");
 
             const passwordInput = document.getElementById("passwordInput");
             const passwordError = document.getElementById("passwordError");
 
-            emailInput.addEventListener("input", function() {
+            emailInput.addEventListener("input", function () {
                 const emailValue = emailInput.value.trim();
                 const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -80,15 +86,23 @@
                 }
             });
 
-            passwordInput.addEventListener("input", function() {
+            passwordInput.addEventListener("input", function () {
                 const passValue = passwordInput.value.trim();
+                const minLength = 6;
+                const hasLetter = /[a-zA-Z]/.test(passValue);
+                const hasNumber = /\d/.test(passValue);
+                const hasSpecial = /[\W_]/.test(passValue);
 
                 if (!passValue) {
                     passwordError.textContent = "Vui lòng nhập mật khẩu.";
                     passwordError.classList.remove("hidden");
                     passwordInput.classList.add("border-red-500");
-                } else if (passValue.length < 6) {
+                } else if (passValue.length < minLength) {
                     passwordError.textContent = "Mật khẩu tối thiểu 6 ký tự.";
+                    passwordError.classList.remove("hidden");
+                    passwordInput.classList.add("border-red-500");
+                } else if (!hasLetter || !hasNumber || !hasSpecial) {
+                    passwordError.textContent = "Mật khẩu phải có ít nhất 1 chữ cái, 1 số và 1 ký tự đặc biệt.";
                     passwordError.classList.remove("hidden");
                     passwordInput.classList.add("border-red-500");
                 } else {
@@ -100,5 +114,4 @@
         });
     </script>
 </body>
-
 </html>

@@ -73,10 +73,10 @@
                     @endphp
 
                     @if (!$user)
-                        <span><a href="{{ route('xacthuc.dang-nhap') }}" class="text-black text-decoration-none">Đăng
-                                nhập /</a></span>
-                        <span><a href="{{ route('xacthuc.dang-ky') }}" class="text-black text-decoration-none">Đăng
-                                ký</a></span>
+                        <button><a href="{{ route('xacthuc.dang-nhap') }}" class="text-black text-decoration-none">Đăng
+                                nhập /</a></button>
+                        <button><a href="{{ route('xacthuc.dang-ky') }}" class="text-black text-decoration-none">Đăng
+                                ký</a></button>
                     @else
                         <span class="text-black">{{ $user->ho_ten }}</span>
                     @endif
@@ -116,12 +116,10 @@
                 @endphp
 
                 <div class="mt-10 flex justify-center space-x-4">
-                    @if ($user && in_array($user->loai_tai_khoan, ['admin', 'nguoi_tao_form']))
                         <a href="{{ route('bieumau.tao') }}"
                             class="bg-white text-primary hover:bg-gray-100 px-8 py-3 rounded-md text-base font-medium">
                             Tạo biểu mẫu
                         </a>
-                    @endif
 
                     <a href="#qr-scanner-area"
                         class="bg-transparent border-2 border-white hover:bg-white hover:bg-opacity-10 px-8 py-3 rounded-md text-base font-medium">

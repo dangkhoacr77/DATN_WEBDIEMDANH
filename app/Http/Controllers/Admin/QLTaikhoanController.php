@@ -14,21 +14,28 @@ class QLTaikhoanController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
+        $currentUserId = session('ma_tai_khoan'); // Lấy mã tài khoản từ session
 
         $taiKhoans = TaiKhoan::query()
             ->when($search, function ($query, $search) {
-                $query->where('ho_ten', 'like', "%$search%")
-                    ->orWhere('mail', 'like', "%$search%")
-                    ->orWhere('so_dien_thoai', 'like', "%$search%")
-                    ->orWhere('loai_tai_khoan', 'like', "%$search%")
-                    ->orWhere('trang_thai', 'like', "%$search%")
-                    ->orWhere('ngay_tao', 'like', "%$search%");
+                $query->where(function ($q) use ($search) {
+                    $q->where('ho_ten', 'like', "%$search%")
+                        ->orWhere('mail', 'like', "%$search%")
+                        ->orWhere('so_dien_thoai', 'like', "%$search%")
+                        ->orWhere('loai_tai_khoan', 'like', "%$search%")
+                        ->orWhere('trang_thai', 'like', "%$search%")
+                        ->orWhere('ngay_tao', 'like', "%$search%");
+                });
+            })
+            ->when($currentUserId, function ($query, $currentUserId) {
+                return $query->where('ma_tai_khoan', '<>', $currentUserId);
             })
             ->orderByDesc('ngay_tao')
-            ->get(); // ✅ Đổi từ paginate() sang get()
+            ->get();
 
         return view('admin.Ql_taikhoan', compact('taiKhoans', 'search'));
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -75,7 +82,7 @@ class QLTaikhoanController extends Controller
         }
 
         $validated = $request->validate([
-            'loai_tai_khoan' => 'required|in:admin,nguoi_tao_form,nguoi_diem_danh',
+            'loai_tai_khoan' => 'required|in:admin,nguoi_dung',
             'trang_thai' => 'required|in:0,1',
         ]);
 

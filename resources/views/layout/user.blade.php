@@ -36,15 +36,8 @@
                 <div id="avatarDropdown"
                     style="position: absolute; right: 0; top: 50px; display: none; background: white; border: 1px solid #ccc; border-radius: 5px; z-index: 100; min-width: 120px;">
                     @if (!$user)
-                        <a href="{{ route('xacthuc.dang-nhap') }}"
-                            style="display: block; padding: 10px 15px; text-decoration: none; color: black;">Đăng
-                            nhập</a>
-                        <a href="{{ route('xacthuc.dang-ky') }}"
-                            style="display: block; padding: 10px 15px; text-decoration: none; color: black;">Đăng ký</a>
                     @else
                         @if ($user->loai_tai_khoan === 'admin')
-                            <a href="{{ route('admin.thong-ke') }}"
-                                style="display: block; padding: 10px 15px; text-decoration: none; color: black;">Admin</a>
                         @else
                             <a href="{{ route('nguoidung.tt-canhan') }}"
                                 style="display: block; padding: 10px 15px; text-decoration: none; color: black;">Người
@@ -79,7 +72,6 @@
                         </a>
 
                         {{-- Người tạo form --}}
-                        @if ($user && $user->loai_tai_khoan === 'nguoi_tao_form')
                             <a href="{{ route('nguoidung.ql-bieumau') }}"
                                 style="display:block; padding:12px 16px; text-decoration:none;
                                       color:{{ request()->routeIs('nguoidung.ql-bieumau') ? '#0d6efd' : '#333' }};
@@ -96,10 +88,6 @@
                                       background-color: {{ request()->routeIs('nguoidung.ql-danhsach') ? '#e9f1ff' : 'transparent' }};">
                                 Danh sách điểm danh
                             </a>
-                        @endif
-
-                        {{-- Người điểm danh --}}
-                        @if ($user && $user->loai_tai_khoan === 'nguoi_diem_danh')
                             <a href="{{ route('nguoidung.ls-diemdanh') }}"
                                 style="display:block; padding:12px 16px; text-decoration:none;
                                       color:{{ request()->routeIs('nguoidung.ls-diemdanh') ? '#0d6efd' : '#333' }};
@@ -108,7 +96,6 @@
                                       background-color: {{ request()->routeIs('nguoidung.ls-diemdanh') ? '#e9f1ff' : 'transparent' }};">
                                 Lịch sử điểm danh
                             </a>
-                        @endif
                     </nav>
                 </div>
             </div>
