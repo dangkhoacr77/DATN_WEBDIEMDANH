@@ -50,6 +50,7 @@ Route::delete('/nguoidung/bieumau/xoa-da-chon', [NguoidungQLBieumauController::c
 Route::get('/nguoidung/ql-danhsach', [QLDanhsachController::class, 'index'])->name('nguoidung.ql-danhsach');
 Route::delete('/nguoidung/ql-danhsach/delete', [QLDanhsachController::class, 'destroy'])->name('nguoidung.ql-danhsach.destroy');
 Route::get('/nguoidung/ql-danhsach/export/{id}', [QLDanhsachController::class, 'export'])->name('nguoidung.ql-danhsach.export');
+Route::get('/nguoidung/ql-danhsach/{id}/preview', [QLDanhsachController::class, 'preview'])->name('nguoidung.ql-danhsach.preview');
 
 Route::get('/nguoidung/traloi-bieumau', [TraloiBieumauController::class, 'index'])->name('nguoidung.traloi-bieumau');
 Route::get('/traloi-bieumau/{id}', [TraloiBieumauController::class, 'show'])->name('traloi-bieumau.show');

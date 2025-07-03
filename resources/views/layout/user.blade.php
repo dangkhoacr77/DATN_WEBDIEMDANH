@@ -16,48 +16,34 @@
     @endphp
 
     <!-- Navbar -->
-    <!-- Header -->
     <nav class="navbar navbar-light bg-primary text-white px-3 d-flex justify-content-between">
-        <div onclick="window.location.href='{{ route('trangchu') }}'"class="navbar-brand mb-0 h1 text-white">QR Điểm Danh</div>
+        <div onclick="window.location.href='{{ route('trangchu') }}'" class="navbar-brand mb-0 h1 text-white">
+            QR Điểm Danh
+        </div>
         <div class="d-flex align-items-center gap-3">
-
             <!-- Avatar & menu -->
             <div class="avatar-menu" onclick="toggleMenu()"
                 style="position: relative; display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                @php
-                    $user = session('nguoi_dung');
-                @endphp
-
-                @if (!$user)
-                @else
+                @if ($user)
                     <span class="text-white">{{ $user->ho_ten }}</span>
                 @endif
 
                 <div id="avatarDropdown"
                     style="position: absolute; right: 0; top: 50px; display: none; background: white; border: 1px solid #ccc; border-radius: 5px; z-index: 100; min-width: 120px;">
-                    @if (!$user)
-                        <a href="{{ route('xacthuc.dang-nhap') }}"
-                            style="display: block; padding: 10px 15px; text-decoration: none; color: black;">Đăng
-                            nhập</a>
-                        <a href="{{ route('xacthuc.dang-ky') }}"
-                            style="display: block; padding: 10px 15px; text-decoration: none; color: black;">Đăng ký</a>
-                    @else
-                        @if ($user->loai_tai_khoan === 'admin')
-                            <a href="{{ route('admin.thong-ke') }}"
-                                style="display: block; padding: 10px 15px; text-decoration: none; color: black;">Admin</a>
-                        @else
+                    @if ($user)
+                        @if ($user->loai_tai_khoan !== 'admin')
                             <a href="{{ route('nguoidung.tt-canhan') }}"
-                                style="display: block; padding: 10px 15px; text-decoration: none; color: black;">Người
-                                dùng</a>
+                                style="display: block; padding: 10px 15px; text-decoration: none; color: black;">
+                                Người dùng
+                            </a>
                         @endif
-
-                        {{-- Đăng xuất --}}
-                       <a href="{{ route('dang-xuat') }}"
-                                    style="display: block; padding: 10px 15px; text-decoration: none; color: black;">Đăng xuất</a>
+                        <a href="{{ route('dang-xuat') }}"
+                            style="display: block; padding: 10px 15px; text-decoration: none; color: black;">
+                            Đăng xuất
+                        </a>
                     @endif
                 </div>
             </div>
-
         </div>
     </nav>
 
@@ -68,47 +54,41 @@
             <div class="col-md-3 col-sm-12 mb-4">
                 <div class="bg-white rounded shadow-sm p-2">
                     <nav class="nav flex-column">
-                        {{-- Thông tin cá nhân --}}
                         <a href="{{ route('nguoidung.tt-canhan') }}"
                             style="display:block; padding:12px 16px; text-decoration:none;
-                                  color:{{ request()->routeIs('nguoidung.tt-canhan') ? '#0d6efd' : '#333' }};
-                                  font-weight:{{ request()->routeIs('nguoidung.tt-canhan') ? 'bold' : '500' }};
-                                  border-left:4px solid {{ request()->routeIs('nguoidung.tt-canhan') ? '#0d6efd' : 'transparent' }};
-                                  background-color: {{ request()->routeIs('nguoidung.tt-canhan') ? '#e9f1ff' : 'transparent' }};">
+                                color:{{ request()->routeIs('nguoidung.tt-canhan') ? '#0d6efd' : '#333' }};
+                                font-weight:{{ request()->routeIs('nguoidung.tt-canhan') ? 'bold' : '500' }};
+                                border-left:4px solid {{ request()->routeIs('nguoidung.tt-canhan') ? '#0d6efd' : 'transparent' }};
+                                background-color: {{ request()->routeIs('nguoidung.tt-canhan') ? '#e9f1ff' : 'transparent' }};">
                             Thông tin cá nhân
                         </a>
 
-                        {{-- Người tạo form --}}
-                        @if ($user && $user->loai_tai_khoan === 'nguoi_tao_form')
-                            <a href="{{ route('nguoidung.ql-bieumau') }}"
-                                style="display:block; padding:12px 16px; text-decoration:none;
-                                      color:{{ request()->routeIs('nguoidung.ql-bieumau') ? '#0d6efd' : '#333' }};
-                                      font-weight:{{ request()->routeIs('nguoidung.ql-bieumau') ? 'bold' : '500' }};
-                                      border-left:4px solid {{ request()->routeIs('nguoidung.ql-bieumau') ? '#0d6efd' : 'transparent' }};
-                                      background-color: {{ request()->routeIs('nguoidung.ql-bieumau') ? '#e9f1ff' : 'transparent' }};">
-                                Danh sách biểu mẫu
-                            </a>
-                            <a href="{{ route('nguoidung.ql-danhsach') }}"
-                                style="display:block; padding:12px 16px; text-decoration:none;
-                                      color:{{ request()->routeIs('nguoidung.ql-danhsach') ? '#0d6efd' : '#333' }};
-                                      font-weight:{{ request()->routeIs('nguoidung.ql-danhsach') ? 'bold' : '500' }};
-                                      border-left:4px solid {{ request()->routeIs('nguoidung.ql-danhsach') ? '#0d6efd' : 'transparent' }};
-                                      background-color: {{ request()->routeIs('nguoidung.ql-danhsach') ? '#e9f1ff' : 'transparent' }};">
-                                Danh sách điểm danh
-                            </a>
-                        @endif
+                        <a href="{{ route('nguoidung.ql-bieumau') }}"
+                            style="display:block; padding:12px 16px; text-decoration:none;
+                                color:{{ request()->routeIs('nguoidung.ql-bieumau') ? '#0d6efd' : '#333' }};
+                                font-weight:{{ request()->routeIs('nguoidung.ql-bieumau') ? 'bold' : '500' }};
+                                border-left:4px solid {{ request()->routeIs('nguoidung.ql-bieumau') ? '#0d6efd' : 'transparent' }};
+                                background-color: {{ request()->routeIs('nguoidung.ql-bieumau') ? '#e9f1ff' : 'transparent' }};">
+                            Danh sách biểu mẫu
+                        </a>
 
-                        {{-- Người điểm danh --}}
-                        @if ($user && $user->loai_tai_khoan === 'nguoi_diem_danh')
-                            <a href="{{ route('nguoidung.ls-diemdanh') }}"
-                                style="display:block; padding:12px 16px; text-decoration:none;
-                                      color:{{ request()->routeIs('nguoidung.ls-diemdanh') ? '#0d6efd' : '#333' }};
-                                      font-weight:{{ request()->routeIs('nguoidung.ls-diemdanh') ? 'bold' : '500' }};
-                                      border-left:4px solid {{ request()->routeIs('nguoidung.ls-diemdanh') ? '#0d6efd' : 'transparent' }};
-                                      background-color: {{ request()->routeIs('nguoidung.ls-diemdanh') ? '#e9f1ff' : 'transparent' }};">
-                                Lịch sử điểm danh
-                            </a>
-                        @endif
+                        <a href="{{ route('nguoidung.ql-danhsach') }}"
+                            style="display:block; padding:12px 16px; text-decoration:none;
+                                color:{{ request()->routeIs('nguoidung.ql-danhsach') ? '#0d6efd' : '#333' }};
+                                font-weight:{{ request()->routeIs('nguoidung.ql-danhsach') ? 'bold' : '500' }};
+                                border-left:4px solid {{ request()->routeIs('nguoidung.ql-danhsach') ? '#0d6efd' : 'transparent' }};
+                                background-color: {{ request()->routeIs('nguoidung.ql-danhsach') ? '#e9f1ff' : 'transparent' }};">
+                            Danh sách điểm danh
+                        </a>
+
+                        <a href="{{ route('nguoidung.ls-diemdanh') }}"
+                            style="display:block; padding:12px 16px; text-decoration:none;
+                                color:{{ request()->routeIs('nguoidung.ls-diemdanh') ? '#0d6efd' : '#333' }};
+                                font-weight:{{ request()->routeIs('nguoidung.ls-diemdanh') ? 'bold' : '500' }};
+                                border-left:4px solid {{ request()->routeIs('nguoidung.ls-diemdanh') ? '#0d6efd' : 'transparent' }};
+                                background-color: {{ request()->routeIs('nguoidung.ls-diemdanh') ? '#e9f1ff' : 'transparent' }};">
+                            Lịch sử điểm danh
+                        </a>
                     </nav>
                 </div>
             </div>
@@ -127,8 +107,7 @@
     <footer class="text-white text-center py-5" style="background: #1c1f3c;">
         <div class="d-flex flex-column align-items-center">
             <div class="d-flex align-items-center mb-2">
-                <div
-                    style="width: 40px; height: 40px; background-color: #2dc5c5; color: white; border-radius: 50%; font-weight: bold; display: flex; align-items: center; justify-content: center; margin-right: 10px;">
+                <div style="width: 40px; height: 40px; background-color: #2dc5c5; color: white; border-radius: 50%; font-weight: bold; display: flex; align-items: center; justify-content: center; margin-right: 10px;">
                     QR DD
                 </div>
                 <span class="text-white">Dự án lập trình web</span>
@@ -144,6 +123,7 @@
             const menu = document.getElementById('avatarDropdown');
             menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
         }
+
         window.onclick = function(event) {
             if (!event.target.closest('.avatar-menu')) {
                 const menu = document.getElementById('avatarDropdown');
@@ -151,7 +131,11 @@
             }
         };
     </script>
+
     @stack('scripts')
+
+    <!-- ✅ Bootstrap JS để Modal hoạt động -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

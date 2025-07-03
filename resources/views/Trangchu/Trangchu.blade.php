@@ -73,10 +73,10 @@
                     @endphp
 
                     @if (!$user)
-                        <span><a href="{{ route('xacthuc.dang-nhap') }}" class="text-black text-decoration-none">Đăng
-                                nhập /</a></span>
-                        <span><a href="{{ route('xacthuc.dang-ky') }}" class="text-black text-decoration-none">Đăng
-                                ký</a></span>
+                        <button><a href="{{ route('xacthuc.dang-nhap') }}" class="text-black text-decoration-none">Đăng
+                                nhập /</a></button>
+                        <button><a href="{{ route('xacthuc.dang-ky') }}" class="text-black text-decoration-none">Đăng
+                                ký</a></button>
                     @else
                         <span class="text-black">{{ $user->ho_ten }}</span>
                     @endif
@@ -93,7 +93,8 @@
                                     dùng</a>
                             @endif
                             <a href="{{ route('dang-xuat') }}"
-                                    style="display: block; padding: 10px 15px; text-decoration: none; color: black;">Đăng xuất</a>
+                                style="display: block; padding: 10px 15px; text-decoration: none; color: black;">Đăng
+                                xuất</a>
                         @endif
                     </div>
                 </div>
@@ -116,7 +117,7 @@
                 @endphp
 
                 <div class="mt-10 flex justify-center space-x-4">
-                    @if ($user && in_array($user->loai_tai_khoan, ['admin', 'nguoi_tao_form']))
+                    @if ($user)
                         <a href="{{ route('bieumau.tao') }}"
                             class="bg-white text-primary hover:bg-gray-100 px-8 py-3 rounded-md text-base font-medium">
                             Tạo biểu mẫu
@@ -212,82 +213,118 @@
     <script src="https://unpkg.com/html5-qrcode"></script>
 
     <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // ========== Feature Cards ==========
-        const featureCards = document.querySelectorAll(".feature-card");
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = "1";
-                    entry.target.style.transform = "translateY(0)";
-                }
-            });
-        }, { threshold: 0.1 });
-
-        featureCards.forEach((card) => {
-            card.style.opacity = "0";
-            card.style.transform = "translateY(20px)";
-            card.style.transition = "all 0.5s ease";
-            observer.observe(card);
-        });
-
-        // ========== QR Scanner ==========
-        const qrResult = document.getElementById('qr-result');
-        const cameraButton = document.getElementById("start-camera-btn");
-        const html5QrCode = new Html5Qrcode("reader");
-        let isCameraRunning = false;
-        let currentCameraId = null;
-
-        function toggleQRScanner() {
-            if (isCameraRunning) {
-                html5QrCode.stop().then(() => {
-                    isCameraRunning = false;
-                    cameraButton.innerHTML = '<i class="fas fa-camera mr-2"></i> Mở';
-                }).catch(err => {
-                    console.error("Không thể tắt camera:", err);
-                });
-            } else {
-                Html5Qrcode.getCameras().then(cameras => {
-                    if (cameras && cameras.length) {
-                        currentCameraId = cameras[0].id;
-                        html5QrCode.start(
-                            currentCameraId,
-                            { fps: 10, qrbox: 250 },
-                            qrCodeMessage => {
-                                qrResult.textContent = qrCodeMessage;
-                                html5QrCode.stop(); isCameraRunning = false; cameraButton.innerHTML = '<i class="fas fa-camera mr-2"></i> Mở';
-                            },
-                            errorMessage => {
-                                // Xử lý lỗi quét ở đây nếu muốn
-                            }
-                        ).then(() => {
-                            isCameraRunning = true;
-                            cameraButton.innerHTML = '<i class="fas fa-times mr-2"></i> Tắt';
-                        }).catch(err => {
-                            console.error("Không thể mở camera:", err);
-                        });
+        document.addEventListener("DOMContentLoaded", function() {
+            // ===== Feature Card Animation (giữ nguyên nếu cần) =====
+            const featureCards = document.querySelectorAll(".feature-card");
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = "1";
+                        entry.target.style.transform = "translateY(0)";
                     }
-                }).catch(err => {
-                    console.error("Không tìm thấy camera:", err);
                 });
+            }, {
+                threshold: 0.1
+            });
+
+            featureCards.forEach((card) => {
+                card.style.opacity = "0";
+                card.style.transform = "translateY(20px)";
+                card.style.transition = "all 0.5s ease";
+                observer.observe(card);
+            });
+
+            // ===== QR Scanner =====
+            const qrResult = document.getElementById('qr-result');
+            const cameraButton = document.getElementById("start-camera-btn");
+            const html5QrCode = new Html5Qrcode("reader");
+            let isCameraRunning = false;
+            let currentCameraId = null;
+
+            function toggleQRScanner() {
+                if (isCameraRunning) {
+                    html5QrCode.stop().then(() => {
+                        isCameraRunning = false;
+                        cameraButton.innerHTML = '<i class="fas fa-camera mr-2"></i> Mở';
+                    }).catch(err => {
+                        console.error("Không thể tắt camera:", err);
+                    });
+                } else {
+                    Html5Qrcode.getCameras().then(cameras => {
+                            console.log("Danh sách camera:", cameras);
+
+                            if (cameras && cameras.length) {
+                                let selectedCameraId = null;
+
+                                // Nếu có từ 2 camera trở lên thì ưu tiên camera sau
+                                if (cameras.length > 1) {
+                                    const backCamera = cameras.find(camera =>
+                                        /back|rear|environment/i.test(camera.label));
+                                    selectedCameraId = backCamera ? backCamera.id : cameras[0].id;
+                                } else {
+                                    // Chỉ có 1 camera (ví dụ trên laptop) => dùng camera đó
+                                    selectedCameraId = cameras[0].id;
+                                }
+
+                                currentCameraId = selectedCameraId;
+
+                                html5QrCode.start(
+                                        selectedCameraId, {
+                                            fps: 10,
+                                            qrbox: 250
+                                        },
+                                        qrCodeMessage => {
+                                            console.log("Kết quả QR:", qrCodeMessage);
+
+                                            if (qrCodeMessage.startsWith("http://") || qrCodeMessage.startsWith(
+                                                    "https://")) {
+                                                isCameraRunning = false;
+                                                cameraButton.innerHTML =
+                                                '<i class="fas fa-camera mr-2"></i> Mở';
+                                                window.location.href = qrCodeMessage;
+                                            } else {
+                                                alert("QR không chứa URL hợp lệ: " + qrCodeMessage);
+                                                html5QrCode.stop();
+                                            }
+                                        isCameraRunning = false; cameraButton.innerHTML =
+                                        '<i class="fas fa-camera mr-2"></i> Mở';
+                                    },
+                                    errorMessage => {
+                                        console.warn("Lỗi quét:", errorMessage);
+                                    }
+                            ).then(() => {
+                                isCameraRunning = true;
+                                cameraButton.innerHTML = '<i class="fas fa-times mr-2"></i> Tắt';
+                            }).catch(err => {
+                                console.error("Không thể mở camera:", err);
+                            });
+
+                        } else {
+                            alert("Không tìm thấy camera.");
+                        }
+                    }).catch(err => {
+                    console.error("Lỗi khi lấy camera:", err);
+                });
+
             }
         }
 
         cameraButton.addEventListener("click", toggleQRScanner);
-    });
+        });
 
-    // ========== Avatar Menu Toggle ==========
-    function toggleMenu() {
-        const menu = document.getElementById("avatarDropdown");
-        menu.style.display = menu.style.display === "block" ? "none" : "block";
-    }
-
-    window.onclick = function (event) {
-        if (!event.target.closest('.avatar-menu')) {
-            document.getElementById("avatarDropdown").style.display = 'none';
+        // ===== Avatar Dropdown =====
+        function toggleMenu() {
+            const menu = document.getElementById("avatarDropdown");
+            menu.style.display = menu.style.display === "block" ? "none" : "block";
         }
-    };
-</script>
+
+        window.onclick = function(event) {
+            if (!event.target.closest('.avatar-menu')) {
+                document.getElementById("avatarDropdown").style.display = 'none';
+            }
+        };
+    </script>
+
 
 </body>
 

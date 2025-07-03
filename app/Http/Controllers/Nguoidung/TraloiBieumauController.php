@@ -9,6 +9,8 @@ use App\Models\CauTraLoi;
 use App\Models\BieuMau;
 use Illuminate\Support\Str;
 use Jenssegers\Agent\Agent;
+use DeviceDetector\DeviceDetector;
+use DeviceDetector\Parser\Device\DeviceParserAbstract;
 
 class TraloiBieumauController extends Controller
 {
@@ -41,12 +43,19 @@ class TraloiBieumauController extends Controller
         $maDiemDanh = Str::uuid()->toString();
         $taiKhoanMa = session('ma_tai_khoan');
 
-        // Lấy thông tin thiết bị
-        $agent = new Agent();
-        $device = $agent->device();
-        $platform = $agent->platform();
-        $browser = $agent->browser();
-        $thietBiDiemDanh = "$device - $platform - $browser";
+        // ✅ Lấy thông tin thiết bị cụ thể hơn với DeviceDetector
+        $userAgent = $request->userAgent(); // hoặc: $request->header('User-Agent')
+        $dd = new \DeviceDetector\DeviceDetector($userAgent);
+        $dd->parse();
+
+        $device = $dd->getDeviceName();               // smartphone, desktop, tablet, ...
+        $os = $dd->getOs('name');                     // Android, iOS, Windows, ...
+        $brand = $dd->getBrandName();                 // Apple, Samsung, etc.
+        $model = $dd->getModel();                     // iPhone 13, Galaxy S21, etc.
+        $browserData = $dd->getClient();              // ['name' => ..., 'version' => ...]
+
+        $thietBiDiemDanh = "$device - $os - $brand $model - {$browserData['name']} {$browserData['version']}";
+        $thietBiDiemDanh = Str::limit($thietBiDiemDanh, 100); // Giới hạn 100 ký tự (tùy DB)
 
         // Lấy biểu mẫu và danh sách liên quan
         $bieuMau = BieuMau::with('danhSach')->where('ma_bieu_mau', $bieuMauMa)->first();
@@ -60,7 +69,7 @@ class TraloiBieumauController extends Controller
         DiemDanh::create([
             'ma_diem_danh' => $maDiemDanh,
             'thoi_gian_diem_danh' => now(),
-            'thiet_bi_diem_danh' => Str::limit($thietBiDiemDanh, 100),
+            'thiet_bi_diem_danh' => $thietBiDiemDanh,
             'dinh_vi_thiet_bi' => $request->input('location') ?? '',
             'bieu_mau_ma' => $bieuMauMa,
             'tai_khoan_ma' => $taiKhoanMa,
@@ -84,6 +93,7 @@ class TraloiBieumauController extends Controller
             'hideQuestions' => true,
         ]);
     }
+
     /**
      * Display the specified resource.
      */

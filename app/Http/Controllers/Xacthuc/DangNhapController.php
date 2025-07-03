@@ -21,11 +21,18 @@ class DangNhapController extends Controller
     {
         $validatedData = $request->validate([
             'mail' => ['required', 'email'],
-            'mat_khau' => ['required'],
+            'mat_khau' => [
+                'required',
+                'string',
+                'min:6',
+                'regex:/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[\W_]).+$/',
+            ],
         ], [
             'mail.required' => 'Vui lòng nhập địa chỉ email.',
             'mail.email' => 'Địa chỉ email không hợp lệ.',
             'mat_khau.required' => 'Vui lòng nhập mật khẩu.',
+            'mat_khau.min' => 'Mật khẩu phải có ít nhất 6 ký tự.',
+            'mat_khau.regex' => 'Mật khẩu phải có ít nhất 1 chữ cái, 1 số và 1 ký tự đặc biệt.',
         ]);
 
         $nguoi_dung = TaiKhoan::where('mail', $request->mail)->first();
@@ -53,10 +60,10 @@ class DangNhapController extends Controller
 
         // ✅ Đăng nhập thành công
         session([
-    'nguoi_dung' => $nguoi_dung,
-    'ma_tai_khoan' => $nguoi_dung->ma_tai_khoan,
-    'ho_ten' => $nguoi_dung->ho_ten,
-]);
+            'nguoi_dung' => $nguoi_dung,
+            'ma_tai_khoan' => $nguoi_dung->ma_tai_khoan,
+            'ho_ten' => $nguoi_dung->ho_ten,
+        ]);
         return redirect()->route('trangchu')->with('success', 'Đăng nhập thành công!');
     }
 

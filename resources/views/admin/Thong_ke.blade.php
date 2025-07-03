@@ -57,7 +57,23 @@
 
             // Biểu đồ biểu mẫu theo tháng
             const formCtx = document.getElementById('formChart')?.getContext('2d');
+
             if (formCtx) {
+                // Lấy dữ liệu từ Laravel
+                const data = @json($bieuMauData);
+
+                // Tìm giá trị lớn nhất trong mảng dữ liệu
+                const maxValue = Math.max(...data);
+
+                // Xác định stepSize và max dựa vào maxValue
+                let stepSize = 1;
+                let maxTick = undefined;
+
+                if (maxValue >= 50) {
+                    stepSize = 10;
+                    maxTick = Math.ceil(maxValue / 10) * 10; // làm tròn max lên bội số của 10
+                }
+
                 new Chart(formCtx, {
                     type: 'bar',
                     data: {
@@ -66,7 +82,7 @@
                         ],
                         datasets: [{
                             label: 'Biểu mẫu đã tạo',
-                            data: @json($bieuMauData),
+                            data: data,
                             backgroundColor: '#6366f1',
                             borderRadius: 6,
                             barThickness: 32
@@ -78,7 +94,8 @@
                             y: {
                                 beginAtZero: true,
                                 ticks: {
-                                    stepSize: 1
+                                    stepSize: stepSize,
+                                    max: maxTick // Chỉ set max nếu cần
                                 },
                                 grid: {
                                     color: '#e5e7eb'

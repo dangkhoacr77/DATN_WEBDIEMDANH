@@ -14,8 +14,8 @@
             <label style="font-size: 14px;">
                 Hiển thị:
                 <select id="rowsPerPageSelect" style="padding: 6px 12px; border-radius: 6px;">
-                    <option value="7">7 dòng</option>
-                    <option value="15" selected>15 dòng</option>
+                    <option value="7"selected>7 dòng</option>
+                    <option value="15">15 dòng</option>
                     <option value="20">20 dòng</option>
                 </select>
             </label>
@@ -37,7 +37,7 @@
         </div>
 
         <!-- Custom Pagination -->
-        <div class="custom-pagination"></div>
+        <div class="custom-pagination" style="display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 24px;"></div>
     </div>
 @endsection
 
@@ -55,7 +55,7 @@
 
 <script>
     let formData = @json($mappedBieuMaus);
-    let rowsPerPage = 10;
+    let rowsPerPage = 7;
     let currentPage = 1;
     let searchValue = "";
 
@@ -64,19 +64,24 @@
     function renderFormTable() {
         const tbody = document.getElementById("form-body");
         tbody.innerHTML = "";
+
         const start = (currentPage - 1) * rowsPerPage;
         const rows = filteredData.slice(start, start + rowsPerPage);
 
         if (rows.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:12px;">Không tìm thấy dữ liệu</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px;">&nbsp;</td></tr>`;
             return;
         }
 
-        rows.forEach((row, index) => {
+        rows.forEach(row => {
             const tr = document.createElement("tr");
+            tr.setAttribute("style", "background-color: #fff; border-bottom: 1px solid #eee;");
             tr.innerHTML = `
                 <td style="padding:12px;">${row.tieu_de}</td>
-                <td style="padding:12px;">${row.mau}</td>
+                <td style="padding:12px;">
+                    <span style="display:inline-block;width:12px;height:12px;border-radius:4px;margin-right:6px;background-color:${row.mau}"></span>
+                    ${row.mau}
+                </td>
                 <td style="padding:12px;">${row.nguoi_tao}</td>
                 <td style="padding:12px;">${row.ngay_tao}</td>
             `;
@@ -93,6 +98,30 @@
             const btn = document.createElement("button");
             btn.textContent = i;
             btn.className = "page" + (i === currentPage ? " active" : "");
+            btn.setAttribute("style", `
+                padding: 8px 14px;
+                border-radius: 12px;
+                background: ${i === currentPage ? '#3b82f6' : '#f1f5f9'};
+                color: ${i === currentPage ? 'white' : '#1e293b'};
+                font-weight: ${i === currentPage ? '600' : '500'};
+                font-size: 14px;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+                border: none;
+                cursor: pointer;
+                transition: all 0.2s ease-in-out;
+            `);
+            btn.onmouseover = () => {
+                if (i !== currentPage) {
+                    btn.style.background = "#3b82f6";
+                    btn.style.color = "white";
+                }
+            };
+            btn.onmouseout = () => {
+                if (i !== currentPage) {
+                    btn.style.background = "#f1f5f9";
+                    btn.style.color = "#1e293b";
+                }
+            };
             btn.onclick = () => {
                 currentPage = i;
                 renderFormTable();
@@ -131,39 +160,4 @@
         renderPagination();
     });
 </script>
-
-<style>
-    .custom-pagination {
-        display: flex;
-        justify-content: center;
-        gap: 8px;
-        flex-wrap: wrap;
-        margin-top: 24px;
-    }
-
-    .custom-pagination .page {
-        padding: 8px 14px;
-        border-radius: 12px;
-        background: #f1f5f9;
-        color: #1e293b;
-        font-weight: 500;
-        font-size: 14px;
-        text-decoration: none;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-        transition: all 0.2s ease-in-out;
-        border: none;
-        cursor: pointer;
-    }
-
-    .custom-pagination .page.active {
-        background: #3b82f6;
-        color: white;
-        font-weight: 600;
-    }
-
-    .custom-pagination .page:hover:not(.active) {
-        background: #3b82f6;
-        color: white;
-    }
-</style>
 @endpush
