@@ -36,7 +36,6 @@ Route::put('/admin/ql-taikhoan/{id}', [QLTaikhoanController::class, 'update'])->
 Route::put('/admin/thong-tin-ca-nhan/{id}', [TTCanhanController::class, 'update'])->name('thong-tin-ca-nhan.update');
 
 // ======================= BIEUMAU =========================
-Route::get('/bieumau/ds-cautraloi', [DsCautraloiController::class, 'index'])->name('bieumau.ds-cautraloi');
 Route::get('/bieumau/tao-form', [TaoFormController::class, 'index'])->name('bieumau.tao');
 Route::middleware(['web'])->group(function () {
     Route::post('/bieumau/xuat-ban', [TaoFormController::class, 'store']);
