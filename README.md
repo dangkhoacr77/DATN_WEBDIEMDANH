@@ -3,6 +3,7 @@ composer install
 cp .env.example .env    
 php artisan key:generate
 php artisan migrate
+php artisan storage:link
 
 b2: chạy all bên dưới
 php artisan config:clear

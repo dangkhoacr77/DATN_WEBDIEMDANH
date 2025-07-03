@@ -94,9 +94,9 @@
     <h3 class="font-medium mb-4">Ảnh nền</h3>
     <div class="grid grid-cols-2 gap-4">
         @for ($i = 1; $i <= 5; $i++)
-            <img src="{{ asset('storage/backgrounds/bg' . $i . '.jpg') }}"
+            <img src="{{ asset('storage/backgrounds/Mau' . $i . '.jpg') }}"
                  class="bg-image-option w-full h-24 object-cover rounded cursor-pointer border-2 border-transparent hover:border-indigo-500"
-                 data-src="{{ asset('storage/backgrounds/bg' . $i . '.jpg') }}">
+                 data-src="{{ asset('storage/backgrounds/Mau' . $i . '.jpg') }}">
         @endfor
     </div>
 </div>
