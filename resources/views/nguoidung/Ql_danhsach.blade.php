@@ -23,7 +23,6 @@
                         <th>Tên danh sách</th>
                         <th>Ngày tạo</th>
                         <th>Thời gian</th>
-                        <th>Hành động</th>
                     </tr>
                 </thead>
                 <tbody id="list-body">
@@ -32,6 +31,11 @@
             </table>
         </div>
     </form>
+
+    <!-- Phân trang -->
+    <nav aria-label="Phân trang">
+        <ul class="pagination justify-content-end mt-3" id="pagination"></ul>
+    </nav>
 
     <!-- Modal preview -->
     <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
@@ -50,9 +54,34 @@
 @endsection
 
 @push('scripts')
+<style>
+    .table-bordered td,
+    .table-bordered th {
+        border-left: none !important;
+        border-right: none !important;
+    }
+
+    .table-bordered {
+        border-left: none !important;
+        border-right: none !important;
+    }
+
+    #list-body tr:first-child td {
+        border-top: none !important;
+    }
+
+    .table thead,
+    .table thead tr {
+        border-top: none !important;
+    }
+</style>
+
 <script>
     const originalData = @json($danhSach);
     let filteredData = [...originalData];
+
+    const rowsPerPage = 7;
+    const pagination = document.getElementById("pagination");
 
     function renderTable(data) {
         const tbody = document.getElementById("list-body");
@@ -83,16 +112,6 @@
             `;
             tbody.appendChild(tr);
         });
-    }
-
-    function applySearch(keyword) {
-        const lowerKeyword = keyword.toLowerCase();
-        filteredData = originalData.filter(ds =>
-            ds.ten_danh_sach.toLowerCase().includes(lowerKeyword) ||
-            ds.ngay_tao.includes(lowerKeyword) ||
-            ds.thoi_gian_tao.includes(lowerKeyword)
-        );
-        renderTable(filteredData);
     }
 
     function toggleAll(master) {
@@ -154,6 +173,44 @@
             });
     }
 
+    function displayPage(data, page) {
+        const start = (page - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        const pageData = data.slice(start, end);
+        renderTable(pageData);
+        renderPagination(data.length, page);
+    }
+
+    function renderPagination(totalRows, currentPage) {
+        const totalPages = Math.ceil(totalRows / rowsPerPage);
+        pagination.innerHTML = "";
+
+        for (let i = 1; i <= totalPages; i++) {
+            const li = document.createElement("li");
+            li.className = `page-item ${i === currentPage ? "active" : ""}`;
+            const a = document.createElement("a");
+            a.className = "page-link";
+            a.href = "#";
+            a.textContent = i;
+            a.onclick = e => {
+                e.preventDefault();
+                displayPage(filteredData, i);
+            };
+            li.appendChild(a);
+            pagination.appendChild(li);
+        }
+    }
+
+    function applySearch(keyword) {
+        const lowerKeyword = keyword.toLowerCase();
+        filteredData = originalData.filter(ds =>
+            ds.ten_danh_sach.toLowerCase().includes(lowerKeyword) ||
+            ds.ngay_tao.includes(lowerKeyword) ||
+            ds.thoi_gian_tao.includes(lowerKeyword)
+        );
+        displayPage(filteredData, 1);
+    }
+
     document.getElementById('deleteForm').addEventListener('submit', function (e) {
         e.preventDefault();
         const form = this;
@@ -175,7 +232,7 @@
     });
 
     document.addEventListener('DOMContentLoaded', () => {
-        renderTable(originalData);
+        displayPage(filteredData, 1);
         document.getElementById("searchInput").addEventListener("input", (e) => {
             applySearch(e.target.value);
         });
