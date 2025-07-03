@@ -5,7 +5,9 @@
 
 @section('content')
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    
+    <!-- Thêm vào <head> -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     <div class="d-flex align-items-center justify-content-between mb-3">
         <input type="text" class="form-control" id="searchInput" onkeyup="searchForm()"
             placeholder="🔍 Tìm kiếm biểu mẫu..."
@@ -21,15 +23,40 @@
                     <th>Tiêu đề</th>
                     <th>Màu</th>
                     <th>Ngày tạo</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($bieumau as $bm)
+               @foreach ($bieumau as $bm)
+                    @php
+                        $hexToColorName = [
+                            '#86efac' => 'Xanh lá',
+                            '#fdba74' => 'Cam',
+                            '#fca5a5' => 'Đỏ nhạt',
+                            '#ff0000' => 'Đỏ',
+                            '#ffffff' => 'Trắng',
+                            '#000000' => 'Đen',
+                        ];
+                        $mau = strtolower($bm->mau);
+                        $tenMau = $hexToColorName[$mau] ?? $bm->ten_mau ?? $mau;
+                    @endphp
                     <tr>
                         <td><input type="checkbox" class="row-checkbox" value="{{ $bm->ma_bieu_mau }}"></td>
                         <td>{{ $bm->tieu_de }}</td>
-                        <td>{{ $bm->mau }}</td>
+                        <td>
+                            <div class="d-flex align-items-center justify-content-center gap-2">
+                                <span class="inline-block w-4 h-4 rounded-full border"
+                                    style="background-color: {{ $bm->mau }};"></span>
+                                <span>{{ $tenMau }}</span>
+                            </div>
+                        </td>
                         <td>{{ \Carbon\Carbon::parse($bm->ngay_tao)->format('d/m/Y') }}</td>
+                        <td>
+                            <a href="{{ url('/bieumau/tao/' . $bm->ma_bieu_mau) }}"
+                                class="btn btn-sm btn-primary" title="Xem biểu mẫu">
+                                👁️
+                            </a>
+                        </td>
                     </tr>
                 @endforeach
             </tbody>
