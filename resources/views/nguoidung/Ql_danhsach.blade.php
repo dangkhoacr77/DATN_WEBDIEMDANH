@@ -23,7 +23,7 @@
                         <th>Tên danh sách</th>
                         <th>Ngày tạo</th>
                         <th>Thời gian</th>
-                        <th>Tải Excel</th>
+                        <th>Hành động</th>
                     </tr>
                 </thead>
                 <tbody id="list-body">
@@ -32,91 +32,153 @@
             </table>
         </div>
     </form>
+
+    <!-- Modal preview -->
+    <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="previewModalLabel">Chi tiết danh sách điểm danh</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body" id="modalContent">
+                    Đang tải dữ liệu...
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
-    <script>
-        // Lấy dữ liệu từ PHP
-        const originalData = @json($danhSach);
-        let filteredData = [...originalData];
+<script>
+    const originalData = @json($danhSach);
+    let filteredData = [...originalData];
 
-        // Render bảng danh sách
-        function renderTable(data) {
-            const tbody = document.getElementById("list-body");
-            tbody.innerHTML = "";
+    function renderTable(data) {
+        const tbody = document.getElementById("list-body");
+        tbody.innerHTML = "";
 
-            if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5">Không có dữ liệu.</td></tr>`;
-                return;
-            }
-
-            data.forEach(ds => {
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td><input type="checkbox" name="ids[]" value="${ds.ma_danh_sach}" class="row-checkbox"></td>
-                    <td>${ds.ten_danh_sach}</td>
-                    <td>${ds.ngay_tao}</td>
-                    <td>${ds.thoi_gian_tao}</td>
-                    <td>
-                        <button type="button" class="btn btn-link text-primary p-0"
-                            onclick="downloadList('${ds.ma_danh_sach}')">
-                            <i class="bi bi-download fs-5"></i>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
+        if (data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5">Không có dữ liệu.</td></tr>`;
+            return;
         }
 
-        // Tìm kiếm client-side
-        function applySearch(keyword) {
-            const lowerKeyword = keyword.toLowerCase();
-            filteredData = originalData.filter(ds =>
-                ds.ten_danh_sach.toLowerCase().includes(lowerKeyword) ||
-                ds.ngay_tao.includes(lowerKeyword) ||
-                ds.thoi_gian_tao.includes(lowerKeyword)
-            );
-            renderTable(filteredData);
-        }
+        data.forEach(ds => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td><input type="checkbox" name="ids[]" value="${ds.ma_danh_sach}" class="row-checkbox"></td>
+                <td>${ds.ten_danh_sach}</td>
+                <td>${ds.ngay_tao}</td>
+                <td>${ds.thoi_gian_tao}</td>
+                <td>
+                    <button type="button" class="btn btn-link text-primary p-0"
+                        onclick="downloadList('${ds.ma_danh_sach}')">
+                        <i class="bi bi-download fs-5"></i>
+                    </button>
+                    <button type="button" class="btn btn-link text-info p-0"
+                        onclick="previewExcel('${ds.ma_danh_sach}', '${ds.ten_danh_sach}')">
+                        <i class="bi bi-eye fs-5"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
 
-        // Chọn tất cả checkbox
-        function toggleAll(master) {
-            document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = master.checked);
-        }
+    function applySearch(keyword) {
+        const lowerKeyword = keyword.toLowerCase();
+        filteredData = originalData.filter(ds =>
+            ds.ten_danh_sach.toLowerCase().includes(lowerKeyword) ||
+            ds.ngay_tao.includes(lowerKeyword) ||
+            ds.thoi_gian_tao.includes(lowerKeyword)
+        );
+        renderTable(filteredData);
+    }
 
-        // Tải file Excel
-        function downloadList(maDanhSach) {
-            window.location.href = `/nguoidung/ql-danhsach/export/${maDanhSach}`;
-        }
+    function toggleAll(master) {
+        document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = master.checked);
+    }
 
-        // Gửi form xóa
-        document.getElementById('deleteForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            const form = this;
-            const formData = new FormData(form);
+    function downloadList(maDanhSach) {
+        window.location.href = `/nguoidung/ql-danhsach/export/${maDanhSach}`;
+    }
 
-            fetch('{{ route('nguoidung.ql-danhsach.destroy') }}', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'X-HTTP-Method-Override': 'DELETE'
-                },
-                body: formData
-            })
+    function previewExcel(maDanhSach, tenDanhSach) {
+        const modal = new bootstrap.Modal(document.getElementById('previewModal'));
+        document.getElementById('modalContent').innerHTML = '⏳ Đang tải dữ liệu...';
+        document.getElementById('previewModalLabel').textContent = `Chi tiết: ${tenDanhSach}`;
+        modal.show();
+
+        fetch(`/nguoidung/ql-danhsach/${maDanhSach}/preview`)
             .then(res => res.json())
             .then(data => {
-                if (data.success) location.reload();
+                if (!data.success || !data.rows || data.rows.length === 0) {
+                    document.getElementById('modalContent').innerHTML = 'Không có dữ liệu điểm danh.';
+                    return;
+                }
+
+                const rows = data.rows;
+                const labels = data.labels || [];
+                const maxAnswers = Math.max(...rows.map(r => r.cau_tra_loi.length), labels.length);
+
+                const table = `
+                    <div style="overflow-x:auto;">
+                        <table class="table table-sm table-striped table-bordered text-center align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Email</th>
+                                    <th>Thời gian</th>
+                                    <th>Thiết bị</th>
+                                    <th>Định vị</th>
+                                    ${[...Array(maxAnswers)].map((_, i) => `<th>${labels[i] ?? ''}</th>`).join('')}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rows.map(row => `
+                                    <tr>
+                                        <td>${row.email}</td>
+                                        <td>${row.thoi_gian}</td>
+                                        <td>${row.thiet_bi}</td>
+                                        <td>${row.dinh_vi}</td>
+                                        ${[...Array(maxAnswers)].map((_, i) => `<td>${row.cau_tra_loi[i] ?? ''}</td>`).join('')}
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>`;
+                document.getElementById('modalContent').innerHTML = table;
             })
-            .catch(err => console.error(err));
-        });
-
-        // Khởi tạo
-        document.addEventListener('DOMContentLoaded', () => {
-            renderTable(originalData);
-
-            document.getElementById("searchInput").addEventListener("input", (e) => {
-                applySearch(e.target.value);
+            .catch(err => {
+                console.error(err);
+                document.getElementById('modalContent').innerHTML = "⚠️ Lỗi khi tải dữ liệu.";
             });
+    }
+
+    document.getElementById('deleteForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const form = this;
+        const formData = new FormData(form);
+
+        fetch('{{ route('nguoidung.ql-danhsach.destroy') }}', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'X-HTTP-Method-Override': 'DELETE'
+            },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) location.reload();
+        })
+        .catch(err => console.error(err));
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        renderTable(originalData);
+        document.getElementById("searchInput").addEventListener("input", (e) => {
+            applySearch(e.target.value);
         });
-    </script>
+    });
+</script>
 @endpush
