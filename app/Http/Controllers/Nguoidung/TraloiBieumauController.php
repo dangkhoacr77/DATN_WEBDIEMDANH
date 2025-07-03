@@ -99,7 +99,7 @@ class TraloiBieumauController extends Controller
      */
     public function show(string $id)
     {
-        $bieuMau = BieuMau::with('cauHois')->findOrFail($id);
+       $bieuMau = BieuMau::with(['cauHois'])->findOrFail($id);
         return view('nguoidung.Traloi_bieumau', compact('bieuMau'));
     }
 

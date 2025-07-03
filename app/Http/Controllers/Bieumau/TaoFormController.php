@@ -12,6 +12,7 @@ use App\Models\CauHoi;
 use App\Models\DanhSachDiemDanh;
 use Illuminate\Support\Facades\Log;
 use App\Models\MaQR;
+use Illuminate\Support\Facades\Storage;
 
 
 
@@ -61,6 +62,7 @@ class TaoFormController extends Controller
                 'tieu_de' => $request->title,
                 'mo_ta_tieu_de' => $request->description,
                 'mau' => $request->theme_color ?? '#ffffff',
+                 'hinh_anh' => $request->background_image ?? null, 
                 'thoi_luong_diem_danh' => $request->time_limit ?? 0,
                 'gioi_han_diem_danh' => $request->participant_limit ?? 0,
                 'so_luong_da_diem_danh' => 0,
@@ -114,6 +116,34 @@ class TaoFormController extends Controller
             return response()->json(['success' => false, 'message' => 'Đã xảy ra lỗi hệ thống']);
         }
     }
+    public function edit($ma_bieu_mau)
+{
+    $bieumau = BieuMau::where('ma_bieu_mau', $ma_bieu_mau)->firstOrFail();
+    $cauhois = CauHoi::where('bieu_mau_ma', $ma_bieu_mau)->get();
+
+    // Map tên màu sang mã màu hex
+    $colorNameToHex = [
+    'Trắng' => '#ffffff',
+        'Đỏ' => '#fca5a5',
+        'Tím' => '#c4b5fd',
+        'Xanh dương đậm' => '#93c5fd',
+        'Xanh trời' => '#a5f3fc',
+        'Cam' => '#fdba74',
+        'Vàng đậm' => '#fde68a',
+        'Xanh ngọc' => '#99f6e4',
+        'Xanh lá' => '#86efac',
+        'Xám nhạt' => '#d1d5db'
+];
+
+// Đảo ngược để ánh xạ mã màu → tên
+$hexToColorName = array_flip($colorNameToHex);
+
+    return view('Bieumau.Tao_form', [
+        'bieumau' => $bieumau,
+        'cauhois' => $cauhois,
+    ]);
+
+}
 
     // Các hàm khác nếu cần
 }
