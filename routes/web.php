@@ -51,7 +51,7 @@ Route::middleware(['web'])->group(function () {
         return response()->json(['success' => false], 400);
     });
 });
-Route::get('/bieumau/tao/{ma_bieu_mau}', [TaoFormController::class, 'edit'])->name('bieumau.sua');
+Route::get('/bieumau/tao/{ma_bieu_mau}', [TaoFormController::class, 'show'])->name('bieumau.show');
 
 
 // ======================= NGUOIDUNG =========================

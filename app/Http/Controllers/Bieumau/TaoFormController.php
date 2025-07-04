@@ -23,7 +23,9 @@ class TaoFormController extends Controller
      */
     public function index()
     {
-        return view('Bieumau.Tao_form');
+        return view('Bieumau.Tao_form', [
+            'isCreating' => true
+        ]);
     }
 
     /**
@@ -34,7 +36,7 @@ class TaoFormController extends Controller
      */
     public function store(Request $request)
     {
-        \Log::info('Dữ liệu gửi lên:', $request->all());
+        Log::info('REQUEST DATA', $request->all());
         $maTaiKhoan = session('ma_tai_khoan');
 
         if (!$maTaiKhoan) {
@@ -56,20 +58,25 @@ class TaoFormController extends Controller
 
             $maBieuMau = (string) Str::uuid();
 
+            $mau = $request->theme_color;
+            if (!$mau && $request->background_image) {
+                $mau = 'hình ảnh';
+            }
+
             // Tạo biểu mẫu
             $bieuMau = BieuMau::create([
                 'ma_bieu_mau' => $maBieuMau,
                 'tieu_de' => $request->title,
                 'mo_ta_tieu_de' => $request->description,
-                'mau' => $request->theme_color ?? '#ffffff',
-                 'hinh_anh' => $request->background_image ?? null, 
-                'thoi_luong_diem_danh' => $request->time_limit ?? 0,
-                'gioi_han_diem_danh' => $request->participant_limit ?? 0,
-                'so_luong_da_diem_danh' => 0,
+                'mau' => $mau,
+                'hinh_anh' => $request->background_image ?? null,
+                'thoi_luong_diem_danh' => $request->time_limit ?? null,
+                'gioi_han_diem_danh' => $request->participant_limit ?? null,
                 'trang_thai' => 1,
                 'ngay_tao' => now(),
                 'tai_khoan_ma' => $maTaiKhoan,
             ]);
+
             // ✅ Tạo bản ghi mã QR ứng với biểu mẫu
             MaQR::create([
                 'ma_qr' => (string) Str::uuid(),
@@ -112,38 +119,46 @@ class TaoFormController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Lỗi xuất bản biểu mẫu: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Đã xảy ra lỗi hệ thống']);
         }
     }
-    public function edit($ma_bieu_mau)
-{
-    $bieumau = BieuMau::where('ma_bieu_mau', $ma_bieu_mau)->firstOrFail();
-    $cauhois = CauHoi::where('bieu_mau_ma', $ma_bieu_mau)->get();
 
-    // Map tên màu sang mã màu hex
-    $colorNameToHex = [
-    'Trắng' => '#ffffff',
-        'Đỏ' => '#fca5a5',
-        'Tím' => '#c4b5fd',
-        'Xanh dương đậm' => '#93c5fd',
-        'Xanh trời' => '#a5f3fc',
-        'Cam' => '#fdba74',
-        'Vàng đậm' => '#fde68a',
-        'Xanh ngọc' => '#99f6e4',
-        'Xanh lá' => '#86efac',
-        'Xám nhạt' => '#d1d5db'
-];
+    public function show($ma_bieu_mau)
+    {
+        $bieumau = BieuMau::where('ma_bieu_mau', $ma_bieu_mau)->firstOrFail();
+        $cauhois = CauHoi::where('bieu_mau_ma', $ma_bieu_mau)->get();
 
-// Đảo ngược để ánh xạ mã màu → tên
-$hexToColorName = array_flip($colorNameToHex);
+        // Danh sách tên màu → mã màu hex
+        $colorNameToHex = [
+            'Trắng' => '#ffffff',
+            'Đỏ' => '#fca5a5',
+            'Tím' => '#c4b5fd',
+            'Xanh dương đậm' => '#93c5fd',
+            'Xanh trời' => '#a5f3fc',
+            'Cam' => '#fdba74',
+            'Vàng đậm' => '#fde68a',
+            'Xanh ngọc' => '#99f6e4',
+            'Xanh lá' => '#86efac',
+            'Xám nhạt' => '#d1d5db'
+        ];
 
-    return view('Bieumau.Tao_form', [
-        'bieumau' => $bieumau,
-        'cauhois' => $cauhois,
-    ]);
+        // Xử lý màu nền
+        $mauHex = isset($colorNameToHex[$bieumau->mau]) ? $colorNameToHex[$bieumau->mau] : (
+            preg_match('/^#([A-Fa-f0-9]{6})$/', $bieumau->mau) ? $bieumau->mau : null
+        );
 
-}
+        // Xử lý hình nền nếu có
+        $hinhNen = null;
+        if ($bieumau->mau === 'hình ảnh' && $bieumau->hinh_anh) {
+            $hinhNen = asset('storage/backgrounds/' . $bieumau->hinh_anh);
+        }
 
-    // Các hàm khác nếu cần
+        return view('Bieumau.Tao_form', [
+            'bieumau' => $bieumau,
+            'cauhois' => $cauhois,
+            'mau' => $mauHex,
+            'hinh_nen' => $hinhNen,
+            'isCreating' => false
+        ]);
+    }
 }

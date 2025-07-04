@@ -23,6 +23,7 @@
                         <th>Tên danh sách</th>
                         <th>Ngày tạo</th>
                         <th>Thời gian</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody id="list-body">
