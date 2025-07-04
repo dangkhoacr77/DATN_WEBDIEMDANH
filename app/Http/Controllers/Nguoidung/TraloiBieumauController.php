@@ -113,7 +113,7 @@ class TraloiBieumauController extends Controller
     public function show(string $id)
     {
         $bieuMau = BieuMau::with(['cauHois', 'danhSach', 'diemDanhs'])->findOrFail($id);
-
+        
         $errorMessage = null;
 
         // ⏱️ Kiểm tra thời lượng điểm danh (nếu có)

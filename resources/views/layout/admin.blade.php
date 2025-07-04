@@ -8,7 +8,7 @@
     <style>
         body {
             margin: 0;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Times New Roman', sans-serif; font-size: 18px;
             background-color: #f5f7fa;
         }
     </style>
@@ -28,28 +28,28 @@
             <div style="display: flex; flex-direction: column;">
 
                 <div onclick="window.location.href='{{ route('admin.thong-ke') }}'"
-                    style="padding: 12px 24px; display: flex; align-items: center; gap: 10px; font-size: 14px;
+                    style="padding: 12px 24px; display: flex; align-items: center; gap: 10px; font-size: 16px;
                     {{ $current === 'admin.thong-ke' ? 'color: #0047ff; background-color: #eef3ff; font-weight: bold;' : 'color: #333;' }}
                     cursor: pointer;">
                     🏠 Thống kê
                 </div>
 
                 <div onclick="window.location.href='{{ route('admin.ql-bieumau') }}'"
-                    style="padding: 12px 24px; display: flex; align-items: center; gap: 10px; font-size: 14px;
+                    style="padding: 12px 24px; display: flex; align-items: center; gap: 10px; font-size: 16px;
                     {{ $current === 'admin.ql-bieumau' ? 'color: #0047ff; background-color: #eef3ff; font-weight: bold;' : 'color: #333;' }}
                     cursor: pointer;">
                     📄 Biểu mẫu
                 </div>
 
                 <div onclick="window.location.href='{{ route('admin.ql-taikhoan') }}'"
-                    style="padding: 12px 24px; display: flex; align-items: center; gap: 10px; font-size: 14px;
+                    style="padding: 12px 24px; display: flex; align-items: center; gap: 10px; font-size: 16px;
                     {{ $current === 'admin.ql-taikhoan' ? 'color: #0047ff; background-color: #eef3ff; font-weight: bold;' : 'color: #333;' }}
                     cursor: pointer;">
                     👤 Tài Khoản
                 </div>
 
                 <div onclick="window.location.href='{{ route('admin.tt-canhan') }}'"
-                    style="padding: 12px 24px; display: flex; align-items: center; gap: 10px; font-size: 14px;
+                    style="padding: 12px 24px; display: flex; align-items: center; gap: 10px; font-size: 16px;
                     {{ $current === 'admin.tt-canhan' ? 'color: #0047ff; background-color: #eef3ff; font-weight: bold;' : 'color: #333;' }}
                     cursor: pointer;">
                     ⚙️ Thông tin cá nhân

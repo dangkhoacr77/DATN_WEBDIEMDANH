@@ -95,7 +95,6 @@ class TaoFormController extends Controller
                     'ma_cau_hoi' => (string) Str::uuid(),
                     'cau_hoi' => $q['title'],
                     'cau_hoi_bat_buoc' => $q['required'] ?? false,
-                    'noi_dung' => '',
                     'bieu_mau_ma' => $maBieuMau
                 ]);
             }

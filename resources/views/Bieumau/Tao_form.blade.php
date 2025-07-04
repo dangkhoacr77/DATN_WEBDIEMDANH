@@ -15,8 +15,8 @@
             height: auto;
             background-repeat: no-repeat;
             background-position: center center;
-            background-size: cover;
-            /* hoặc contain nếu muốn thấy đủ toàn ảnh */
+            background-size: contain;
+            font-family: 'Times New Roman', Times, serif;
             background-attachment: fixed;
         }
 
@@ -104,7 +104,7 @@
             <div>
                 <h3 class="font-medium mb-4">Ảnh nền</h3>
                 <div class="grid grid-cols-2 gap-4">
-                    @for ($i = 1; $i <= 5; $i++)
+                    @for ($i = 1; $i <= 6; $i++)
                         <img src="{{ asset('storage/backgrounds/Mau' . $i . '.jpg') }}"
                             class="bg-image-option w-full h-24 object-cover rounded cursor-pointer border-2 border-transparent hover:border-indigo-500"
                             data-src="{{ asset('storage/backgrounds/Mau' . $i . '.jpg') }}">
@@ -140,29 +140,26 @@
         </div>
     </div>
     <!-- Nút Reset -->
-
-
-    <body id="main-body" class="bg-gray-50 min-h-screen">
         <div class="flex flex-col min-h-screen">
-            <header class="bg-white shadow-sm py-4 px-6 flex items-center justify-between border-b">
-                <h1 class="text-xl font-medium text-gray-800">Tạo Biểu Mẫu</h1>
+            <header class="bg-blue-600 text-white py-4 px-6 flex items-center justify-between shadow-md">
+                <h1 class="text-xl font-medium text-white-800">Tạo Biểu Mẫu</h1>
                 <div class="flex items-center space-x-4">
                     <button onclick="window.location.href='{{ route('trangchu') }}'"
                         class="text-gray-600 hover:text-indigo-600" title="Trang chủ">
-                        <span class="material-icons">home</span>
+                        <span class="material-icons text-white">home</span>
                     </button>
                     <button id="settings-btn" class="text-gray-600 hover:text-indigo-600" title="Cài đặt">
-                        <span class="material-icons">settings</span>
+                        <span class="material-icons text-white">settings</span>
                     </button>
                     <button id="theme-btn" class="text-gray-600 hover:text-indigo-600" title="Thay đổi giao diện">
-                        <span class="material-icons">palette</span>
+                        <span class="material-icons text-white">palette</span>
                     </button>
                     <button id="show-qr-btn" class="text-gray-600 hover:text-indigo-600" title="Mã QR">
-                        <span class="material-icons">qr_code</span>
+                        <span class="material-icons text-white">qr_code</span>
                     </button>
                     @if ($isCreating ?? false)
                         <button id="publish-btn"
-                            class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 flex items-center">
+                            class="bg-indigo-700 text-white px-4 py-2 rounded-md hover:bg-indigo-700 flex items-center">
                             <span class="material-icons mr-2">publish</span>Xuất bản
                         </button>
                     @endif

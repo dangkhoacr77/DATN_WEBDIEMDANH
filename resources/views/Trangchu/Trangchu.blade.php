@@ -54,7 +54,7 @@
     </style>
 </head>
 
-<body class="bg-gray-50 font-sans">
+<body class="bg-gray-50 text-gray-900" style="font-family: 'Times New Roman', Times, serif; font-size: 18px;">
     <!-- Bỏ qua phần nav và banner do không thay đổi -->
     <nav class="bg-white shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -175,8 +175,6 @@
                         class="bg-primary hover:bg-indigo-700 text-white px-6 py-2 rounded-md text-sm font-medium flex items-center">
                         <i class="fas fa-camera mr-2"></i> Mở
                     </button>
-                    <p class="text-sm text-gray-700">Kết quả: <span id="qr-result"
-                            class="font-bold text-primary"></span></p>
                 </div>
             </div>
         </div>

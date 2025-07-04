@@ -10,7 +10,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 
-<body style="background: #f8f9fa; font-family: 'Segoe UI', sans-serif;">
+<body style="background: #f8f9fa; font-family: 'Times New Roman', sans-serif; font-size: 18px;">
     @php
         $user = session('nguoi_dung');
     @endphp
