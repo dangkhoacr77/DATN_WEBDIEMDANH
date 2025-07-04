@@ -23,7 +23,7 @@
 
         <!-- Bảng -->
         <div style="overflow-x: auto;">
-            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 18px;">
                 <thead style="background: #f1f5f9;">
                     <tr>
                         <th style="text-align:left; padding: 12px;">Tên</th>
