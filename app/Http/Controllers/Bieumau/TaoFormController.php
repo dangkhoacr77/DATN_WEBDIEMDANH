@@ -148,7 +148,7 @@ class TaoFormController extends Controller
 
         // Xử lý hình nền nếu có
         $hinhNen = null;
-        if ($bieumau->mau === 'hình ảnh' && $bieumau->hinh_anh) {
+        if ($bieumau->mau === 'Hình ảnh' && $bieumau->hinh_anh) {
             $hinhNen = asset('storage/backgrounds/' . $bieumau->hinh_anh);
         }
 

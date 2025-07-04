@@ -27,28 +27,10 @@
             </thead>
             <tbody>
                 @foreach ($bieumau as $bm)
-                    @php
-                        $hexToColorName = [
-                            '#86efac' => 'Xanh lá',
-                            '#fdba74' => 'Cam',
-                            '#fca5a5' => 'Đỏ nhạt',
-                            '#ff0000' => 'Đỏ',
-                            '#ffffff' => 'Trắng',
-                            '#000000' => 'Đen',
-                        ];
-                        $mau = strtolower($bm->mau);
-                        $tenMau = $hexToColorName[$mau] ?? ($bm->ten_mau ?? $mau);
-                    @endphp
                     <tr>
                         <td><input type="checkbox" class="row-checkbox" value="{{ $bm->ma_bieu_mau }}"></td>
                         <td>{{ $bm->tieu_de }}</td>
-                        <td>
-                            <div class="d-flex align-items-center justify-content-center gap-2">
-                                <span class="inline-block w-4 h-4 rounded-full border"
-                                    style="background-color: {{ $bm->mau }};"></span>
-                                <span>{{ $tenMau }}</span>
-                            </div>
-                        </td>
+                        <td>{{ $bm->mau }}</td>
                         <td>{{ \Carbon\Carbon::parse($bm->ngay_tao)->format('d/m/Y') }}</td>
                         <td>
                             <button type="button" class="btn btn-link text-info p-0"

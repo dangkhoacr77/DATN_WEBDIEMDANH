@@ -210,8 +210,7 @@
                     <div class="max-w-3xl mx-auto">
                         <!-- Form Header -->
                         <div class="bg-white rounded-lg shadow-sm mb-6 overflow-hidden">
-                            <div id="form-background" class="form-header-background relative"
-                                style="background-image: url('{{ $bieumau->hinh_anh ?? '' }}');">
+                            <div id="form-background" class="form-header-background relative bg-white bg-opacity-80">
                                 <div class="form-header-overlay absolute inset-0 bg-white/60"></div>
                                 <div class="absolute inset-0 flex flex-col justify-center items-start px-6">
                                     <input type="text" id="form-title"
@@ -533,7 +532,7 @@
                                 description,
                                 time_limit,
                                 participant_limit,
-                                theme_color: selectedColorName || 'Trắng',
+                                theme_color: window.selectedBackgroundImage ? 'Hình ảnh' : (selectedColorName || 'Trắng'),
                                 background_image: window.selectedBackgroundImage || null,
                                 questions,
                                 qr_image: base64Image
