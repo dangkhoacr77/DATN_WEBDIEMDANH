@@ -20,7 +20,7 @@
                 <tr>
                     <th><input type="checkbox" id="selectAll" onclick="toggleAll(this)"></th>
                     <th>Tiêu đề</th>
-                    <th>Màu</th>
+                    <th>Giao diện</th>
                     <th>Ngày tạo</th>
                     <th></th>
                 </tr>

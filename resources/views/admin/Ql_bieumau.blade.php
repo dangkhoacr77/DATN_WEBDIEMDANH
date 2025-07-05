@@ -26,7 +26,7 @@
                 <thead style="background: #f1f5f9;">
                     <tr>
                         <th style="text-align:left; padding: 12px;">Tiêu đề</th>
-                        <th style="text-align:left; padding: 12px;">Màu</th>
+                        <th style="text-align:left; padding: 12px;">Giao diện</th>
                         <th style="text-align:left; padding: 12px;">Người tạo</th>
                         <th style="text-align:left; padding: 12px;">Ngày tạo</th>
                         <th></th>

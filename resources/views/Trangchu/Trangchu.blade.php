@@ -73,10 +73,10 @@
                     @endphp
 
                     @if (!$user)
-                        <button><a href="{{ route('xacthuc.dang-nhap') }}" class="text-black text-decoration-none">Đăng
-                                nhập /</a></button>
-                        <button><a href="{{ route('xacthuc.dang-ky') }}" class="text-black text-decoration-none">Đăng
-                                ký</a></button>
+                        <a href="{{ route('xacthuc.dang-nhap') }}" class="text-black text-decoration-none">Đăng
+                                nhập </a>
+                        <a href="{{ route('xacthuc.dang-ky') }}" class="text-black text-decoration-none">Đăng
+                                ký</a>
                     @else
                         <span class="text-black">{{ $user->ho_ten }}</span>
                     @endif
