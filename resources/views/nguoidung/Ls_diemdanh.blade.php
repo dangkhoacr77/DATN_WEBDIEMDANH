@@ -13,7 +13,7 @@
         <label style="font-size: 14px;">
             Hiển thị:
             <select id="rowsPerPageSelect" style="padding: 6px 12px; border-radius: 6px;">
-                <option value="7" selected>7 dòng</option>
+                <option value="10" selected>10 dòng</option>
                 <option value="15">15 dòng</option>
                 <option value="20">20 dòng</option>
             </select>
@@ -59,8 +59,8 @@
                             <span class="fw-semibold me-1">Ngày</span>
                             <select id="sortNgay" class="form-select form-select-sm" onchange="onSortChange('ngay')" style="width: 80px;">
                                 <option value="">Chọn</option>
-                                <option value="desc" selected>M→C</option>
-                                <option value="asc">C→M</option>
+                                <option value="desc" selected>Mới</option>
+                                <option value="asc">Cũ</option>
                             </select>
                         </div>
                     </th>

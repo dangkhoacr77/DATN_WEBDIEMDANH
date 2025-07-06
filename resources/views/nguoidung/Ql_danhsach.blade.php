@@ -36,8 +36,8 @@
                             <span class="fw-semibold me-1">Ngày tạo</span>
                             <select id="sortNgayTao" onchange="onSortChange('ngay_tao')" class="form-select form-select-sm" style="width: 80px;">
                                 <option value="">Chọn</option>
-                                <option value="desc">M→C</option>
-                                <option value="asc">C→M</option>
+                                <option value="desc">Mới</option>
+                                <option value="asc">Cũ</option>
                             </select>
                         </div>
                     </th>
