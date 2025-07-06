@@ -14,6 +14,7 @@ class QLDanhsachController extends Controller
         $nguoiDung = session('nguoi_dung');
 
         $danhSach = DanhSachDiemDanh::where('tai_khoan_ma', $nguoiDung['ma_tai_khoan'])
+            ->where('trang_thai', 1)
             ->orderByDesc('ngay_tao')
             ->get();
 
@@ -70,12 +71,25 @@ class QLDanhsachController extends Controller
         return response()->stream($callback, 200, $headers);
     }
 
-    public function preview($id)
+
+    public function destroy(Request $request)
+    {
+        DanhSachDiemDanh::whereIn('ma_danh_sach', $request->ids)
+            ->update(['trang_thai' => 0]);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function show($id)
     {
         $ds = DanhSachDiemDanh::findOrFail($id);
-        $diemDanhs = $ds->diemDanhs()->with(['cauTraLoi', 'taiKhoan'])->get();
 
-        // Lấy danh sách câu hỏi theo mã câu hỏi
+        // Sắp xếp theo thời gian mới nhất (DESC)
+        $diemDanhs = $ds->diemDanhs()
+            ->with(['cauTraLoi', 'taiKhoan'])
+            ->orderByDesc('thoi_gian_diem_danh')
+            ->get();
+
         $cauHoiList = $ds->bieuMau->cauHois()->orderBy('ma_cau_hoi')->get();
         $labels = $cauHoiList->pluck('cau_hoi')->toArray();
         $cauHoiIds = $cauHoiList->pluck('ma_cau_hoi')->toArray();
@@ -91,16 +105,6 @@ class QLDanhsachController extends Controller
             ];
         });
 
-        return response()->json([
-            'success' => true,
-            'rows' => $rows,
-            'labels' => $labels
-        ]);
-    }
-
-    public function destroy(Request $request)
-    {
-        DanhSachDiemDanh::whereIn('ma_danh_sach', $request->ids)->delete();
-        return response()->json(['success' => true]);
+        return view('nguoidung.Chitiet_ds', compact('ds', 'labels', 'rows'));
     }
 }

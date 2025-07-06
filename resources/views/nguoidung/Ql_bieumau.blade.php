@@ -82,7 +82,9 @@
                         <td><input type="checkbox" class="row-checkbox" value="{{ $bm->ma_bieu_mau }}"></td>
                         <td>{{ $bm->tieu_de }}</td>
                         <td>{{ $bm->mau }}</td>
-                        <td>{{ \Carbon\Carbon::parse($bm->ngay_tao)->format('d/m/Y') }}</td>
+                        <td data-time="{{ \Carbon\Carbon::parse($bm->ngay_tao)->format('Y-m-d H:i:s') }}">
+                            {{ \Carbon\Carbon::parse($bm->ngay_tao)->format('d/m/Y') }}
+                        </td>
                         <td>
                             <button type="button" class="btn btn-link text-info p-0"
                                 onclick="window.location.href='{{ route('bieumau.show', ['ma_bieu_mau' => $bm->ma_bieu_mau]) }}'">
@@ -101,178 +103,186 @@
 @endsection
 
 @push('scripts')
-<script>
-    let originalRows = [];
-    let searchedRows = [];
-    let sortedRows = [];
-    let currentPage = 1;
-    const rowsPerPage = 7;
+    <script>
+        let originalRows = [];
+        let searchedRows = [];
+        let sortedRows = [];
+        let currentPage = 1;
+        const rowsPerPage = 7;
 
-    function toggleAll(master) {
-        document.querySelectorAll(".row-checkbox").forEach(cb => cb.checked = master.checked);
-    }
-
-    function deleteSelectedRows() {
-        const selected = document.querySelectorAll(".row-checkbox:checked");
-        if (!selected.length) return alert("Bạn chưa chọn dòng nào để xóa.");
-
-        if (confirm("Bạn có chắc chắn muốn xóa các biểu mẫu đã chọn không?")) {
-            const ids = Array.from(selected).map(cb => cb.value);
-            fetch("{{ route('nguoidung.bieumau.xoaDaChon') }}", {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-                },
-                body: JSON.stringify({ ids })
-            })
-            .then(response => response.json())
-            .then(() => location.reload())
-            .catch(() => alert("Đã xảy ra lỗi!"));
-        }
-    }
-
-    function onSortChange(type) {
-        if (type === 'tieu_de') {
-            document.getElementById("sortGiaoDien").value = "";
-            document.getElementById("sortNgayTao").value = "";
-        } else if (type === 'giao_dien') {
-            document.getElementById("sortTieuDe").value = "";
-            document.getElementById("sortNgayTao").value = "";
-        } else if (type === 'ngay_tao') {
-            document.getElementById("sortTieuDe").value = "";
-            document.getElementById("sortGiaoDien").value = "";
+        function toggleAll(master) {
+            document.querySelectorAll(".row-checkbox").forEach(cb => cb.checked = master.checked);
         }
 
-        applySort();
-        displayPage(1);
-    }
+        function deleteSelectedRows() {
+            const selected = document.querySelectorAll(".row-checkbox:checked");
+            if (!selected.length) return alert("Bạn chưa chọn dòng nào để xóa.");
 
-    function filterTable() {
-        applySearch();
-        applySort();
-        displayPage(1);
-    }
-
-    function applySearch() {
-        const keyword = document.getElementById("searchInput").value.toLowerCase();
-        searchedRows = originalRows.filter(row => {
-            const tieuDe = row.children[1].textContent.toLowerCase();
-            const giaoDien = row.children[2].textContent.toLowerCase();
-            const ngayTao = row.children[3].textContent.toLowerCase();
-            return tieuDe.includes(keyword) || giaoDien.includes(keyword) || ngayTao.includes(keyword);
-        });
-    }
-
-    function applySort() {
-        const sortTieuDe = document.getElementById("sortTieuDe").value;
-        const sortGiaoDien = document.getElementById("sortGiaoDien").value;
-        const sortNgayTao = document.getElementById("sortNgayTao").value;
-
-        sortedRows = [...searchedRows];
-
-        if (sortTieuDe) {
-            sortedRows.sort((a, b) => {
-                const aText = a.children[1].textContent.toLowerCase();
-                const bText = b.children[1].textContent.toLowerCase();
-                return sortTieuDe === "asc" ? aText.localeCompare(bText) : bText.localeCompare(aText);
-            });
-        } else if (sortGiaoDien) {
-            sortedRows.sort((a, b) => {
-                const aText = a.children[2].textContent.toLowerCase();
-                const bText = b.children[2].textContent.toLowerCase();
-                return sortGiaoDien === "asc" ? aText.localeCompare(bText) : bText.localeCompare(aText);
-            });
-        } else if (sortNgayTao) {
-            sortedRows.sort((a, b) => {
-                const aDate = new Date(a.children[3].textContent.split('/').reverse().join('/'));
-                const bDate = new Date(b.children[3].textContent.split('/').reverse().join('/'));
-                return sortNgayTao === "asc" ? aDate - bDate : bDate - aDate;
-            });
-        } else {
-            sortedRows.sort((a, b) => {
-                const aDate = new Date(a.children[3].textContent.split('/').reverse().join('/'));
-                const bDate = new Date(b.children[3].textContent.split('/').reverse().join('/'));
-                return bDate - aDate;
-            });
-        }
-    }
-
-    function displayPage(page) {
-        const tbody = document.querySelector("#formTable tbody");
-        tbody.innerHTML = "";
-
-        const totalPages = Math.ceil(sortedRows.length / rowsPerPage);
-        if (page > totalPages) page = totalPages;
-        const start = (page - 1) * rowsPerPage;
-        const pageRows = sortedRows.slice(start, start + rowsPerPage);
-        pageRows.forEach(row => tbody.appendChild(row));
-
-        renderPagination(totalPages, page);
-    }
-
-    function renderPagination(totalPages, activePage) {
-        const pagination = document.getElementById("pagination");
-        pagination.innerHTML = "";
-
-        function createPageItem(page, text = page, isActive = false, isDisabled = false) {
-            const li = document.createElement("li");
-            li.className = `page-item ${isActive ? "active" : ""} ${isDisabled ? "disabled" : ""}`;
-            const a = document.createElement("a");
-            a.className = "page-link";
-            a.href = "#";
-            a.innerText = text;
-            if (!isDisabled) {
-                a.onclick = (e) => {
-                    e.preventDefault();
-                    currentPage = page;
-                    displayPage(currentPage);
-                };
+            if (confirm("Bạn có chắc chắn muốn xóa các biểu mẫu đã chọn không?")) {
+                const ids = Array.from(selected).map(cb => cb.value);
+                fetch("{{ route('nguoidung.bieumau.xoaDaChon') }}", {
+                        method: "DELETE",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+                        },
+                        body: JSON.stringify({
+                            ids
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(() => location.reload())
+                    .catch(() => alert("Đã xảy ra lỗi!"));
             }
-            li.appendChild(a);
-            return li;
         }
 
-        // « Prev
-        pagination.appendChild(createPageItem(currentPage - 1, "«", false, currentPage === 1));
+        function onSortChange(type) {
+            if (type === 'tieu_de') {
+                document.getElementById("sortGiaoDien").value = "";
+                document.getElementById("sortNgayTao").value = "";
+            } else if (type === 'giao_dien') {
+                document.getElementById("sortTieuDe").value = "";
+                document.getElementById("sortNgayTao").value = "";
+            } else if (type === 'ngay_tao') {
+                document.getElementById("sortTieuDe").value = "";
+                document.getElementById("sortGiaoDien").value = "";
+            }
 
-        const visiblePages = [];
+            applySort();
+            displayPage(1);
+        }
 
-        if (totalPages <= 7) {
-            for (let i = 1; i <= totalPages; i++) visiblePages.push(i);
-        } else {
-            visiblePages.push(1);
+        function filterTable() {
+            applySearch();
+            applySort();
+            displayPage(1);
+        }
 
-            if (currentPage <= 3) {
-                visiblePages.push(2, 3, 4);
-                visiblePages.push("...");
-            } else if (currentPage >= totalPages - 2) {
-                visiblePages.push("...");
-                visiblePages.push(totalPages - 3, totalPages - 2, totalPages - 1);
+        function applySearch() {
+            const keyword = document.getElementById("searchInput").value.toLowerCase();
+            searchedRows = originalRows.filter(row => {
+                const tieuDe = row.children[1].textContent.toLowerCase();
+                const giaoDien = row.children[2].textContent.toLowerCase();
+                const ngayTao = row.children[3].textContent.toLowerCase();
+                return tieuDe.includes(keyword) || giaoDien.includes(keyword) || ngayTao.includes(keyword);
+            });
+        }
+
+        function parseVNDateTime(text) {
+            const [datePart, timePart] = text.split(' ');
+            const [day, month, year] = datePart.split('/');
+            const [hour = 0, minute = 0, second = 0] = (timePart || '').split(':');
+            return new Date(year, month - 1, day, hour, minute, second);
+        }
+
+        function applySort() {
+            const sortTieuDe = document.getElementById("sortTieuDe").value;
+            const sortGiaoDien = document.getElementById("sortGiaoDien").value;
+            const sortNgayTao = document.getElementById("sortNgayTao").value;
+
+            sortedRows = [...searchedRows];
+
+            if (sortTieuDe) {
+                sortedRows.sort((a, b) => {
+                    const aText = a.children[1].textContent.toLowerCase();
+                    const bText = b.children[1].textContent.toLowerCase();
+                    return sortTieuDe === "asc" ? aText.localeCompare(bText) : bText.localeCompare(aText);
+                });
+            } else if (sortGiaoDien) {
+                sortedRows.sort((a, b) => {
+                    const aText = a.children[2].textContent.toLowerCase();
+                    const bText = b.children[2].textContent.toLowerCase();
+                    return sortGiaoDien === "asc" ? aText.localeCompare(bText) : bText.localeCompare(aText);
+                });
+            } else if (sortNgayTao) {
+                sortedRows.sort((a, b) => {
+                    const aDate = new Date(a.children[3].dataset.time);
+                    const bDate = new Date(b.children[3].dataset.time);
+                    return sortNgayTao === "asc" ? aDate - bDate : bDate - aDate;
+                });
             } else {
-                visiblePages.push("...");
-                visiblePages.push(currentPage - 1, currentPage, currentPage + 1);
-                visiblePages.push("...");
+                // Mặc định: mới nhất trước
+                sortedRows.sort((a, b) => {
+                    const aDate = new Date(a.children[3].dataset.time);
+                    const bDate = new Date(b.children[3].dataset.time);
+                    return bDate - aDate;
+                });
             }
-
-            visiblePages.push(totalPages);
         }
 
-        visiblePages.forEach(p => {
-            if (p === "...") {
-                pagination.appendChild(createPageItem(null, "...", false, true));
-            } else {
-                pagination.appendChild(createPageItem(p, p, p === currentPage));
+        function displayPage(page) {
+            const tbody = document.querySelector("#formTable tbody");
+            tbody.innerHTML = "";
+
+            const totalPages = Math.ceil(sortedRows.length / rowsPerPage);
+            if (page > totalPages) page = totalPages;
+            const start = (page - 1) * rowsPerPage;
+            const pageRows = sortedRows.slice(start, start + rowsPerPage);
+            pageRows.forEach(row => tbody.appendChild(row));
+
+            renderPagination(totalPages, page);
+        }
+
+        function renderPagination(totalPages, activePage) {
+            const pagination = document.getElementById("pagination");
+            pagination.innerHTML = "";
+
+            function createPageItem(page, text = page, isActive = false, isDisabled = false) {
+                const li = document.createElement("li");
+                li.className = `page-item ${isActive ? "active" : ""} ${isDisabled ? "disabled" : ""}`;
+                const a = document.createElement("a");
+                a.className = "page-link";
+                a.href = "#";
+                a.innerText = text;
+                if (!isDisabled) {
+                    a.onclick = (e) => {
+                        e.preventDefault();
+                        currentPage = page;
+                        displayPage(currentPage);
+                    };
+                }
+                li.appendChild(a);
+                return li;
             }
+
+            pagination.appendChild(createPageItem(currentPage - 1, "«", false, currentPage === 1));
+
+            const visiblePages = [];
+
+            if (totalPages <= 7) {
+                for (let i = 1; i <= totalPages; i++) visiblePages.push(i);
+            } else {
+                visiblePages.push(1);
+
+                if (currentPage <= 3) {
+                    visiblePages.push(2, 3, 4);
+                    visiblePages.push("...");
+                } else if (currentPage >= totalPages - 2) {
+                    visiblePages.push("...");
+                    visiblePages.push(totalPages - 3, totalPages - 2, totalPages - 1);
+                } else {
+                    visiblePages.push("...");
+                    visiblePages.push(currentPage - 1, currentPage, currentPage + 1);
+                    visiblePages.push("...");
+                }
+
+                visiblePages.push(totalPages);
+            }
+
+            visiblePages.forEach(p => {
+                if (p === "...") {
+                    pagination.appendChild(createPageItem(null, "...", false, true));
+                } else {
+                    pagination.appendChild(createPageItem(p, p, p === currentPage));
+                }
+            });
+
+            pagination.appendChild(createPageItem(currentPage + 1, "»", false, currentPage === totalPages));
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            originalRows = Array.from(document.querySelectorAll("#formTable tbody tr"));
+            filterTable();
         });
-
-        // » Next
-        pagination.appendChild(createPageItem(currentPage + 1, "»", false, currentPage === totalPages));
-    }
-
-    document.addEventListener("DOMContentLoaded", function () {
-        originalRows = Array.from(document.querySelectorAll("#formTable tbody tr"));
-        filterTable();
-    });
-</script>
+    </script>
 @endpush

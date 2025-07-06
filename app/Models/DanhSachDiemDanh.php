@@ -12,7 +12,7 @@ class DanhSachDiemDanh extends Model
     public $incrementing = false;
     protected $keyType = 'string';
 
-    protected $fillable = ['ma_danh_sach', 'ten_danh_sach', 'du_lieu_ds', 'ngay_tao', 'thoi_gian_tao', 'bieu_mau_ma', 'tai_khoan_ma'];
+    protected $fillable = ['ma_danh_sach', 'ten_danh_sach', 'du_lieu_ds', 'ngay_tao', 'thoi_gian_tao', 'bieu_mau_ma', 'tai_khoan_ma', 'trang_thai'];
     public $timestamps = false;
 
     public function bieuMau()

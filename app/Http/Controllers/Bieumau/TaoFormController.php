@@ -108,6 +108,7 @@ class TaoFormController extends Controller
                 'thoi_gian_tao' => now(),
                 'bieu_mau_ma' => $maBieuMau,
                 'tai_khoan_ma' => $maTaiKhoan,
+                'trang_thai' => 1,
             ]);
 
             DB::commit();
