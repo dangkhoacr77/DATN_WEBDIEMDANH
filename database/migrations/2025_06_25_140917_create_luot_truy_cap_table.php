@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('ip');
             $table->string('user_agent')->nullable(); // thông tin trình duyệt/thiết bị
-            $table->timestamp('thoi_gian');
+            $table->timestamp('thoi_gian')->useCurrent();
         });
     }
 
