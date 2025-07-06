@@ -10,7 +10,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 
-<body style="background: #f8f9fa; font-family: 'Times New Roman', sans-serif; font-size: 18px;">
+<body class="d-flex flex-column min-vh-100"
+    style="background: #f8f9fa; font-family: 'Times New Roman', sans-serif; font-size: 18px;">
     @php
         $user = session('nguoi_dung');
     @endphp
@@ -48,7 +49,7 @@
     </nav>
 
     <!-- Main layout -->
-    <div class="container-fluid mt-4">
+    <div class="container-fluid mt-4 flex-grow-1">
         <div class="row">
             <!-- Sidebar -->
             <div class="col-md-3 col-sm-12 mb-4">
@@ -104,18 +105,31 @@
     </div>
 
     <!-- Footer -->
-    <footer class="text-white text-center py-5" style="background: #1c1f3c;">
-        <div class="d-flex flex-column align-items-center">
+    <footer class="mt-auto py-4" style="background: linear-gradient(90deg, #1c1f3c, #2c3e50); color: white;">
+        <div class="container d-flex flex-column align-items-center">
+            <!-- Logo + Tên dự án -->
             <div class="d-flex align-items-center mb-2">
-                <div style="width: 40px; height: 40px; background-color: #2dc5c5; color: white; border-radius: 50%; font-weight: bold; display: flex; align-items: center; justify-content: center; margin-right: 10px;">
-                    QR DD
+                <div
+                    style="width: 45px; height: 45px; background-color: #00bcd4; color: white; border-radius: 50%; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: center; margin-right: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">
+                    QR
                 </div>
-                <span class="text-white">Dự án lập trình web</span>
+                <h5 class="mb-0 fw-semibold">Hệ thống điểm danh QR</h5>
             </div>
-            <small>Lý Thanh Duy | Võ Thành Đăng Khoa</small><br>
-            <small>Khóa học 2022 – 2025.</small>
+
+            <!-- Thông tin nhóm -->
+            <div class="text-center" style="font-size: 15px;">
+                <div>Lý Thanh Duy &nbsp;|&nbsp; Võ Thành Đăng Khoa</div>
+                <div>Khóa học: <span style="font-weight: 500;">2022 – 2025</span></div>
+            </div>
+
+            <!-- Đường kẻ chia -->
+            <div class="w-100 my-3" style="height: 1px; background-color: rgba(255,255,255,0.2);"></div>
+
+            <!-- Bản quyền -->
+            <small style="opacity: 0.8;">&copy; {{ date('Y') }} QR Điểm Danh</small>
         </div>
     </footer>
+
 
     <!-- Scripts -->
     <script>
