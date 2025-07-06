@@ -148,12 +148,14 @@
                         class="text-gray-600 hover:text-indigo-600" title="Trang chủ">
                         <span class="material-icons text-white">home</span>
                     </button>
+                    @if ($isCreating ?? false)
                     <button id="settings-btn" class="text-gray-600 hover:text-indigo-600" title="Cài đặt">
                         <span class="material-icons text-white">settings</span>
                     </button>
                     <button id="theme-btn" class="text-gray-600 hover:text-indigo-600" title="Thay đổi giao diện">
                         <span class="material-icons text-white">palette</span>
                     </button>
+                    @endif
                     <button id="show-qr-btn" class="text-gray-600 hover:text-indigo-600" title="Mã QR">
                         <span class="material-icons text-white">qr_code</span>
                     </button>
@@ -265,12 +267,14 @@
                         </div>
 
                         <!-- Thêm câu hỏi -->
+                        @if ($isCreating ?? false)
                         <div class="mt-6 flex justify-center">
                             <button id="add-question"
                                 class="flex items-center text-indigo-600 hover:text-indigo-800 font-medium py-3 px-6 border-2 border-dashed border-indigo-200 rounded-lg hover:bg-indigo-50">
                                 <span class="material-icons mr-2">add</span>Thêm câu hỏi
                             </button>
                         </div>
+                        @endif
 
                         <!-- QR Popup -->
                         <!-- ✅ Đặt ở cuối body, ngay trước </body> -->
