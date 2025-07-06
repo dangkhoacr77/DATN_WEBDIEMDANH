@@ -7,13 +7,13 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-    <div class="d-flex align-items-center justify-content-between mb-3">
+    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
         <input type="text" class="form-control" id="searchInput" placeholder="🔍 Tìm kiếm lịch sử..."
             style="border: none; background: #efefef; border-radius: 8px; padding: 8px 16px; width: 300px;">
         <label style="font-size: 14px;">
             Hiển thị:
             <select id="rowsPerPageSelect" style="padding: 6px 12px; border-radius: 6px;">
-                <option value="7"selected>7 dòng</option>
+                <option value="7" selected>7 dòng</option>
                 <option value="15">15 dòng</option>
                 <option value="20">20 dòng</option>
             </select>
@@ -24,11 +24,47 @@
         <table class="table align-middle text-center" id="dd-table">
             <thead class="table-light">
                 <tr>
-                    <th>Tiêu đề</th>
-                    <th>Người tạo</th>
+                    <th>
+                        <div class="d-inline-flex align-items-center">
+                            <span class="fw-semibold me-1">Biểu mẫu</span>
+                            <select id="sortTieu_de" class="form-select form-select-sm" onchange="onSortChange('tieu_de')" style="width: 80px;">
+                                <option value="">Chọn</option>
+                                <option value="asc">A→Z</option>
+                                <option value="desc">Z→A</option>
+                            </select>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="d-inline-flex align-items-center">
+                            <span class="fw-semibold me-1">Người tạo</span>
+                            <select id="sortNguoi_tao" class="form-select form-select-sm" onchange="onSortChange('nguoi_tao')" style="width: 80px;">
+                                <option value="">Chọn</option>
+                                <option value="asc">A→Z</option>
+                                <option value="desc">Z→A</option>
+                            </select>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="d-inline-flex align-items-center">
+                            <span class="fw-semibold me-1">Thiết bị</span>
+                            <select id="sortThiet_bi" class="form-select form-select-sm" onchange="onSortChange('thiet_bi')" style="width: 80px;">
+                                <option value="">Chọn</option>
+                                <option value="asc">A→Z</option>
+                                <option value="desc">Z→A</option>
+                            </select>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="d-inline-flex align-items-center">
+                            <span class="fw-semibold me-1">Ngày</span>
+                            <select id="sortNgay" class="form-select form-select-sm" onchange="onSortChange('ngay')" style="width: 80px;">
+                                <option value="">Chọn</option>
+                                <option value="desc" selected>M→C</option>
+                                <option value="asc">C→M</option>
+                            </select>
+                        </div>
+                    </th>
                     <th>Thời gian</th>
-                    <th>Ngày</th>
-                    <th>Thiết bị</th>
                     <th>Định vị</th>
                 </tr>
             </thead>
@@ -42,101 +78,128 @@
 @endsection
 
 @push('scripts')
-    <script>
-        let rawData = @json($lichSu);
-        let data = rawData.map(dd => ({
+<script>
+    let rawData = @json($lichSu);
+    let data = rawData.map(dd => {
+        const datetime = new Date(dd.thoi_gian_diem_danh);
+        return {
             tieu_de: dd.bieu_mau?.tieu_de ?? '---',
             nguoi_tao: dd.bieu_mau?.tai_khoan?.ho_ten ?? '---',
-            thoi_gian: dd.thoi_gian_diem_danh ? new Date(dd.thoi_gian_diem_danh).toLocaleTimeString('vi-VN', {
-                hour: '2-digit',
-                minute: '2-digit'
-            }) : '',
-            ngay: dd.thoi_gian_diem_danh ? new Date(dd.thoi_gian_diem_danh).toLocaleDateString('vi-VN') : '',
             thiet_bi: dd.thiet_bi_diem_danh ?? '',
-            dinh_vi: dd.dinh_vi_thiet_bi ?? ''
-        }));
+            dinh_vi: dd.dinh_vi_thiet_bi ?? '',
+            ngay: datetime.toLocaleDateString('vi-VN'),
+            thoi_gian: datetime.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
+            raw_datetime: datetime
+        };
+    });
 
-        let rowsPerPage = 7;
-        let currentPage = 1;
-        let searchValue = '';
-        let filteredData = [...data];
+    let rowsPerPage = 7, currentPage = 1, filteredData = [...data];
+    let currentSortField = 'ngay', currentSortOrder = 'desc', searchKeyword = '';
 
-        function renderTable() {
-            const tbody = document.getElementById("dd-body");
-            tbody.innerHTML = "";
-            const start = (currentPage - 1) * rowsPerPage;
-            const rows = filteredData.slice(start, start + rowsPerPage);
+    function renderTable() {
+        const tbody = document.getElementById("dd-body");
+        tbody.innerHTML = "";
 
-            if (rows.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-3">Không tìm thấy dữ liệu</td></tr>`;
-                return;
-            }
+        const start = (currentPage - 1) * rowsPerPage;
+        const rows = filteredData.slice(start, start + rowsPerPage);
 
-            rows.forEach(row => {
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
+        if (!rows.length) {
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-3">Không tìm thấy dữ liệu</td></tr>`;
+            return;
+        }
+
+        rows.forEach(row => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
                 <td>${row.tieu_de}</td>
                 <td>${row.nguoi_tao}</td>
-                <td>${row.thoi_gian}</td>
-                <td>${row.ngay}</td>
                 <td>${row.thiet_bi}</td>
+                <td>${row.ngay}</td>
+                <td>${row.thoi_gian}</td>
                 <td>${row.dinh_vi}</td>
             `;
-                tbody.appendChild(tr);
-            });
+            tbody.appendChild(tr);
+        });
+    }
+
+    function renderPagination() {
+        const pagination = document.getElementById("pagination");
+        pagination.innerHTML = "";
+        const pageCount = Math.ceil(filteredData.length / rowsPerPage);
+
+        for (let i = 1; i <= pageCount; i++) {
+            const li = document.createElement("li");
+            li.className = `page-item ${i === currentPage ? "active" : ""}`;
+            const a = document.createElement("a");
+            a.className = "page-link";
+            a.href = "#";
+            a.textContent = i;
+            a.onclick = e => {
+                e.preventDefault();
+                currentPage = i;
+                renderTable();
+                renderPagination();
+            };
+            li.appendChild(a);
+            pagination.appendChild(li);
+        }
+    }
+
+    function applyFilterSortRender() {
+        filteredData = data.filter(row =>
+            row.tieu_de.toLowerCase().includes(searchKeyword) ||
+            row.nguoi_tao.toLowerCase().includes(searchKeyword) ||
+            row.thiet_bi.toLowerCase().includes(searchKeyword) ||
+            row.dinh_vi.toLowerCase().includes(searchKeyword) ||
+            row.ngay.includes(searchKeyword)
+        );
+
+        if (currentSortField === 'ngay') {
+            filteredData.sort((a, b) => currentSortOrder === 'asc'
+                ? a.raw_datetime - b.raw_datetime
+                : b.raw_datetime - a.raw_datetime);
+        } else {
+            filteredData.sort((a, b) => currentSortOrder === 'asc'
+                ? a[currentSortField].localeCompare(b[currentSortField])
+                : b[currentSortField].localeCompare(a[currentSortField]));
         }
 
-        function renderPagination() {
-            const pagination = document.getElementById("pagination");
-            pagination.innerHTML = "";
-            const pageCount = Math.ceil(filteredData.length / rowsPerPage);
+        currentPage = 1;
+        renderTable();
+        renderPagination();
+    }
 
-            for (let i = 1; i <= pageCount; i++) {
-                const li = document.createElement("li");
-                li.className = `page-item ${i === currentPage ? "active" : ""}`;
-                const a = document.createElement("a");
-                a.className = "page-link";
-                a.href = "#";
-                a.textContent = i;
-                a.onclick = e => {
-                    e.preventDefault();
-                    currentPage = i;
-                    renderTable();
-                    renderPagination();
-                };
-                li.appendChild(a);
-                pagination.appendChild(li);
-            }
-        }
+    function onSortChange(field) {
+        ['tieu_de', 'nguoi_tao', 'thiet_bi', 'ngay'].forEach(id => {
+            if (id !== field) document.getElementById('sort' + capitalize(id)).value = '';
+        });
 
-        function applySearch(keyword) {
-            searchValue = keyword.toLowerCase();
-            filteredData = data.filter(row =>
-                row.tieu_de.toLowerCase().includes(searchValue) ||
-                row.nguoi_tao.toLowerCase().includes(searchValue) ||
-                row.thiet_bi.toLowerCase().includes(searchValue) ||
-                row.dinh_vi.toLowerCase().includes(searchValue) ||
-                row.ngay.includes(searchValue)
-            );
+        const order = document.getElementById('sort' + capitalize(field)).value;
+        if (!order) return;
+
+        currentSortField = field;
+        currentSortOrder = order;
+        applyFilterSortRender();
+    }
+
+    function capitalize(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("searchInput").addEventListener("input", e => {
+            searchKeyword = e.target.value.toLowerCase();
+            applyFilterSortRender();
+        });
+
+        document.getElementById("rowsPerPageSelect").addEventListener("change", e => {
+            rowsPerPage = parseInt(e.target.value);
             currentPage = 1;
             renderTable();
             renderPagination();
-        }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            document.getElementById("rowsPerPageSelect").addEventListener("change", (e) => {
-                rowsPerPage = parseInt(e.target.value);
-                currentPage = 1;
-                renderTable();
-                renderPagination();
-            });
-
-            document.getElementById("searchInput").addEventListener("input", (e) => {
-                applySearch(e.target.value);
-            });
-
-            renderTable();
-            renderPagination();
         });
-    </script>
+
+        applyFilterSortRender(); // khởi động
+    });
+</script>
 @endpush
