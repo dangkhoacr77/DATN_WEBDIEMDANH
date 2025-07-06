@@ -4,41 +4,55 @@
 @section('page-title', 'Quản lý danh sách điểm danh')
 
 @section('content')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     <div class="mb-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
         <input id="searchInput" type="text" class="form-control"
             placeholder="🔍 Tìm kiếm danh sách..."
             style="max-width: 300px; border: none; background: #efefef; border-radius: 8px;">
-        <button type="submit" form="deleteForm" class="btn btn-danger">🗑️ Xóa đã chọn</button>
+        <button class="btn btn-outline-danger" onclick="deleteSelectedRows()">
+            <i class="fas fa-trash-alt me-1"></i> Xóa đã chọn
+        </button>
     </div>
 
-    <form id="deleteForm" method="POST" onsubmit="return confirm('Bạn có chắc muốn xóa?');">
-        @csrf
-        @method('DELETE')
+    <div class="table-responsive">
+        <table class="table align-middle text-center">
+            <thead class="table-light align-middle">
+                <tr>
+                    <th style="width: 50px;"><input type="checkbox" id="selectAll" onclick="toggleAll(this)"></th>
+                    <th>
+                        <div class="d-inline-flex align-items-center">
+                            <span class="fw-semibold me-1">Tên danh sách</span>
+                            <select id="sortTen" onchange="onSortChange('ten_danh_sach')" class="form-select form-select-sm" style="width: 80px;">
+                                <option value="">Chọn</option>
+                                <option value="asc">A→Z</option>
+                                <option value="desc">Z→A</option>
+                            </select>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="d-inline-flex align-items-center">
+                            <span class="fw-semibold me-1">Ngày tạo</span>
+                            <select id="sortNgayTao" onchange="onSortChange('ngay_tao')" class="form-select form-select-sm" style="width: 80px;">
+                                <option value="">Chọn</option>
+                                <option value="desc">M→C</option>
+                                <option value="asc">C→M</option>
+                            </select>
+                        </div>
+                    </th>
+                    <th>Thời gian</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="list-body"></tbody>
+        </table>
+    </div>
 
-        <div class="table-responsive">
-            <table class="table table-bordered align-middle text-center">
-                <thead class="table-light">
-                    <tr>
-                        <th><input type="checkbox" id="selectAll" onclick="toggleAll(this)"></th>
-                        <th>Tên danh sách</th>
-                        <th>Ngày tạo</th>
-                        <th>Thời gian</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody id="list-body">
-                    {{-- Dữ liệu sẽ được render bằng JavaScript --}}
-                </tbody>
-            </table>
-        </div>
-    </form>
-
-    <!-- Phân trang -->
     <nav aria-label="Phân trang">
         <ul class="pagination justify-content-end mt-3" id="pagination"></ul>
     </nav>
 
-    <!-- Modal preview -->
     <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
             <div class="modal-content">
@@ -46,197 +60,176 @@
                     <h5 class="modal-title" id="previewModalLabel">Chi tiết danh sách điểm danh</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
                 </div>
-                <div class="modal-body" id="modalContent">
-                    Đang tải dữ liệu...
-                </div>
+                <div class="modal-body" id="modalContent">Đang tải dữ liệu...</div>
             </div>
         </div>
     </div>
 @endsection
 
 @push('scripts')
-<style>
-    .table-bordered td,
-    .table-bordered th {
-        border-left: none !important;
-        border-right: none !important;
-    }
-
-    .table-bordered {
-        border-left: none !important;
-        border-right: none !important;
-    }
-
-    #list-body tr:first-child td {
-        border-top: none !important;
-    }
-
-    .table thead,
-    .table thead tr {
-        border-top: none !important;
-    }
-</style>
-
 <script>
     const originalData = @json($danhSach);
-    let filteredData = [...originalData];
-
+    let originalRows = [], searchedRows = [], sortedRows = [], currentPage = 1;
     const rowsPerPage = 7;
-    const pagination = document.getElementById("pagination");
 
-    function renderTable(data) {
-        const tbody = document.getElementById("list-body");
-        tbody.innerHTML = "";
+    const formatDate = dateStr => {
+        const d = new Date(dateStr);
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = d.getFullYear();
+        return `${day}/${month}/${year}`;
+    };
 
-        if (data.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5">Không có dữ liệu.</td></tr>`;
-            return;
+    function toggleAll(master) {
+        document.querySelectorAll(".row-checkbox").forEach(cb => cb.checked = master.checked);
+    }
+
+    function deleteSelectedRows() {
+        const selected = document.querySelectorAll(".row-checkbox:checked");
+        if (!selected.length) return alert("Bạn chưa chọn dòng nào để xóa.");
+
+        if (confirm("Bạn có chắc chắn muốn xóa các danh sách đã chọn không?")) {
+            const ids = Array.from(selected).map(cb => cb.value);
+            fetch("{{ route('nguoidung.ql-danhsach.destroy') }}", {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": '{{ csrf_token() }}',
+                    "X-HTTP-Method-Override": "DELETE"
+                },
+                body: new URLSearchParams(ids.map(id => ['ids[]', id]))
+            })
+            .then(res => res.json())
+            .then(data => data.success ? location.reload() : alert("Xóa thất bại."))
+            .catch(() => alert("Đã xảy ra lỗi!"));
         }
+    }
 
-        data.forEach(ds => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-                <td><input type="checkbox" name="ids[]" value="${ds.ma_danh_sach}" class="row-checkbox"></td>
-                <td>${ds.ten_danh_sach}</td>
-                <td>${ds.ngay_tao}</td>
-                <td>${ds.thoi_gian_tao}</td>
-                <td>
-                    <button type="button" class="btn btn-link text-primary p-0"
-                        onclick="downloadList('${ds.ma_danh_sach}')">
-                        <i class="bi bi-download fs-5"></i>
-                    </button>
-                    <button type="button" class="btn btn-link text-info p-0"
-                        onclick="previewExcel('${ds.ma_danh_sach}', '${ds.ten_danh_sach}')">
-                        <i class="bi bi-eye fs-5"></i>
-                    </button>
-                </td>
-            `;
-            tbody.appendChild(tr);
+    function onSortChange(type) {
+        if (type === 'ten_danh_sach') document.getElementById("sortNgayTao").value = "";
+        if (type === 'ngay_tao') document.getElementById("sortTen").value = "";
+        applySort();
+        displayPage(1);
+    }
+
+    function filterTable() {
+        applySearch();
+        applySort();
+        displayPage(1);
+    }
+
+    function applySearch() {
+        const keyword = document.getElementById("searchInput").value.toLowerCase();
+        searchedRows = originalRows.filter(row => {
+            const ten = row.children[1].textContent.toLowerCase();
+            const ngay = row.children[2].textContent.toLowerCase();
+            const tg = row.children[3].textContent.toLowerCase();
+            return ten.includes(keyword) || ngay.includes(keyword) || tg.includes(keyword);
         });
     }
 
-    function toggleAll(master) {
-        document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = master.checked);
-    }
+    function applySort() {
+        const sortTen = document.getElementById("sortTen")?.value;
+        const sortNgayTao = document.getElementById("sortNgayTao")?.value;
+        sortedRows = [...searchedRows];
 
-    function downloadList(maDanhSach) {
-        window.location.href = `/nguoidung/ql-danhsach/export/${maDanhSach}`;
-    }
-
-    function previewExcel(maDanhSach, tenDanhSach) {
-        const modal = new bootstrap.Modal(document.getElementById('previewModal'));
-        document.getElementById('modalContent').innerHTML = '⏳ Đang tải dữ liệu...';
-        document.getElementById('previewModalLabel').textContent = `Chi tiết: ${tenDanhSach}`;
-        modal.show();
-
-        fetch(`/nguoidung/ql-danhsach/${maDanhSach}/preview`)
-            .then(res => res.json())
-            .then(data => {
-                if (!data.success || !data.rows || data.rows.length === 0) {
-                    document.getElementById('modalContent').innerHTML = 'Không có dữ liệu điểm danh.';
-                    return;
-                }
-
-                const rows = data.rows;
-                const labels = data.labels || [];
-                const maxAnswers = Math.max(...rows.map(r => r.cau_tra_loi.length), labels.length);
-
-                const table = `
-                    <div style="overflow-x:auto;">
-                        <table class="table table-sm table-striped table-bordered text-center align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Email</th>
-                                    <th>Thời gian</th>
-                                    <th>Thiết bị</th>
-                                    <th>Định vị</th>
-                                    ${[...Array(maxAnswers)].map((_, i) => `<th>${labels[i] ?? ''}</th>`).join('')}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${rows.map(row => `
-                                    <tr>
-                                        <td>${row.email}</td>
-                                        <td>${row.thoi_gian}</td>
-                                        <td>${row.thiet_bi}</td>
-                                        <td>${row.dinh_vi}</td>
-                                        ${[...Array(maxAnswers)].map((_, i) => `<td>${row.cau_tra_loi[i] ?? ''}</td>`).join('')}
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>`;
-                document.getElementById('modalContent').innerHTML = table;
-            })
-            .catch(err => {
-                console.error(err);
-                document.getElementById('modalContent').innerHTML = "⚠️ Lỗi khi tải dữ liệu.";
+        if (sortTen) {
+            sortedRows.sort((a, b) => sortTen === "asc"
+                ? a.children[1].textContent.localeCompare(b.children[1].textContent)
+                : b.children[1].textContent.localeCompare(a.children[1].textContent));
+        } else if (sortNgayTao) {
+            const parseDateTime = (row) => {
+                const ngay = row.children[2].textContent.trim().split('/').reverse().join('-'); // yyyy-mm-dd
+                const gio = row.children[3].textContent.trim() || '00:00';
+                return new Date(`${ngay}T${gio}`);
+            };
+            sortedRows.sort((a, b) => {
+                const aDateTime = parseDateTime(a);
+                const bDateTime = parseDateTime(b);
+                return sortNgayTao === "asc" ? aDateTime - bDateTime : bDateTime - aDateTime;
             });
+        } else {
+            // Mặc định sắp xếp theo ngày+giờ mới nhất
+            const parseDateTime = (row) => {
+                const ngay = row.children[2].textContent.trim().split('/').reverse().join('-');
+                const gio = row.children[3].textContent.trim() || '00:00';
+                return new Date(`${ngay}T${gio}`);
+            };
+            sortedRows.sort((a, b) => {
+                const aDateTime = parseDateTime(a);
+                const bDateTime = parseDateTime(b);
+                return bDateTime - aDateTime;
+            });
+        }
     }
 
-    function displayPage(data, page) {
+    function displayPage(page) {
+        const tbody = document.querySelector("#list-body");
+        tbody.innerHTML = "";
+
+        const totalPages = Math.ceil(sortedRows.length / rowsPerPage);
+        if (page > totalPages) page = totalPages;
         const start = (page - 1) * rowsPerPage;
-        const end = start + rowsPerPage;
-        const pageData = data.slice(start, end);
-        renderTable(pageData);
-        renderPagination(data.length, page);
+        const pageRows = sortedRows.slice(start, start + rowsPerPage);
+        pageRows.forEach(row => tbody.appendChild(row));
+        renderPagination(totalPages, page);
     }
 
-    function renderPagination(totalRows, currentPage) {
-        const totalPages = Math.ceil(totalRows / rowsPerPage);
+    function renderPagination(totalPages, activePage) {
+        const pagination = document.getElementById("pagination");
         pagination.innerHTML = "";
 
-        for (let i = 1; i <= totalPages; i++) {
+        const createPageItem = (page, text = page, isActive = false, isDisabled = false) => {
             const li = document.createElement("li");
-            li.className = `page-item ${i === currentPage ? "active" : ""}`;
+            li.className = `page-item ${isActive ? "active" : ""} ${isDisabled ? "disabled" : ""}`;
             const a = document.createElement("a");
             a.className = "page-link";
             a.href = "#";
-            a.textContent = i;
-            a.onclick = e => {
-                e.preventDefault();
-                displayPage(filteredData, i);
-            };
+            a.innerText = text;
+            if (!isDisabled) a.onclick = e => { e.preventDefault(); currentPage = page; displayPage(currentPage); };
             li.appendChild(a);
-            pagination.appendChild(li);
+            return li;
+        };
+
+        pagination.appendChild(createPageItem(currentPage - 1, "«", false, currentPage === 1));
+
+        const visiblePages = [];
+        if (totalPages <= 7) for (let i = 1; i <= totalPages; i++) visiblePages.push(i);
+        else {
+            visiblePages.push(1);
+            if (currentPage <= 3) visiblePages.push(2, 3, 4, "...");
+            else if (currentPage >= totalPages - 2) visiblePages.push("...", totalPages - 3, totalPages - 2, totalPages - 1);
+            else visiblePages.push("...", currentPage - 1, currentPage, currentPage + 1, "...");
+            visiblePages.push(totalPages);
         }
-    }
 
-    function applySearch(keyword) {
-        const lowerKeyword = keyword.toLowerCase();
-        filteredData = originalData.filter(ds =>
-            ds.ten_danh_sach.toLowerCase().includes(lowerKeyword) ||
-            ds.ngay_tao.includes(lowerKeyword) ||
-            ds.thoi_gian_tao.includes(lowerKeyword)
-        );
-        displayPage(filteredData, 1);
-    }
-
-    document.getElementById('deleteForm').addEventListener('submit', function (e) {
-        e.preventDefault();
-        const form = this;
-        const formData = new FormData(form);
-
-        fetch('{{ route('nguoidung.ql-danhsach.destroy') }}', {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'X-HTTP-Method-Override': 'DELETE'
-            },
-            body: formData
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) location.reload();
-        })
-        .catch(err => console.error(err));
-    });
-
-    document.addEventListener('DOMContentLoaded', () => {
-        displayPage(filteredData, 1);
-        document.getElementById("searchInput").addEventListener("input", (e) => {
-            applySearch(e.target.value);
+        visiblePages.forEach(p => {
+            pagination.appendChild(p === "..." ? createPageItem(null, "...", false, true) : createPageItem(p, p, p === currentPage));
         });
+
+        pagination.appendChild(createPageItem(currentPage + 1, "»", false, currentPage === totalPages));
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        originalRows = originalData.map(ds => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td><input type="checkbox" class="row-checkbox" value="${ds.ma_danh_sach}"></td>
+                <td>${ds.ten_danh_sach}</td>
+                <td>${formatDate(ds.ngay_tao)}</td>
+                <td>${ds.thoi_gian_tao}</td>
+                <td>
+                    <button type="button" class="btn btn-link text-primary p-0" onclick="downloadList('${ds.ma_danh_sach}')">
+                        <i class="bi bi-download fs-5"></i>
+                    </button>
+                    <button type="button" class="btn btn-link text-info p-0" onclick="previewExcel('${ds.ma_danh_sach}', '${ds.ten_danh_sach}')">
+                        <i class="bi bi-eye fs-5"></i>
+                    </button>
+                </td>`;
+            return tr;
+        });
+
+        filterTable();
+        document.getElementById("searchInput").addEventListener("input", () => filterTable());
     });
 </script>
 @endpush
