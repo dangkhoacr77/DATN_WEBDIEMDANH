@@ -164,6 +164,11 @@
                             class="bg-indigo-700 text-white px-4 py-2 rounded-md hover:bg-indigo-700 flex items-center">
                             <span class="material-icons mr-2">publish</span>Xuất bản
                         </button>
+                        @else
+                        <button 
+                            class="bg-indigo-700 text-white px-4 py-2 rounded-md hover:bg-indigo-700 flex items-center">
+                            <a href="{{ route('nguoidung.ql-bieumau') }}">← Quay lại</a>
+                        </button>
                     @endif
                 </div>
             </header>
