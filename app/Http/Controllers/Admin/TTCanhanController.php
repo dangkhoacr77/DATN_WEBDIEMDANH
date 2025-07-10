@@ -13,10 +13,10 @@ class TTCanhanController extends Controller
      */
     public function index()
     {
-        $nguoiDung = session('nguoi_dung'); // đã đăng nhập
+        $nguoiDung = session('nguoi_dung'); 
 
         if (!$nguoiDung) {
-            return redirect()->route('dang-nhap'); // hoặc 401
+            return redirect()->route('dang-nhap'); 
         }
 
         // Lấy dữ liệu đầy đủ từ DB

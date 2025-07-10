@@ -43,11 +43,6 @@ class TaoFormController extends Controller
             return response()->json(['success' => false, 'message' => 'Bạn chưa đăng nhập']);
         }
 
-        // Tạo mã BM001, BM002...
-        $last = BieuMau::orderBy('ma_bieu_mau', 'desc')->first();
-        $nextNumber = $last ? ((int)substr($last->ma_bieu_mau, 2)) + 1 : 1;
-        $ma_bieu_mau = 'BM' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
-
         // Kiểm tra dữ liệu đầu vào
         if (!$request->title || !is_array($request->questions) || count($request->questions) === 0) {
             return response()->json(['success' => false, 'message' => 'Dữ liệu biểu mẫu không hợp lệ']);

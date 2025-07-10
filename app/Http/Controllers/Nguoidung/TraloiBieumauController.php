@@ -43,7 +43,7 @@ class TraloiBieumauController extends Controller
         $maDiemDanh = Str::uuid()->toString();
         $taiKhoanMa = session('ma_tai_khoan');
 
-        // ✅ Lấy thông tin thiết bị cụ thể hơn
+        //  Lấy thông tin thiết bị cụ thể hơn
         $userAgent = $request->userAgent();
         $dd = new \DeviceDetector\DeviceDetector($userAgent);
         $dd->parse();
@@ -54,21 +54,21 @@ class TraloiBieumauController extends Controller
         $model = $dd->getModel();                          // Galaxy S21, iPhone 13,...
         $browserData = $dd->getClient();                   // ['name' => ..., 'version' => ...]
 
-        // ✅ Tên thiết bị cụ thể
+        //  Tên thiết bị cụ thể
         $deviceName = trim("{$brand} {$model}");
         if (!$deviceName || $deviceName === '') {
             $deviceName = $device; // Fallback nếu brand/model rỗng
         }
 
-        // ✅ Gộp thông tin thiết bị
+        //  Gộp thông tin thiết bị
         $browserInfo = isset($browserData['name']) ? $browserData['name'] : 'Trình duyệt không xác định';
         $browserVersion = isset($browserData['version']) ? $browserData['version'] : '';
         $thietBiDiemDanh = "$deviceName - $os - $browserInfo $browserVersion";
 
-        // ✅ Giới hạn độ dài nếu cần
+        //  Giới hạn độ dài nếu cần
         $thietBiDiemDanh = Str::limit($thietBiDiemDanh, 100);
 
-        // ✅ Kiểm tra biểu mẫu
+        //  Kiểm tra biểu mẫu
         $bieuMau = BieuMau::with('danhSach')->where('ma_bieu_mau', $bieuMauMa)->first();
         if (!$bieuMau) {
             return redirect()->back()->withErrors(['message' => 'Biểu mẫu không tồn tại.']);

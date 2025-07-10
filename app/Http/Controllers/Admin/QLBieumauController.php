@@ -15,7 +15,7 @@ class QLBieumauController extends Controller
     {
         $bieuMaus = BieuMau::with('taiKhoan')
             ->orderByDesc('ngay_tao')
-            ->get(); // ✅ Lấy tất cả, không phân trang server-side nữa
+            ->get(); 
 
         return view('admin.QL_bieumau', compact('bieuMaus'));
     }

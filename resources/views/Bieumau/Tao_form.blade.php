@@ -325,12 +325,12 @@
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // ===== 1. Thiết lập ban đầu từ server (màu nền & hình nền) =====
+            // ===== Thiết lập ban đầu từ server (màu nền & hình nền) =====
             let selectedColor = "{{ $mau ?? '#93c5fd' }}"; // Màu nền mặc định nếu không có giá trị từ server
             let selectedColorName = selectedColor ? 'Xanh dương đậm' : null;
             let selectedBgImage = "{{ $hinh_nen ?? '' }}"; // Hình nền được chọn trước đó
 
-            // ===== 2. Áp dụng hình nền hoặc màu nền khi tải trang =====
+            // ===== Áp dụng hình nền hoặc màu nền khi tải trang =====
             if (selectedBgImage) {
                 // Nếu có hình nền -> đặt làm nền cho body
                 document.body.style.backgroundImage = `url('${selectedBgImage}')`;
@@ -344,7 +344,7 @@
                 document.body.style.backgroundColor = selectedColor;
             }
 
-            // ===== 3. Xử lý chọn hình nền trong giao diện =====
+            // ===== Xử lý chọn hình nền trong giao diện =====
             document.querySelectorAll('.bg-image-option').forEach(img => {
                 img.addEventListener('click', function() {
                     // Lấy tên file ảnh từ data-src
@@ -364,7 +364,6 @@
                     selectedColorName = null;
                     document.body.style.backgroundColor = '';
 
-                    // Hiệu ứng viền khi chọn ảnh
                     document.querySelectorAll('.bg-image-option').forEach(i => i.classList.remove(
                         'ring-2', 'ring-indigo-500'));
                     this.classList.add('ring-2', 'ring-indigo-500');
@@ -373,7 +372,7 @@
                 });
             });
 
-            // ===== 4. Hiển thị màu đang chọn khi tải lại trang =====
+            // ===== Hiển thị màu đang chọn khi tải lại trang =====
             const allColorButtons = document.querySelectorAll('[data-code]');
             allColorButtons.forEach(btn => {
                 if (btn.dataset.code === selectedColor) {
@@ -381,7 +380,7 @@
                 }
             });
 
-            // ===== 5. Xử lý khi chọn màu nền mới =====
+            // ===== Xử lý khi chọn màu nền mới =====
             allColorButtons.forEach(btn => {
                 btn.addEventListener('click', function() {
                     selectedColor = this.dataset.code;
@@ -400,7 +399,7 @@
                 });
             });
 
-            // ===== 6. Cài đặt hiển thị/ẩn thanh trượt giới hạn =====
+            // ===== Cài đặt hiển thị/ẩn thanh trượt giới hạn =====
             const timeSlider = document.getElementById('setting-time-limit');
             const timeValue = document.getElementById('time-limit-value');
             const participantSlider = document.getElementById('setting-participant-limit');
@@ -423,12 +422,12 @@
             enableTimeLimitCheckbox.addEventListener('change', updateSliderState);
             enableParticipantLimitCheckbox.addEventListener('change', updateSliderState);
 
-            // ===== 7. Hiển thị giá trị khi thay đổi thanh trượt =====
+            // ===== Hiển thị giá trị khi thay đổi thanh trượt =====
             timeSlider?.addEventListener('input', () => timeValue.textContent = timeSlider.value);
             participantSlider?.addEventListener('input', () => participantValue.textContent = participantSlider
                 .value);
 
-            // ===== 8. Hiện/ẩn bảng giao diện & cài đặt =====
+            // ===== Hiện/ẩn bảng giao diện & cài đặt =====
             document.getElementById('theme-btn')?.addEventListener('click', () => {
                 document.getElementById('theme-panel')?.classList.remove('translate-x-full');
             });
@@ -442,7 +441,7 @@
                 document.getElementById('settings-panel')?.classList.add('translate-x-full');
             });
 
-            // ===== 9. Thêm câu hỏi mới vào biểu mẫu =====
+            // ===== Thêm câu hỏi mới vào biểu mẫu =====
             document.getElementById('add-question')?.addEventListener('click', function() {
                 const html = `
                         <div class="question-box bg-white rounded-lg shadow-sm p-6 relative group" >
@@ -520,7 +519,7 @@
                 }).element;
             }
 
-            // ===== 11. Xoá câu hỏi =====
+            // ===== Xoá câu hỏi =====
             container.addEventListener('click', e => {
                 if (e.target.closest('.material-icons')?.textContent === 'delete') {
                     const questionBox = e.target.closest('.question-box');
@@ -528,7 +527,7 @@
                 }
             });
 
-            // ===== 12. Xử lý nút Xuất bản: kiểm tra dữ liệu, gửi API =====
+            // ===== Xử lý nút Xuất bản: kiểm tra dữ liệu, gửi API =====
             document.getElementById('publish-btn')?.addEventListener('click', async () => {
                 const title = document.getElementById('form-title')?.value || '';
                 const description = document.getElementById('form-description')?.value || '';
@@ -630,15 +629,12 @@
                 document.getElementById('qr-popup').classList.remove('hidden');
             });
 
-            // ===== 14. Ẩn popup QR =====
+            // ===== Đóng popup QR =====
             document.getElementById('close-qr-btn')?.addEventListener('click', () => {
                 document.getElementById('qr-popup').classList.add('hidden');
             });
         });
     </script>
-
-    <!-- Uncomment to use QR code library in production -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script> -->
 </body>
 
 </html>

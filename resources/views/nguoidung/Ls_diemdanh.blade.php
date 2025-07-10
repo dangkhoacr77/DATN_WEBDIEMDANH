@@ -199,7 +199,7 @@
             renderPagination();
         });
 
-        applyFilterSortRender(); // khởi động
+        applyFilterSortRender(); 
     });
 </script>
 @endpush

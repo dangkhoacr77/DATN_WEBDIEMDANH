@@ -151,7 +151,6 @@ const compare = (a, b, dir = 'asc') => (a === b ? 0 : a > b ? 1 : -1) * (dir ===
 const roleWeight = v => v === 'admin' ? 0 : 1;
 const statusWeight = v => v === 'Hoạt động' ? 0 : 1;
 
-// ✅ Bổ sung bảng ánh xạ cho các giá trị value trong select
 const dirMap = { az:'asc', za:'desc', asc:'asc', desc:'desc', old:'asc', new:'desc' };
 
 function applySort() {
@@ -165,7 +164,6 @@ function applySort() {
             case 'mail':
                 return compare(a[sortColumn].toLowerCase(), b[sortColumn].toLowerCase(), sortDirection);
             case 'so_dien_thoai':
-                // ✅ So sánh theo giá trị số thực
                 return compare(Number(a.so_dien_thoai), Number(b.so_dien_thoai), sortDirection);
             case 'ngay_raw':
             default:
@@ -331,7 +329,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     case 'sort-date': sortColumn = 'ngay_raw'; break;
                     case 'sort-status': sortColumn = 'trang_thai'; break;
                 }
-                // ✅ Sửa lại dòng này
                 sortDirection = dirMap[sel.value] ?? 'asc';
             }
             currentPage = 1;

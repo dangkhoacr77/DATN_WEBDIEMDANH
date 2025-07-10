@@ -37,28 +37,28 @@ class DangNhapController extends Controller
 
         $nguoi_dung = TaiKhoan::where('mail', $request->mail)->first();
 
-        // ❌ Không tìm thấy tài khoản
+        //  Không tìm thấy tài khoản
         if (!$nguoi_dung) {
             return back()->withErrors([
                 'mail' => 'Email chưa được đăng ký.',
             ])->withInput();
         }
 
-        // ❌ Tài khoản bị khóa
+        //  Tài khoản bị khóa
         if ($nguoi_dung->trang_thai == 0) {
             return back()->withErrors([
                 'mail' => 'Tài khoản đã bị khóa.',
             ])->withInput();
         }
 
-        // ❌ Sai mật khẩu
+        //  Sai mật khẩu
         if (!Hash::check($request->mat_khau, $nguoi_dung->mat_khau)) {
             return back()->withErrors([
                 'mat_khau' => 'Mật khẩu không chính xác.',
             ])->withInput();
         }
 
-        // ✅ Đăng nhập thành công
+        //  Đăng nhập thành công
         session([
             'nguoi_dung' => $nguoi_dung,
             'ma_tai_khoan' => $nguoi_dung->ma_tai_khoan,

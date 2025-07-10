@@ -22,7 +22,7 @@ class LsDiemdanhController extends Controller
     $lichSu = DiemDanh::with(['bieuMau.taiKhoan'])
         ->where('tai_khoan_ma', $nguoiDung['ma_tai_khoan'])
         ->orderByDesc('thoi_gian_diem_danh')
-        ->get(); // ❌ paginate ➜ ✅ get toàn bộ để lọc client-side
+        ->get(); 
 
     return view('nguoidung.Ls_diemdanh', compact('lichSu'));
 }
