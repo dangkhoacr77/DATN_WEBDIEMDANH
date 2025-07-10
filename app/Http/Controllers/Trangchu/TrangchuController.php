@@ -12,19 +12,7 @@ class TrangchuController extends Controller
      */
     public function index()
     {
-        $forms = [
-            (object)[
-                'title' => 'Biểu mẫu 1',
-                'description' => 'Mô tả biểu mẫu 1',
-                'created_at' => now()
-            ],
-            (object)[
-                'title' => 'Biểu mẫu 2',
-                'description' => 'Mô tả biểu mẫu 2',
-                'created_at' => now()->subDays(2)
-            ]
-        ];
-        return view('Trangchu.Trangchu', compact('forms'));
+        return view('Trangchu.Trangchu');
     }
 
     /**
