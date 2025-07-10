@@ -130,10 +130,9 @@ class TaoFormController extends Controller
 
         // Danh sách tên màu → mã màu hex
         $colorNameToHex = [
-            'Trắng' => '#ffffff',
+            'Xanh dương đậm' => '#93c5fd',
             'Đỏ' => '#fca5a5',
             'Tím' => '#c4b5fd',
-            'Xanh dương đậm' => '#93c5fd',
             'Xanh trời' => '#a5f3fc',
             'Cam' => '#fdba74',
             'Vàng đậm' => '#fde68a',
