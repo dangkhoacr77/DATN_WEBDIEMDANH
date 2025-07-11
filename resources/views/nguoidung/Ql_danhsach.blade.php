@@ -242,5 +242,9 @@
             filterTable();
             document.getElementById("searchInput").addEventListener("input", () => filterTable());
         });
+
+        function downloadList(id) {
+            window.location.href = `/nguoidung/ql-danhsach/export/${id}`;
+        }
     </script>
 @endpush
