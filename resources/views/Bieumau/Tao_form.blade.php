@@ -164,7 +164,7 @@
                     </button>
                 @else
                     <button class="bg-indigo-700 text-white px-4 py-2 rounded-md hover:bg-indigo-700 flex items-center">
-                        <a href="{{ route('nguoidung.ql-bieumau') }}">← Quay lại</a>
+                        <a href="{{ url()->previous() }}">← Quay lại</a>
                     </button>
                 @endif
             </div>
@@ -230,8 +230,7 @@
                     <div id="questions-container" class="space-y-4">
                         @if (isset($cauhois))
                             @foreach ($cauhois as $ch)
-                                <div class="question-box bg-white rounded-lg shadow-sm p-6 relative group"
-                                    >
+                                <div class="question-box bg-white rounded-lg shadow-sm p-6 relative group">
                                     <div class="flex items-start">
                                         <div class="mr-4 flex flex-col items-center pt-2 drag-handle cursor-move">
                                             <span class="material-icons text-gray-400">drag_indicator</span>
@@ -264,23 +263,26 @@
                                 </div>
                             @endforeach
                         @endif
-                         <div class="question-box bg-white rounded-lg shadow-sm p-6 relative group" >
+                        <div class="question-box bg-white rounded-lg shadow-sm p-6 relative group">
                             <div class="flex items-start">
                                 <div class="mr-4 flex flex-col items-center pt-2 drag-handle cursor-move">
                                     <span class="material-icons text-gray-400">drag_indicator</span>
                                 </div>
                                 <div class="flex-1">
-                                    <input type="text" class="question-title w-full font-medium border-b-2 border-transparent focus:border-indigo-500 focus:outline-none py-1 px-1 mb-2"
+                                    <input type="text"
+                                        class="question-title w-full font-medium border-b-2 border-transparent focus:border-indigo-500 focus:outline-none py-1 px-1 mb-2"
                                         value="" placeholder="Câu hỏi">
                                     <div class="mt-4">
-                                        <input type="text" class="w-full border-b border-gray-300 py-2 focus:outline-none text-gray-500"
+                                        <input type="text"
+                                            class="w-full border-b border-gray-300 py-2 focus:outline-none text-gray-500"
                                             placeholder="Văn bản trả lời ngắn" disabled>
                                     </div>
                                 </div>
                             </div>
                             <div class="question-toolbar flex items-center justify-between mt-4 pt-4 border-t">
-                                <button class="text-gray-500 hover:text-indigo-600 p-1 rounded-full hover:bg-indigo-50" title="Xoá câu hỏi">
-                                 <span class="material-icons">delete</span>
+                                <button class="text-gray-500 hover:text-indigo-600 p-1 rounded-full hover:bg-indigo-50"
+                                    title="Xoá câu hỏi">
+                                    <span class="material-icons">delete</span>
                                 </button>
                                 <div class="flex items-center space-x-2 text-sm text-gray-500">
                                     <label class="px-3 py-1 hover:bg-gray-100 rounded-md">
@@ -352,7 +354,7 @@
 
                     // Đặt hình nền cho body
                     document.body.style.backgroundImage =
-                    `url('/storage/backgrounds/${imageName}')`;
+                        `url('/storage/backgrounds/${imageName}')`;
                     document.body.style.backgroundSize = 'cover';
                     document.body.style.backgroundPosition = 'center center';
                     document.body.style.backgroundRepeat = 'no-repeat';

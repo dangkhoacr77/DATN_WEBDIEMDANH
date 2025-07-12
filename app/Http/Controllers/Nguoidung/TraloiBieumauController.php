@@ -112,8 +112,12 @@ class TraloiBieumauController extends Controller
      */
     public function show(string $id)
     {
+        if (!session('ma_tai_khoan')) {
+            return redirect()->route('xacthuc.dang-nhap')->with('error', 'Bạn cần đăng nhập.');
+        }
+
         $bieuMau = BieuMau::with(['cauHois', 'danhSach', 'diemDanhs'])->findOrFail($id);
-        
+
         $errorMessage = null;
 
         // ⏱️ Kiểm tra thời lượng điểm danh (nếu có)
