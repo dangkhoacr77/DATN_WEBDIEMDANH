@@ -94,7 +94,7 @@
 
             if (confirm("Bạn có chắc chắn muốn xóa các danh sách đã chọn không?")) {
                 const ids = Array.from(selected).map(cb => cb.value);
-                fetch("{{ route('nguoidung.ql-danhsach.destroy') }}", {
+                fetch("{{ url()->route('nguoidung.ql-danhsach.destroy', [], false) }}",{
                         method: "POST",
                         headers: {
                             "X-CSRF-TOKEN": '{{ csrf_token() }}',

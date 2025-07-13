@@ -27,6 +27,11 @@ class QLBieumauController extends Controller
 
     public function xoaDaChon(Request $request)
     {
+        $nguoiDung = session('nguoi_dung');
+        if (!$nguoiDung) {
+            return response()->json(['message' => 'Chưa đăng nhập'], 401); // Trả về JSON thay vì redirect
+        }
+
         $ids = $request->input('ids', []);
         if (!empty($ids)) {
             BieuMau::whereIn('ma_bieu_mau', $ids)->update(['trang_thai' => 0]);
@@ -34,6 +39,7 @@ class QLBieumauController extends Controller
 
         return response()->json(['message' => 'Đã cập nhật trạng thái thành công']);
     }
+
 
     /**
      * Show the form for creating a new resource.

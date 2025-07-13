@@ -23,7 +23,10 @@ class QLDanhsachController extends Controller
 
     public function export($id)
     {
-        $ds = DanhSachDiemDanh::findOrFail($id);
+        $ds = DanhSachDiemDanh::where('ma_danh_sach', $id)
+            ->where('trang_thai', 1)
+            ->firstOrFail();
+
         $diemDanhs = $ds->diemDanhs()->with(['cauTraLoi', 'taiKhoan'])->get();
 
         // Lấy danh sách câu hỏi theo biểu mẫu và sắp xếp theo mã câu hỏi

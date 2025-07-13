@@ -54,7 +54,7 @@ Route::middleware(['web'])->group(function () {
     // ======================= NGUOIDUNG =========================
     Route::get('/nguoidung/ls-diemdanh', [LsDiemdanhController::class, 'index'])->name('nguoidung.ls-diemdanh');
     Route::get('/nguoidung/ql-bieumau', [NguoidungQLBieumauController::class, 'index'])->name('nguoidung.ql-bieumau');
-    Route::delete('/nguoidung/bieumau/xoa-da-chon', [NguoidungQLBieumauController::class, 'xoaDaChon'])->name('nguoidung.bieumau.xoaDaChon');
+    Route::post('/nguoidung/bieumau/xoa-da-chon', [NguoidungQLBieumauController::class, 'xoaDaChon'])->name('nguoidung.bieumau.xoaDaChon');
 
     Route::get('/nguoidung/ql-danhsach', [QLDanhsachController::class, 'index'])->name('nguoidung.ql-danhsach');
     Route::delete('/nguoidung/ql-danhsach/delete', [QLDanhsachController::class, 'destroy'])->name('nguoidung.ql-danhsach.destroy');

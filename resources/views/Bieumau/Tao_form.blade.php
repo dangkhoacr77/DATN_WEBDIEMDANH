@@ -473,7 +473,8 @@
                                 </div>
                             </div>
                         </div>`;
-                    document.getElementById('questions-container').insertAdjacentHTML('beforeend', html);
+                    const addBtn = document.getElementById('add-question').closest('div');
+                    addBtn.insertAdjacentHTML('beforebegin', html);
                 });
 
                 const container = document.getElementById('questions-container');

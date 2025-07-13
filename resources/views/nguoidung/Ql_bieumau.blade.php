@@ -120,8 +120,8 @@
 
             if (confirm("Bạn có chắc chắn muốn xóa các biểu mẫu đã chọn không?")) {
                 const ids = Array.from(selected).map(cb => cb.value);
-                fetch("{{ route('nguoidung.bieumau.xoaDaChon') }}", {
-                        method: "DELETE",
+                fetch("{{ url()->route('nguoidung.bieumau.xoaDaChon', [], false) }}", {
+                        method: "POST",
                         headers: {
                             "Content-Type": "application/json",
                             "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
@@ -130,9 +130,17 @@
                             ids
                         })
                     })
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(error => {
+                                throw new Error(error.message || 'Lỗi không xác định');
+                            });
+                        }
+                        return response.json();
+                    })
                     .then(() => location.reload())
-                    .catch(() => alert("Đã xảy ra lỗi!"));
+                    .catch(err => alert("Đã xảy ra lỗi: " + err.message));
+
             }
         }
 
