@@ -93,7 +93,7 @@
         };
     });
 
-    let rowsPerPage = 7, currentPage = 1, filteredData = [...data];
+    let rowsPerPage = 10, currentPage = 1, filteredData = [...data];
     let currentSortField = 'ngay', currentSortOrder = 'desc', searchKeyword = '';
 
     function renderTable() {

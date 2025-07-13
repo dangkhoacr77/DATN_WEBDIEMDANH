@@ -13,7 +13,6 @@ php artisan view:clear
 
 
 
-use ngrok
 php artisan serve --host=0.0.0.0 --port=8000
 chạy cmd trỏ tới thư mục ngrok chạy: ngrok http 8000
 lấy cái Forwarding

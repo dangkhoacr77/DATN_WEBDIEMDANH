@@ -263,189 +263,190 @@
                                 </div>
                             @endforeach
                         @endif
-                        <div class="question-box bg-white rounded-lg shadow-sm p-6 relative group">
-                            <div class="flex items-start">
-                                <div class="mr-4 flex flex-col items-center pt-2 drag-handle cursor-move">
-                                    <span class="material-icons text-gray-400">drag_indicator</span>
-                                </div>
-                                <div class="flex-1">
-                                    <input type="text"
-                                        class="question-title w-full font-medium border-b-2 border-transparent focus:border-indigo-500 focus:outline-none py-1 px-1 mb-2"
-                                        value="" placeholder="Câu hỏi">
-                                    <div class="mt-4">
+                        @if ($isCreating ?? false)
+                            <div class="question-box bg-white rounded-lg shadow-sm p-6 relative group">
+                                <div class="flex items-start">
+                                    <div class="mr-4 flex flex-col items-center pt-2 drag-handle cursor-move">
+                                        <span class="material-icons text-gray-400">drag_indicator</span>
+                                    </div>
+                                    <div class="flex-1">
                                         <input type="text"
-                                            class="w-full border-b border-gray-300 py-2 focus:outline-none text-gray-500"
-                                            placeholder="Văn bản trả lời ngắn" disabled>
+                                            class="question-title w-full font-medium border-b-2 border-transparent focus:border-indigo-500 focus:outline-none py-1 px-1 mb-2"
+                                            value="" placeholder="Câu hỏi">
+                                        <div class="mt-4">
+                                            <input type="text"
+                                                class="w-full border-b border-gray-300 py-2 focus:outline-none text-gray-500"
+                                                placeholder="Văn bản trả lời ngắn" disabled>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="question-toolbar flex items-center justify-between mt-4 pt-4 border-t">
+                                    <button
+                                        class="text-gray-500 hover:text-indigo-600 p-1 rounded-full hover:bg-indigo-50"
+                                        title="Xoá câu hỏi">
+                                        <span class="material-icons">delete</span>
+                                    </button>
+                                    <div class="flex items-center space-x-2 text-sm text-gray-500">
+                                        <label class="px-3 py-1 hover:bg-gray-100 rounded-md">
+                                            Bắt buộc
+                                            <input type="checkbox" class="question-required ml-2">
+                                        </label>
                                     </div>
                                 </div>
                             </div>
-                            <div class="question-toolbar flex items-center justify-between mt-4 pt-4 border-t">
-                                <button class="text-gray-500 hover:text-indigo-600 p-1 rounded-full hover:bg-indigo-50"
-                                    title="Xoá câu hỏi">
-                                    <span class="material-icons">delete</span>
+                        @endif
+                        <!-- Thêm câu hỏi -->
+                        @if ($isCreating ?? false)
+                            <div class="mt-6 flex justify-center">
+                                <button id="add-question"
+                                    class="flex items-center text-indigo-600 hover:text-indigo-800 font-medium py-3 px-6 border-2 border-dashed border-indigo-200 rounded-lg hover:bg-indigo-50">
+                                    <span class="material-icons mr-2">add</span>Thêm câu hỏi
                                 </button>
-                                <div class="flex items-center space-x-2 text-sm text-gray-500">
-                                    <label class="px-3 py-1 hover:bg-gray-100 rounded-md">
-                                        Bắt buộc
-                                        <input type="checkbox" class="question-required ml-2">
-                                    </label>
+                            </div>
+                        @endif
+
+                        <!-- QR Popup -->
+                        <div id="qr-popup"
+                            class="fixed inset-0 bg-black bg-opacity-40 hidden flex items-center justify-center z-50">
+                            <div class="bg-white p-6 rounded-lg w-80">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-lg font-medium">Mã QR Biểu Mẫu</h3>
+                                    <button id="close-qr-btn" class="text-gray-500 hover:text-gray-700">
+                                        <span class="material-icons">close</span>
+                                    </button>
+                                </div>
+                                <div id="qr-code"
+                                    class="w-64 h-64 bg-gray-100 flex items-center justify-center mb-4 mx-auto">
+                                    <canvas></canvas>
                                 </div>
                             </div>
                         </div>
+
                     </div>
-
-                    <!-- Thêm câu hỏi -->
-                    @if ($isCreating ?? false)
-                        <div class="mt-6 flex justify-center">
-                            <button id="add-question"
-                                class="flex items-center text-indigo-600 hover:text-indigo-800 font-medium py-3 px-6 border-2 border-dashed border-indigo-200 rounded-lg hover:bg-indigo-50">
-                                <span class="material-icons mr-2">add</span>Thêm câu hỏi
-                            </button>
-                        </div>
-                    @endif
-
-                    <!-- QR Popup -->
-                    <div id="qr-popup"
-                        class="fixed inset-0 bg-black bg-opacity-40 hidden flex items-center justify-center z-50">
-                        <div class="bg-white p-6 rounded-lg w-80">
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-lg font-medium">Mã QR Biểu Mẫu</h3>
-                                <button id="close-qr-btn" class="text-gray-500 hover:text-gray-700">
-                                    <span class="material-icons">close</span>
-                                </button>
-                            </div>
-                            <div id="qr-code"
-                                class="w-64 h-64 bg-gray-100 flex items-center justify-center mb-4 mx-auto">
-                                <canvas></canvas>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </div>
-    </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // ===== Thiết lập ban đầu từ server (màu nền & hình nền) =====
-            let selectedColor = "{{ $mau ?? '#93c5fd' }}"; // Màu nền mặc định nếu không có giá trị từ server
-            let selectedColorName = selectedColor ? 'Xanh dương đậm' : null;
-            let selectedBgImage = "{{ $hinh_nen ?? '' }}"; // Hình nền được chọn trước đó
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                // ===== Thiết lập ban đầu từ server (màu nền & hình nền) =====
+                let selectedColor = "{{ $mau ?? '#93c5fd' }}"; // Màu nền mặc định nếu không có giá trị từ server
+                let selectedColorName = selectedColor ? 'Xanh dương đậm' : null;
+                let selectedBgImage = "{{ $hinh_nen ?? '' }}"; // Hình nền được chọn trước đó
 
-            // ===== Áp dụng hình nền hoặc màu nền khi tải trang =====
-            if (selectedBgImage) {
-                // Nếu có hình nền -> đặt làm nền cho body
-                document.body.style.backgroundImage = `url('${selectedBgImage}')`;
-                document.body.style.backgroundSize = 'cover';
-                document.body.style.backgroundPosition = 'center center';
-                document.body.style.backgroundRepeat = 'no-repeat';
-                document.body.style.backgroundAttachment = 'fixed';
-                window.selectedBackgroundImage = selectedBgImage;
-            } else if (selectedColor) {
-                // Nếu không có hình nền, dùng màu nền
-                document.body.style.backgroundColor = selectedColor;
-            }
-
-            // ===== Xử lý chọn hình nền trong giao diện =====
-            document.querySelectorAll('.bg-image-option').forEach(img => {
-                img.addEventListener('click', function() {
-                    // Lấy tên file ảnh từ data-src
-                    const imageName = this.dataset.src.split('/').pop();
-
-                    // Đặt hình nền cho body
-                    document.body.style.backgroundImage =
-                        `url('/storage/backgrounds/${imageName}')`;
+                // ===== Áp dụng hình nền hoặc màu nền khi tải trang =====
+                if (selectedBgImage) {
+                    // Nếu có hình nền -> đặt làm nền cho body
+                    document.body.style.backgroundImage = `url('${selectedBgImage}')`;
                     document.body.style.backgroundSize = 'cover';
                     document.body.style.backgroundPosition = 'center center';
                     document.body.style.backgroundRepeat = 'no-repeat';
                     document.body.style.backgroundAttachment = 'fixed';
-
-                    // Cập nhật biến và reset màu nền
-                    window.selectedBackgroundImage = imageName;
-                    selectedColor = null;
-                    selectedColorName = null;
-                    document.body.style.backgroundColor = '';
-
-                    document.querySelectorAll('.bg-image-option').forEach(i => i.classList.remove(
-                        'ring-2', 'ring-indigo-500'));
-                    this.classList.add('ring-2', 'ring-indigo-500');
-                    document.querySelectorAll('[data-code]').forEach(el => el.classList.remove(
-                        'ring-2', 'ring-indigo-500'));
-                });
-            });
-
-            // ===== Hiển thị màu đang chọn khi tải lại trang =====
-            const allColorButtons = document.querySelectorAll('[data-code]');
-            allColorButtons.forEach(btn => {
-                if (btn.dataset.code === selectedColor) {
-                    btn.classList.add('ring-2', 'ring-indigo-500');
-                }
-            });
-
-            // ===== Xử lý khi chọn màu nền mới =====
-            allColorButtons.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    selectedColor = this.dataset.code;
-                    selectedColorName = this.dataset.color;
-
-                    // Cập nhật body theo màu
+                    window.selectedBackgroundImage = selectedBgImage;
+                } else if (selectedColor) {
+                    // Nếu không có hình nền, dùng màu nền
                     document.body.style.backgroundColor = selectedColor;
-                    window.selectedBackgroundImage = null;
-                    document.body.style.backgroundImage = '';
+                }
 
-                    // Reset border highlight
-                    document.querySelectorAll('.bg-image-option').forEach(img => img.classList
-                        .remove('ring-2', 'ring-indigo-500'));
-                    allColorButtons.forEach(b => b.classList.remove('ring-2', 'ring-indigo-500'));
-                    this.classList.add('ring-2', 'ring-indigo-500');
+                // ===== Xử lý chọn hình nền trong giao diện =====
+                document.querySelectorAll('.bg-image-option').forEach(img => {
+                    img.addEventListener('click', function() {
+                        // Lấy tên file ảnh từ data-src
+                        const imageName = this.dataset.src.split('/').pop();
+
+                        // Đặt hình nền cho body
+                        document.body.style.backgroundImage =
+                            `url('/storage/backgrounds/${imageName}')`;
+                        document.body.style.backgroundSize = 'cover';
+                        document.body.style.backgroundPosition = 'center center';
+                        document.body.style.backgroundRepeat = 'no-repeat';
+                        document.body.style.backgroundAttachment = 'fixed';
+
+                        // Cập nhật biến và reset màu nền
+                        window.selectedBackgroundImage = imageName;
+                        selectedColor = null;
+                        selectedColorName = null;
+                        document.body.style.backgroundColor = '';
+
+                        document.querySelectorAll('.bg-image-option').forEach(i => i.classList.remove(
+                            'ring-2', 'ring-indigo-500'));
+                        this.classList.add('ring-2', 'ring-indigo-500');
+                        document.querySelectorAll('[data-code]').forEach(el => el.classList.remove(
+                            'ring-2', 'ring-indigo-500'));
+                    });
                 });
-            });
 
-            // ===== Cài đặt hiển thị/ẩn thanh trượt giới hạn =====
-            const timeSlider = document.getElementById('setting-time-limit');
-            const timeValue = document.getElementById('time-limit-value');
-            const participantSlider = document.getElementById('setting-participant-limit');
-            const participantValue = document.getElementById('participant-limit-value');
-            const enableTimeLimitCheckbox = document.getElementById('enable-time-limit');
-            const enableParticipantLimitCheckbox = document.getElementById('enable-participant-limit');
+                // ===== Hiển thị màu đang chọn khi tải lại trang =====
+                const allColorButtons = document.querySelectorAll('[data-code]');
+                allColorButtons.forEach(btn => {
+                    if (btn.dataset.code === selectedColor) {
+                        btn.classList.add('ring-2', 'ring-indigo-500');
+                    }
+                });
 
-            // Bật/tắt thanh trượt tuỳ theo checkbox
-            const updateSliderState = () => {
-                timeSlider.disabled = !enableTimeLimitCheckbox.checked;
-                participantSlider.disabled = !enableParticipantLimitCheckbox.checked;
+                // ===== Xử lý khi chọn màu nền mới =====
+                allColorButtons.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        selectedColor = this.dataset.code;
+                        selectedColorName = this.dataset.color;
 
-                timeSlider.classList.toggle('opacity-50', timeSlider.disabled);
-                timeSlider.classList.toggle('cursor-not-allowed', timeSlider.disabled);
-                participantSlider.classList.toggle('opacity-50', participantSlider.disabled);
-                participantSlider.classList.toggle('cursor-not-allowed', participantSlider.disabled);
-            };
+                        // Cập nhật body theo màu
+                        document.body.style.backgroundColor = selectedColor;
+                        window.selectedBackgroundImage = null;
+                        document.body.style.backgroundImage = '';
 
-            updateSliderState();
-            enableTimeLimitCheckbox.addEventListener('change', updateSliderState);
-            enableParticipantLimitCheckbox.addEventListener('change', updateSliderState);
+                        // Reset border highlight
+                        document.querySelectorAll('.bg-image-option').forEach(img => img.classList
+                            .remove('ring-2', 'ring-indigo-500'));
+                        allColorButtons.forEach(b => b.classList.remove('ring-2', 'ring-indigo-500'));
+                        this.classList.add('ring-2', 'ring-indigo-500');
+                    });
+                });
 
-            // ===== Hiển thị giá trị khi thay đổi thanh trượt =====
-            timeSlider?.addEventListener('input', () => timeValue.textContent = timeSlider.value);
-            participantSlider?.addEventListener('input', () => participantValue.textContent = participantSlider
-                .value);
+                // ===== Cài đặt hiển thị/ẩn thanh trượt giới hạn =====
+                const timeSlider = document.getElementById('setting-time-limit');
+                const timeValue = document.getElementById('time-limit-value');
+                const participantSlider = document.getElementById('setting-participant-limit');
+                const participantValue = document.getElementById('participant-limit-value');
+                const enableTimeLimitCheckbox = document.getElementById('enable-time-limit');
+                const enableParticipantLimitCheckbox = document.getElementById('enable-participant-limit');
 
-            // ===== Hiện/ẩn bảng giao diện & cài đặt =====
-            document.getElementById('theme-btn')?.addEventListener('click', () => {
-                document.getElementById('theme-panel')?.classList.remove('translate-x-full');
-            });
-            document.getElementById('close-theme-btn')?.addEventListener('click', () => {
-                document.getElementById('theme-panel')?.classList.add('translate-x-full');
-            });
-            document.getElementById('settings-btn')?.addEventListener('click', () => {
-                document.getElementById('settings-panel')?.classList.remove('translate-x-full');
-            });
-            document.getElementById('close-settings-btn')?.addEventListener('click', () => {
-                document.getElementById('settings-panel')?.classList.add('translate-x-full');
-            });
+                // Bật/tắt thanh trượt tuỳ theo checkbox
+                const updateSliderState = () => {
+                    timeSlider.disabled = !enableTimeLimitCheckbox.checked;
+                    participantSlider.disabled = !enableParticipantLimitCheckbox.checked;
 
-            // ===== Thêm câu hỏi mới vào biểu mẫu =====
-            document.getElementById('add-question')?.addEventListener('click', function() {
-                const html = `
+                    timeSlider.classList.toggle('opacity-50', timeSlider.disabled);
+                    timeSlider.classList.toggle('cursor-not-allowed', timeSlider.disabled);
+                    participantSlider.classList.toggle('opacity-50', participantSlider.disabled);
+                    participantSlider.classList.toggle('cursor-not-allowed', participantSlider.disabled);
+                };
+
+                updateSliderState();
+                enableTimeLimitCheckbox.addEventListener('change', updateSliderState);
+                enableParticipantLimitCheckbox.addEventListener('change', updateSliderState);
+
+                // ===== Hiển thị giá trị khi thay đổi thanh trượt =====
+                timeSlider?.addEventListener('input', () => timeValue.textContent = timeSlider.value);
+                participantSlider?.addEventListener('input', () => participantValue.textContent = participantSlider
+                    .value);
+
+                // ===== Hiện/ẩn bảng giao diện & cài đặt =====
+                document.getElementById('theme-btn')?.addEventListener('click', () => {
+                    document.getElementById('theme-panel')?.classList.remove('translate-x-full');
+                });
+                document.getElementById('close-theme-btn')?.addEventListener('click', () => {
+                    document.getElementById('theme-panel')?.classList.add('translate-x-full');
+                });
+                document.getElementById('settings-btn')?.addEventListener('click', () => {
+                    document.getElementById('settings-panel')?.classList.remove('translate-x-full');
+                });
+                document.getElementById('close-settings-btn')?.addEventListener('click', () => {
+                    document.getElementById('settings-panel')?.classList.add('translate-x-full');
+                });
+
+                // ===== Thêm câu hỏi mới vào biểu mẫu =====
+                document.getElementById('add-question')?.addEventListener('click', function() {
+                    const html = `
                         <div class="question-box bg-white rounded-lg shadow-sm p-6 relative group" >
                             <div class="flex items-start">
                                 <div class="mr-4 flex flex-col items-center pt-2 drag-handle cursor-move">
@@ -472,171 +473,171 @@
                                 </div>
                             </div>
                         </div>`;
-                document.getElementById('questions-container').insertAdjacentHTML('beforeend', html);
-            });
-
-            const container = document.getElementById('questions-container');
-            let draggedItem = null;
-
-            container.addEventListener('dragstart', e => {
-                const box = e.target.closest('.question-box');
-                if (box) {
-                    draggedItem = box;
-                    box.classList.add('dragging');
-                }
-            });
-
-            container.addEventListener('dragend', () => {
-                if (draggedItem) {
-                    draggedItem.classList.remove('dragging');
-                    draggedItem = null;
-                }
-            });
-
-            container.addEventListener('dragover', e => {
-                e.preventDefault();
-                const afterElement = getDragAfterElement(container, e.clientY);
-                const dragging = document.querySelector('.dragging');
-                if (!dragging) return;
-                if (!afterElement) {
-                    container.appendChild(dragging);
-                } else {
-                    container.insertBefore(dragging, afterElement);
-                }
-            });
-
-            function getDragAfterElement(container, y) {
-                const elements = [...container.querySelectorAll('.question-box:not(.dragging)')];
-                return elements.reduce((closest, child) => {
-                    const box = child.getBoundingClientRect();
-                    const offset = y - box.top - box.height / 2;
-                    if (offset < 0 && offset > closest.offset) {
-                        return {
-                            offset,
-                            element: child
-                        };
-                    } else return closest;
-                }, {
-                    offset: Number.NEGATIVE_INFINITY
-                }).element;
-            }
-
-            // ===== Xoá câu hỏi =====
-            container.addEventListener('click', e => {
-                if (e.target.closest('.material-icons')?.textContent === 'delete') {
-                    const questionBox = e.target.closest('.question-box');
-                    if (confirm('Xóa câu hỏi này?')) questionBox.remove();
-                }
-            });
-
-            // ===== Xử lý nút Xuất bản: kiểm tra dữ liệu, gửi API =====
-            document.getElementById('publish-btn')?.addEventListener('click', async () => {
-                const title = document.getElementById('form-title')?.value || '';
-                const description = document.getElementById('form-description')?.value || '';
-                const time_limit = enableTimeLimitCheckbox.checked ? parseInt(timeSlider?.value || 0) :
-                    null;
-                const participant_limit = enableParticipantLimitCheckbox.checked ? parseInt(
-                    participantSlider?.value || 0) : null;
-
-                // Thu thập dữ liệu từ các câu hỏi
-                const questionBoxes = document.querySelectorAll('.question-box');
-                const questions = [];
-                let hasEmptyTitle = false;
-
-                questionBoxes.forEach((box) => {
-                    const title = box.querySelector('.question-title')?.value.trim() || '';
-                    const required = box.querySelector('.question-required')?.checked || false;
-
-                    if (!title) {
-                        hasEmptyTitle = true;
-                        box.querySelector('.question-title').classList.add('border-red-500');
-                    } else {
-                        box.querySelector('.question-title').classList.remove('border-red-500');
-                    }
-
-                    questions.push({
-                        title,
-                        required
-                    });
+                    document.getElementById('questions-container').insertAdjacentHTML('beforeend', html);
                 });
 
-                // Kiểm tra dữ liệu đầu vào
-                if (hasEmptyTitle) {
-                    alert("❌ Bạn cần điền nội dung cho tất cả câu hỏi.");
-                    return;
-                }
-                if (questions.length === 0) {
-                    alert("❌ Bạn phải tạo ít nhất 1 câu hỏi trước khi xuất bản.");
-                    return;
+                const container = document.getElementById('questions-container');
+                let draggedItem = null;
+
+                container.addEventListener('dragstart', e => {
+                    const box = e.target.closest('.question-box');
+                    if (box) {
+                        draggedItem = box;
+                        box.classList.add('dragging');
+                    }
+                });
+
+                container.addEventListener('dragend', () => {
+                    if (draggedItem) {
+                        draggedItem.classList.remove('dragging');
+                        draggedItem = null;
+                    }
+                });
+
+                container.addEventListener('dragover', e => {
+                    e.preventDefault();
+                    const afterElement = getDragAfterElement(container, e.clientY);
+                    const dragging = document.querySelector('.dragging');
+                    if (!dragging) return;
+                    if (!afterElement) {
+                        container.appendChild(dragging);
+                    } else {
+                        container.insertBefore(dragging, afterElement);
+                    }
+                });
+
+                function getDragAfterElement(container, y) {
+                    const elements = [...container.querySelectorAll('.question-box:not(.dragging)')];
+                    return elements.reduce((closest, child) => {
+                        const box = child.getBoundingClientRect();
+                        const offset = y - box.top - box.height / 2;
+                        if (offset < 0 && offset > closest.offset) {
+                            return {
+                                offset,
+                                element: child
+                            };
+                        } else return closest;
+                    }, {
+                        offset: Number.NEGATIVE_INFINITY
+                    }).element;
                 }
 
-                // Nếu có QR, lấy hình ảnh base64 từ canvas
-                const canvas = document.querySelector('#qr-code canvas');
-                const base64Image = canvas ? canvas.toDataURL() : null;
+                // ===== Xoá câu hỏi =====
+                container.addEventListener('click', e => {
+                    if (e.target.closest('.material-icons')?.textContent === 'delete') {
+                        const questionBox = e.target.closest('.question-box');
+                        if (confirm('Xóa câu hỏi này?')) questionBox.remove();
+                    }
+                });
 
-                // Gửi request tạo biểu mẫu
-                try {
-                    const res = await fetch('/bieumau/xuat-ban', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
-                                .content
-                        },
-                        body: JSON.stringify({
+                // ===== Xử lý nút Xuất bản: kiểm tra dữ liệu, gửi API =====
+                document.getElementById('publish-btn')?.addEventListener('click', async () => {
+                    const title = document.getElementById('form-title')?.value || '';
+                    const description = document.getElementById('form-description')?.value || '';
+                    const time_limit = enableTimeLimitCheckbox.checked ? parseInt(timeSlider?.value || 0) :
+                        null;
+                    const participant_limit = enableParticipantLimitCheckbox.checked ? parseInt(
+                        participantSlider?.value || 0) : null;
+
+                    // Thu thập dữ liệu từ các câu hỏi
+                    const questionBoxes = document.querySelectorAll('.question-box');
+                    const questions = [];
+                    let hasEmptyTitle = false;
+
+                    questionBoxes.forEach((box) => {
+                        const title = box.querySelector('.question-title')?.value.trim() || '';
+                        const required = box.querySelector('.question-required')?.checked || false;
+
+                        if (!title) {
+                            hasEmptyTitle = true;
+                            box.querySelector('.question-title').classList.add('border-red-500');
+                        } else {
+                            box.querySelector('.question-title').classList.remove('border-red-500');
+                        }
+
+                        questions.push({
                             title,
-                            description,
-                            time_limit,
-                            participant_limit,
-                            theme_color: window.selectedBackgroundImage ? 'Hình ảnh' : (
-                                selectedColorName || 'Xanh dương đậm'),
-                            background_image: window.selectedBackgroundImage || null,
-                            questions,
-                            qr_image: base64Image
-                        })
+                            required
+                        });
                     });
 
-                    const data = await res.json();
-                    if (data.success) {
-                        alert('🎉 Biểu mẫu đã được xuất bản thành công!');
-                        window.currentFormCode = data.ma_bieu_mau;
-                    } else {
-                        alert('❌ ' + (data.message || 'Xuất bản thất bại. Vui lòng thử lại!'));
+                    // Kiểm tra dữ liệu đầu vào
+                    if (hasEmptyTitle) {
+                        alert("❌ Bạn cần điền nội dung cho tất cả câu hỏi.");
+                        return;
                     }
-                } catch (err) {
-                    console.error(err);
-                    alert('Đã có lỗi xảy ra khi gửi dữ liệu.');
-                }
-            });
+                    if (questions.length === 0) {
+                        alert("❌ Bạn phải tạo ít nhất 1 câu hỏi trước khi xuất bản.");
+                        return;
+                    }
 
-            // ===== 13. Hiển thị popup QR code =====
-            document.getElementById('show-qr-btn')?.addEventListener('click', () => {
-                let formCode = window.currentFormCode || "{{ $bieumau->ma_bieu_mau ?? '' }}";
-                if (!formCode) {
-                    alert('⚠️ Biểu mẫu chưa được xuất bản!');
-                    return;
-                }
+                    // Nếu có QR, lấy hình ảnh base64 từ canvas
+                    const canvas = document.querySelector('#qr-code canvas');
+                    const base64Image = canvas ? canvas.toDataURL() : null;
 
-                const qrUrl = `${window.location.origin}/traloi-bieumau/${formCode}`;
-                const canvas = document.querySelector('#qr-code canvas');
+                    // Gửi request tạo biểu mẫu
+                    try {
+                        const res = await fetch('/bieumau/xuat-ban', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                    .content
+                            },
+                            body: JSON.stringify({
+                                title,
+                                description,
+                                time_limit,
+                                participant_limit,
+                                theme_color: window.selectedBackgroundImage ? 'Hình ảnh' : (
+                                    selectedColorName || 'Xanh dương đậm'),
+                                background_image: window.selectedBackgroundImage || null,
+                                questions,
+                                qr_image: base64Image
+                            })
+                        });
 
-                // Sử dụng thư viện QRious để tạo QR code
-                new QRious({
-                    element: canvas,
-                    value: qrUrl,
-                    size: 256,
-                    level: 'H'
+                        const data = await res.json();
+                        if (data.success) {
+                            alert('🎉 Biểu mẫu đã được xuất bản thành công!');
+                            window.currentFormCode = data.ma_bieu_mau;
+                        } else {
+                            alert('❌ ' + (data.message || 'Xuất bản thất bại. Vui lòng thử lại!'));
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        alert('Đã có lỗi xảy ra khi gửi dữ liệu.');
+                    }
                 });
 
-                document.getElementById('qr-popup').classList.remove('hidden');
-            });
+                // ===== 13. Hiển thị popup QR code =====
+                document.getElementById('show-qr-btn')?.addEventListener('click', () => {
+                    let formCode = window.currentFormCode || "{{ $bieumau->ma_bieu_mau ?? '' }}";
+                    if (!formCode) {
+                        alert('⚠️ Biểu mẫu chưa được xuất bản!');
+                        return;
+                    }
 
-            // ===== Đóng popup QR =====
-            document.getElementById('close-qr-btn')?.addEventListener('click', () => {
-                document.getElementById('qr-popup').classList.add('hidden');
+                    const qrUrl = `${window.location.origin}/traloi-bieumau/${formCode}`;
+                    const canvas = document.querySelector('#qr-code canvas');
+
+                    // Sử dụng thư viện QRious để tạo QR code
+                    new QRious({
+                        element: canvas,
+                        value: qrUrl,
+                        size: 256,
+                        level: 'H'
+                    });
+
+                    document.getElementById('qr-popup').classList.remove('hidden');
+                });
+
+                // ===== Đóng popup QR =====
+                document.getElementById('close-qr-btn')?.addEventListener('click', () => {
+                    document.getElementById('qr-popup').classList.add('hidden');
+                });
             });
-        });
-    </script>
+        </script>
 </body>
 
 </html>
