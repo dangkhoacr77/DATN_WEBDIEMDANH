@@ -11,81 +11,25 @@
     <style>
         html,
         body {
-            min-height: 100%;
-            height: auto;
-            background-repeat: no-repeat;
-            background-position: center center;
-            background-size: contain;
-            font-family: 'Times New Roman', Times, serif;
-            background-attachment: fixed;
-        }
-
-        .question-box:hover .question-toolbar {
+            min-height: 100%;height: auto;background-repeat: no-repeat; background-position: center center;background-size: contain;  font-family: 'Times New Roman', Times, serif;background-attachment: fixed;
+        }.question-box:hover .question-toolbar {
             opacity: 1;
-        }
-
-        .question-toolbar {
-            transition: opacity 0.2s ease;
-            opacity: 0;
-        }
-
-        .dragging {
-            opacity: 0.5;
-            border: 2px dashed #4f46e5;
-        }
-
-        .drag-over {
+        }.question-toolbar {
+            transition: opacity 0.2s ease;opacity: 0;
+        }.dragging {
+            opacity: 0.5; border: 2px dashed #4f46e5;
+        }.drag-over {
             background-color: #e0e7ff;
-        }
-
-        .qr-popup {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(2px);
-            transition: opacity 0.2s ease;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .qr-popup.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .qr-popup-content {
-            background-color: white;
-            padding: 24px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-header-background {
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-            height: 200px;
-            position: relative;
-            border-radius: 12px 12px 0 0;
-            overflow: hidden;
-        }
-
-        .form-header-overlay {
-            background-color: rgba(255, 255, 255, 0.2);
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
+        }.qr-popup {
+            position: fixed;top: 0;left: 0;width: 100%;height: 100%;display: flex;align-items: center;justify-content: center;z-index: 1000;background-color: rgba(0, 0, 0, 0.5);backdrop-filter: blur(2px);transition: opacity 0.2s ease;opacity: 0;pointer-events: none;
+        }.qr-popup.active {
+            opacity: 1; pointer-events: auto;
+        }.qr-popup-content {
+            background-color: white; padding: 24px;  border-radius: 8px;width: 90%;max-width: 400px;box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }.form-header-background {
+            background-size: contain;background-position: center;background-repeat: no-repeat;height: 200px;position: relative;border-radius: 12px 12px 0 0;overflow: hidden;
+        }.form-header-overlay {
+            background-color: rgba(255, 255, 255, 0.2); width: 100%;height: 100%;position: absolute;top: 0;left: 0;
         }
     </style>
 </head>
@@ -137,7 +81,6 @@
             </div>
         </div>
     </div>
-
     <div class="flex flex-col min-h-screen">
         <header class="bg-blue-600 text-white py-4 px-6 flex items-center justify-between shadow-md">
             <h1 class="text-xl font-medium text-white-800">Tạo Biểu Mẫu</h1>
@@ -177,7 +120,6 @@
                     <span class="material-icons">close</span>
                 </button>
             </div>
-
             <div class="p-4 space-y-4">
                 <!-- Giới hạn thời gian -->
                 <div>
@@ -189,7 +131,6 @@
                         class="w-full accent-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
                     <p class="text-sm text-gray-600 mt-1">Đang chọn: <span id="time-limit-value">30</span> phút</p>
                 </div>
-
                 <!-- Giới hạn số người -->
                 <div>
                     <label class="flex items-center gap-2 font-medium mb-2">
@@ -202,11 +143,20 @@
                     <p class="text-sm text-gray-600 mt-1">Đang chọn: <span id="participant-limit-value">100</span>
                         người</p>
                 </div>
+                <!-- Biểu mẫu điểm danh theo ngày -->
+                <div>
+                    <label class="flex items-center gap-2 font-medium mb-2">
+                        <input type="checkbox" id="attendance-mode-toggle">
+                        Biểu mẫu điểm danh theo ngày
+                    </label>
+                    <div id="excel-upload-wrapper" class="mt-2 hidden">
+                        <label class="block text-sm mb-1 text-gray-600">Nhập danh sách điểm danh (Excel)</label>
+                        <input type="file" id="excel-upload" accept=".xlsx,.xls,.csv"
+                            class="block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
             </div>
-
         </div>
-
-
         <div class="flex flex-1 overflow-hidden">
             <!-- Main Content -->
             <div class="flex-1 overflow-auto p-8">
@@ -225,7 +175,6 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- Questions -->
                     <div id="questions-container" class="space-y-4">
                         @if (isset($cauhois))
@@ -304,7 +253,6 @@
                                 </button>
                             </div>
                         @endif
-
                         <!-- QR Popup -->
                         <div id="qr-popup"
                             class="fixed inset-0 bg-black bg-opacity-40 hidden flex items-center justify-center z-50">
@@ -321,7 +269,6 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -332,7 +279,6 @@
                 let selectedColor = "{{ $mau ?? '#93c5fd' }}"; // Màu nền mặc định nếu không có giá trị từ server
                 let selectedColorName = selectedColor ? 'Xanh dương đậm' : null;
                 let selectedBgImage = "{{ $hinh_nen ?? '' }}"; // Hình nền được chọn trước đó
-
                 // ===== Áp dụng hình nền hoặc màu nền khi tải trang =====
                 if (selectedBgImage) {
                     // Nếu có hình nền -> đặt làm nền cho body
@@ -346,13 +292,11 @@
                     // Nếu không có hình nền, dùng màu nền
                     document.body.style.backgroundColor = selectedColor;
                 }
-
                 // ===== Xử lý chọn hình nền trong giao diện =====
                 document.querySelectorAll('.bg-image-option').forEach(img => {
                     img.addEventListener('click', function() {
                         // Lấy tên file ảnh từ data-src
                         const imageName = this.dataset.src.split('/').pop();
-
                         // Đặt hình nền cho body
                         document.body.style.backgroundImage =
                             `url('/storage/backgrounds/${imageName}')`;
@@ -360,7 +304,6 @@
                         document.body.style.backgroundPosition = 'center center';
                         document.body.style.backgroundRepeat = 'no-repeat';
                         document.body.style.backgroundAttachment = 'fixed';
-
                         // Cập nhật biến và reset màu nền
                         window.selectedBackgroundImage = imageName;
                         selectedColor = null;
@@ -374,7 +317,6 @@
                             'ring-2', 'ring-indigo-500'));
                     });
                 });
-
                 // ===== Hiển thị màu đang chọn khi tải lại trang =====
                 const allColorButtons = document.querySelectorAll('[data-code]');
                 allColorButtons.forEach(btn => {
@@ -382,18 +324,15 @@
                         btn.classList.add('ring-2', 'ring-indigo-500');
                     }
                 });
-
                 // ===== Xử lý khi chọn màu nền mới =====
                 allColorButtons.forEach(btn => {
                     btn.addEventListener('click', function() {
                         selectedColor = this.dataset.code;
                         selectedColorName = this.dataset.color;
-
                         // Cập nhật body theo màu
                         document.body.style.backgroundColor = selectedColor;
                         window.selectedBackgroundImage = null;
                         document.body.style.backgroundImage = '';
-
                         // Reset border highlight
                         document.querySelectorAll('.bg-image-option').forEach(img => img.classList
                             .remove('ring-2', 'ring-indigo-500'));
@@ -401,7 +340,6 @@
                         this.classList.add('ring-2', 'ring-indigo-500');
                     });
                 });
-
                 // ===== Cài đặt hiển thị/ẩn thanh trượt giới hạn =====
                 const timeSlider = document.getElementById('setting-time-limit');
                 const timeValue = document.getElementById('time-limit-value');
@@ -409,27 +347,22 @@
                 const participantValue = document.getElementById('participant-limit-value');
                 const enableTimeLimitCheckbox = document.getElementById('enable-time-limit');
                 const enableParticipantLimitCheckbox = document.getElementById('enable-participant-limit');
-
                 // Bật/tắt thanh trượt tuỳ theo checkbox
                 const updateSliderState = () => {
                     timeSlider.disabled = !enableTimeLimitCheckbox.checked;
                     participantSlider.disabled = !enableParticipantLimitCheckbox.checked;
-
                     timeSlider.classList.toggle('opacity-50', timeSlider.disabled);
                     timeSlider.classList.toggle('cursor-not-allowed', timeSlider.disabled);
                     participantSlider.classList.toggle('opacity-50', participantSlider.disabled);
                     participantSlider.classList.toggle('cursor-not-allowed', participantSlider.disabled);
                 };
-
                 updateSliderState();
                 enableTimeLimitCheckbox.addEventListener('change', updateSliderState);
                 enableParticipantLimitCheckbox.addEventListener('change', updateSliderState);
-
                 // ===== Hiển thị giá trị khi thay đổi thanh trượt =====
                 timeSlider?.addEventListener('input', () => timeValue.textContent = timeSlider.value);
                 participantSlider?.addEventListener('input', () => participantValue.textContent = participantSlider
                     .value);
-
                 // ===== Hiện/ẩn bảng giao diện & cài đặt =====
                 document.getElementById('theme-btn')?.addEventListener('click', () => {
                     document.getElementById('theme-panel')?.classList.remove('translate-x-full');
@@ -443,7 +376,6 @@
                 document.getElementById('close-settings-btn')?.addEventListener('click', () => {
                     document.getElementById('settings-panel')?.classList.add('translate-x-full');
                 });
-
                 // ===== Thêm câu hỏi mới vào biểu mẫu =====
                 document.getElementById('add-question')?.addEventListener('click', function() {
                     const html = `
@@ -476,7 +408,6 @@
                     const addBtn = document.getElementById('add-question').closest('div');
                     addBtn.insertAdjacentHTML('beforebegin', html);
                 });
-
                 const container = document.getElementById('questions-container');
                 let draggedItem = null;
 
@@ -487,14 +418,12 @@
                         box.classList.add('dragging');
                     }
                 });
-
                 container.addEventListener('dragend', () => {
                     if (draggedItem) {
                         draggedItem.classList.remove('dragging');
                         draggedItem = null;
                     }
                 });
-
                 container.addEventListener('dragover', e => {
                     e.preventDefault();
                     const afterElement = getDragAfterElement(container, e.clientY);
@@ -506,7 +435,6 @@
                         container.insertBefore(dragging, afterElement);
                     }
                 });
-
                 function getDragAfterElement(container, y) {
                     const elements = [...container.querySelectorAll('.question-box:not(.dragging)')];
                     return elements.reduce((closest, child) => {
@@ -522,7 +450,6 @@
                         offset: Number.NEGATIVE_INFINITY
                     }).element;
                 }
-
                 // ===== Xoá câu hỏi =====
                 container.addEventListener('click', e => {
                     if (e.target.closest('.material-icons')?.textContent === 'delete') {
@@ -530,7 +457,6 @@
                         if (confirm('Xóa câu hỏi này?')) questionBox.remove();
                     }
                 });
-
                 // ===== Xử lý nút Xuất bản: kiểm tra dữ liệu, gửi API =====
                 document.getElementById('publish-btn')?.addEventListener('click', async () => {
                     const title = document.getElementById('form-title')?.value || '';
@@ -539,16 +465,13 @@
                         null;
                     const participant_limit = enableParticipantLimitCheckbox.checked ? parseInt(
                         participantSlider?.value || 0) : null;
-
                     // Thu thập dữ liệu từ các câu hỏi
                     const questionBoxes = document.querySelectorAll('.question-box');
                     const questions = [];
                     let hasEmptyTitle = false;
-
                     questionBoxes.forEach((box) => {
                         const title = box.querySelector('.question-title')?.value.trim() || '';
                         const required = box.querySelector('.question-required')?.checked || false;
-
                         if (!title) {
                             hasEmptyTitle = true;
                             box.querySelector('.question-title').classList.add('border-red-500');
@@ -561,7 +484,6 @@
                             required
                         });
                     });
-
                     // Kiểm tra dữ liệu đầu vào
                     if (hasEmptyTitle) {
                         alert("❌ Bạn cần điền nội dung cho tất cả câu hỏi.");
@@ -571,7 +493,6 @@
                         alert("❌ Bạn phải tạo ít nhất 1 câu hỏi trước khi xuất bản.");
                         return;
                     }
-
                     // Nếu có QR, lấy hình ảnh base64 từ canvas
                     const canvas = document.querySelector('#qr-code canvas');
                     const base64Image = canvas ? canvas.toDataURL() : null;
@@ -597,7 +518,6 @@
                                 qr_image: base64Image
                             })
                         });
-
                         const data = await res.json();
                         if (data.success) {
                             alert('🎉 Biểu mẫu đã được xuất bản thành công!');
@@ -610,7 +530,6 @@
                         alert('Đã có lỗi xảy ra khi gửi dữ liệu.');
                     }
                 });
-
                 // ===== 13. Hiển thị popup QR code =====
                 document.getElementById('show-qr-btn')?.addEventListener('click', () => {
                     let formCode = window.currentFormCode || "{{ $bieumau->ma_bieu_mau ?? '' }}";
@@ -621,7 +540,6 @@
 
                     const qrUrl = `${window.location.origin}/traloi-bieumau/${formCode}`;
                     const canvas = document.querySelector('#qr-code canvas');
-
                     // Sử dụng thư viện QRious để tạo QR code
                     new QRious({
                         element: canvas,
@@ -629,10 +547,8 @@
                         size: 256,
                         level: 'H'
                     });
-
                     document.getElementById('qr-popup').classList.remove('hidden');
                 });
-
                 // ===== Đóng popup QR =====
                 document.getElementById('close-qr-btn')?.addEventListener('click', () => {
                     document.getElementById('qr-popup').classList.add('hidden');
@@ -640,5 +556,4 @@
             });
         </script>
 </body>
-
 </html>

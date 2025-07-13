@@ -12,7 +12,7 @@ php artisan route:clear
 php artisan view:clear
 
 
-
 php artisan serve --host=0.0.0.0 --port=8000
+php artisan serve --host=127.0.0.1 --port=8000
 chạy cmd trỏ tới thư mục ngrok chạy: ngrok http 8000
 lấy cái Forwarding
