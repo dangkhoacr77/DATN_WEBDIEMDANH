@@ -50,6 +50,8 @@ Route::middleware(['web'])->group(function () {
         return response()->json(['success' => false], 400);
     });
     Route::get('/bieumau/tao/{ma_bieu_mau}', [TaoFormController::class, 'show'])->name('bieumau.show');
+    Route::post('/bieumau/{ma_bieu_mau}/tao-lai-qr', [TaoFormController::class, 'taoLaiQR'])->name('bieumau.taoLaiQR');
+
 
     // ======================= NGUOIDUNG =========================
     Route::get('/nguoidung/ls-diemdanh', [LsDiemdanhController::class, 'index'])->name('nguoidung.ls-diemdanh');

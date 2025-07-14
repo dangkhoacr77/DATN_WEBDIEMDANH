@@ -106,6 +106,13 @@
                         <span class="material-icons mr-2">publish</span>Xuất bản
                     </button>
                 @else
+                @if ($bieumau->loai == 2)
+<button id="tao-lai-qr-btn"
+        data-id="{{ $bieumau->ma_bieu_mau }}"
+        class="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600 ml-2">
+    🔁 Tạo lại mã QR
+</button>
+@endif
                     <button class="bg-indigo-700 text-white px-4 py-2 rounded-md hover:bg-indigo-700 flex items-center">
                         <a href="{{ url()->previous() }}">← Quay lại</a>
                     </button>
@@ -269,6 +276,14 @@
         </div>
       <script>
 document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('tao-lai-qr-btn')?.addEventListener('click', function () {
+    const formId = this.dataset.id;
+    if (!formId) {
+        alert("❌ Không tìm thấy ID biểu mẫu.");
+        return;
+    }
+    taoLaiQR(formId);
+});
     // ===== Thiết lập ban đầu từ server (màu nền & hình nền) =====
     let selectedColor = "{{ $mau ?? '#93c5fd' }}";
     let selectedColorName = selectedColor ? 'Xanh dương đậm' : null;
@@ -511,7 +526,40 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('close-qr-btn')?.addEventListener('click', () => {
         document.getElementById('qr-popup').classList.add('hidden');
     });
+
 });
+async function taoLaiQR(formId) {
+    if (!confirm("Bạn có chắc muốn tạo lại mã QR")) return;
+
+    try {
+        const res = await fetch(location.origin + `/bieumau/${formId}/tao-lai-qr`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        });
+
+        const data = await res.json(); // ✅ Lấy nội dung trước
+
+        if (res.ok && data.success) {
+            const canvas = document.querySelector('#qr-code canvas');
+            new QRious({
+                element: canvas,
+                value: data.url,
+                size: 256,
+                level: 'H'
+            });
+            document.getElementById('qr-popup').classList.remove('hidden');
+            alert('✅ QR mới đã được tạo cho ngày ' + data.ngay_diem_danh);
+        } else {
+            // ❗ Nếu không thành công, show message từ server
+            alert('⚠️ ' + (data.message || 'Có lỗi xảy ra'));
+        }
+    } catch (error) {
+        alert('⚠️ Lỗi khi tạo lại QR');
+        console.error(error);
+    }
+}
 </script>
 </body>
 </html>

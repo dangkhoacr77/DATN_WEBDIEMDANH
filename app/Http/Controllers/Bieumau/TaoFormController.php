@@ -186,4 +186,79 @@ class TaoFormController extends Controller
             'isCreating' => false
         ]);
     }
+
+public function taoLaiQR(Request $request, $ma_bieu_mau)
+{
+    try {
+        // Sửa lại: tìm theo ma_bieu_mau thay vì id
+        $bieumau = BieuMau::where('ma_bieu_mau', $ma_bieu_mau)->first();
+
+        if (!$bieumau) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy biểu mẫu.'
+            ], 404);
+        }
+
+        if ($bieumau->loai != 2) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Chỉ hỗ trợ biểu mẫu điểm danh theo ngày.'
+            ], 400);
+        }
+        //Carbon::createFromFormat('Y-m-d', '2025-07-20');
+        $ngayMoi = now();
+        $tenCotMoi = $ngayMoi->format('Y-m-d');
+
+        $danhSach = DanhSachDiemDanh::where('bieu_mau_ma', $bieumau->ma_bieu_mau)->first();
+
+        if (!$danhSach) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy danh sách điểm danh.'
+            ], 404);
+        }
+
+        $duLieu = json_decode($danhSach->du_lieu_ds, true);
+
+        // 🔴 Kiểm tra nếu ngày đã tồn tại
+        if (isset($duLieu[0]) && array_key_exists($tenCotMoi, $duLieu[0])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ngày điểm danh hôm nay đã tồn tại trong danh sách.'
+            ], 409);
+        }
+
+        // ✅ Thêm cột ngày mới cho từng dòng
+        foreach ($duLieu as &$dong) {
+            $dong[$tenCotMoi] = '';
+        }
+
+        // Cập nhật danh sách
+        $danhSach->du_lieu_ds = json_encode($duLieu, JSON_UNESCAPED_UNICODE);
+        $danhSach->ngay_tao = $ngayMoi->toDateString();
+        $danhSach->thoi_gian_tao = $ngayMoi;
+        $danhSach->save();
+
+        // Cập nhật ngày tạo của biểu mẫu
+        $bieumau->ngay_tao = $ngayMoi;
+        $bieumau->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Đã tạo lại QR thành công.',
+            'url' => url('/traloi-bieumau/' . $bieumau->ma_bieu_mau),
+            'ngay_diem_danh' => $tenCotMoi
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Tạo lại QR lỗi: ' . $e->getMessage());
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Đã xảy ra lỗi khi tạo lại QR: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+
 }
