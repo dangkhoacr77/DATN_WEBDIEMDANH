@@ -287,21 +287,12 @@
             document.getElementById('device_name').value = navigator.userAgent;
 
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(async (position) => {
+                navigator.geolocation.getCurrentPosition((position) => {
                     const lat = position.coords.latitude;
                     const lon = position.coords.longitude;
-
-                    try {
-                        const res = await fetch(
-                            `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=YOUR_API_KEY`
-                        );
-                        const data = await res.json();
-                        document.getElementById('location').value = data.results[0]
-                            ?.formatted_address || `${lat},${lon}`;
-                    } catch {
-                        document.getElementById('location').value = `${lat},${lon}`;
-                    }
-                }, () => {
+                    document.getElementById('location').value = `${lat},${lon}`;
+                }, (error) => {
+                    console.warn('Không lấy được định vị:', error.message);
                     document.getElementById('location').value = '';
                 });
             }

@@ -109,7 +109,7 @@
                 @if ($bieumau->loai == 2)
 <button id="tao-lai-qr-btn"
         data-id="{{ $bieumau->ma_bieu_mau }}"
-        class="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600 ml-2">
+        class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 ml-2">
     🔁 Tạo lại mã QR
 </button>
 @endif

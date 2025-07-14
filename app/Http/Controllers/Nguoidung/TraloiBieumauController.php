@@ -14,25 +14,16 @@ use DeviceDetector\Parser\Device\DeviceParserAbstract;
 
 class TraloiBieumauController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         return view('nguoidung.Traloi_bieumau');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $bieuMauMa = $request->input('bieu_mau_ma');
@@ -43,32 +34,26 @@ class TraloiBieumauController extends Controller
         $maDiemDanh = Str::uuid()->toString();
         $taiKhoanMa = session('ma_tai_khoan');
 
-        //  Lấy thông tin thiết bị cụ thể hơn
         $userAgent = $request->userAgent();
-        $dd = new \DeviceDetector\DeviceDetector($userAgent);
+        $dd = new DeviceDetector($userAgent);
         $dd->parse();
 
-        $device = $dd->getDeviceName();                    // smartphone, desktop, tablet, ...
-        $os = $dd->getOs('name') ?? 'Không rõ HĐH';        // Android, Windows, iOS,...
-        $brand = $dd->getBrandName();                      // Samsung, Apple, HP,...
-        $model = $dd->getModel();                          // Galaxy S21, iPhone 13,...
-        $browserData = $dd->getClient();                   // ['name' => ..., 'version' => ...]
+        $device = $dd->getDeviceName();
+        $os = $dd->getOs('name') ?? 'Không rõ HĐH';
+        $brand = $dd->getBrandName();
+        $model = $dd->getModel();
+        $browserData = $dd->getClient();
 
-        //  Tên thiết bị cụ thể
         $deviceName = trim("{$brand} {$model}");
         if (!$deviceName || $deviceName === '') {
-            $deviceName = $device; // Fallback nếu brand/model rỗng
+            $deviceName = $device;
         }
 
-        //  Gộp thông tin thiết bị
         $browserInfo = isset($browserData['name']) ? $browserData['name'] : 'Trình duyệt không xác định';
         $browserVersion = isset($browserData['version']) ? $browserData['version'] : '';
         $thietBiDiemDanh = "$deviceName - $os - $browserInfo $browserVersion";
-
-        //  Giới hạn độ dài nếu cần
         $thietBiDiemDanh = Str::limit($thietBiDiemDanh, 100);
 
-        //  Kiểm tra biểu mẫu
         $bieuMau = BieuMau::with('danhSach')->where('ma_bieu_mau', $bieuMauMa)->first();
         if (!$bieuMau) {
             return redirect()->back()->withErrors(['message' => 'Biểu mẫu không tồn tại.']);
@@ -76,7 +61,54 @@ class TraloiBieumauController extends Controller
 
         $maDanhSach = optional($bieuMau->danhSach)->ma_danh_sach;
 
-        // ✅ Tạo điểm danh
+        // Xử lý riêng cho loại biểu mẫu 2
+        if ($bieuMau->loai == 2) {
+            $emailDangNhap = strtolower(trim(session('email')));
+            $homNay = now()->format('Y-m-d');
+            $danhSach = $bieuMau->danhSach;
+            $duLieu = json_decode($danhSach->du_lieu_ds, true);
+
+            $found = false;
+            foreach ($duLieu as &$dong) {
+                foreach ($dong as $key => $value) {
+                    if (strtolower(trim($value)) === $emailDangNhap) {
+                        // Kiểm tra đã điểm danh hôm nay chưa
+                        if (isset($dong[$homNay]) && trim($dong[$homNay]) === 'x') {
+                            return redirect()->back()->withErrors(['message' => 'Bạn đã điểm danh hôm nay.']);
+                        }
+                        $dong[$homNay] = 'x';
+                        $found = true;
+                        break 2;
+                    }
+                }
+            }
+
+            if (!$found) {
+                return redirect()->back()->withErrors(['message' => 'Email của bạn không có trong danh sách điểm danh.']);
+            }
+
+            $danhSach->du_lieu_ds = json_encode($duLieu, JSON_UNESCAPED_UNICODE);
+            $danhSach->save();
+
+            DiemDanh::create([
+                'ma_diem_danh' => $maDiemDanh,
+                'thoi_gian_diem_danh' => now(),
+                'thiet_bi_diem_danh' => $thietBiDiemDanh,
+                'dinh_vi_thiet_bi' => $request->input('location') ?? '',
+                'bieu_mau_ma' => $bieuMauMa,
+                'tai_khoan_ma' => $taiKhoanMa,
+                'danh_sach_ma' => $maDanhSach,
+            ]);
+
+            return view('nguoidung.Traloi_bieumau', [
+                'bieuMau' => $bieuMau,
+                'success' => 'Bạn đã điểm danh thành công!',
+                'hideQuestions' => true,
+                'redirectAfter' => route('trangchu'),
+            ]);
+        }
+
+        // Biểu mẫu loại 1
         DiemDanh::create([
             'ma_diem_danh' => $maDiemDanh,
             'thoi_gian_diem_danh' => now(),
@@ -87,7 +119,6 @@ class TraloiBieumauController extends Controller
             'danh_sach_ma' => $maDanhSach,
         ]);
 
-        // ✅ Lưu câu trả lời
         $traLoiData = $request->input('cau_tra_loi', []);
         foreach ($traLoiData as $maCauHoi => $traLoi) {
             CauTraLoi::create([
@@ -106,10 +137,6 @@ class TraloiBieumauController extends Controller
         ]);
     }
 
-
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         if (!session('ma_tai_khoan')) {
@@ -117,19 +144,38 @@ class TraloiBieumauController extends Controller
         }
 
         $bieuMau = BieuMau::with(['cauHois', 'danhSach', 'diemDanhs'])->findOrFail($id);
-
         $errorMessage = null;
 
-        // ⏱️ Kiểm tra thời lượng điểm danh (nếu có)
-        if ($bieuMau->thoi_luong_diem_danh) {
-            $ngayTao = \Carbon\Carbon::parse($bieuMau->ngay_tao);
-            $thoiGianHetHan = $ngayTao->addMinutes($bieuMau->thoi_luong_diem_danh);
-            if (now()->greaterThan($thoiGianHetHan)) {
-                $errorMessage = 'Biểu mẫu này đã hết thời gian điểm danh.';
+        // Kiểm tra danh sách loại 2
+        if ($bieuMau->loai == 2) {
+            $emailDangNhap = strtolower(trim(session('email')));
+            $duLieu = json_decode(optional($bieuMau->danhSach)->du_lieu_ds, true);
+            $emailTonTai = false;
+
+            foreach ($duLieu as $dong) {
+                foreach ($dong as $value) {
+                    if (strtolower(trim($value)) === $emailDangNhap) {
+                        $emailTonTai = true;
+                        break 2;
+                    }
+                }
+            }
+
+            if (!$emailTonTai) {
+                $errorMessage = 'Email của bạn không có trong danh sách điểm danh.';
             }
         }
 
-        // 👥 Kiểm tra giới hạn số người điểm danh (nếu có)
+        // Kiểm tra thời hạn biểu mẫu
+        if (!$errorMessage && $bieuMau->thoi_luong_diem_danh) {
+            $ngayTao = \Carbon\Carbon::parse($bieuMau->ngay_tao);
+            $thoiGianHetHan = $ngayTao->addMinutes($bieuMau->thoi_luong_diem_danh);
+            if (now()->greaterThan($thoiGianHetHan)) {
+                $errorMessage = 'Biểu mẫu đã hết thời gian điểm danh.';
+            }
+        }
+
+        // Kiểm tra giới hạn người tham gia
         if (!$errorMessage && $bieuMau->gioi_han_diem_danh) {
             $soNguoiDaDiemDanh = $bieuMau->diemDanhs->count();
             if ($soNguoiDaDiemDanh >= $bieuMau->gioi_han_diem_danh) {
@@ -143,28 +189,7 @@ class TraloiBieumauController extends Controller
         ]);
     }
 
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
+    public function edit(string $id) {}
+    public function update(Request $request, string $id) {}
+    public function destroy(string $id) {}
 }
