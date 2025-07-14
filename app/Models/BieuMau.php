@@ -15,7 +15,7 @@ class BieuMau extends Model
     protected $fillable = [
     'ma_bieu_mau', 'tieu_de', 'mo_ta_tieu_de', 'hinh_anh', 'mau',
     'thoi_luong_diem_danh', 'gioi_han_diem_danh', 
-    'trang_thai', 'ngay_tao', 'tai_khoan_ma'
+    'trang_thai', 'ngay_tao', 'tai_khoan_ma', 'loai', 'du_lieu_vao'
 ];
 
     public $timestamps = false;

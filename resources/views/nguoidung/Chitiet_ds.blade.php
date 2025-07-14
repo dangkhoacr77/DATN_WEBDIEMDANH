@@ -11,6 +11,7 @@
 
 @php
     $user = session('nguoi_dung');
+    $isLoai2 = $ds->bieuMau->loai == 2;
 @endphp
 
 <!-- Navbar -->
@@ -53,10 +54,12 @@
                 <table class="table table-bordered align-middle text-center" style="white-space: nowrap; min-width: max-content;">
                     <thead class="table-light">
                         <tr>
-                            <th>Email</th>
-                            <th>Thời gian</th>
-                            <th>Thiết bị</th>
-                            <th>Định vị</th>
+                            @if (!$isLoai2)
+                                <th>Email</th>
+                                <th>Thời gian</th>
+                                <th>Thiết bị</th>
+                                <th>Định vị</th>
+                            @endif
                             @foreach ($labels as $label)
                                 <th>{{ $label }}</th>
                             @endforeach
@@ -65,13 +68,19 @@
                     <tbody>
                         @foreach ($rows as $row)
                             <tr>
-                                <td>{{ $row['email'] }}</td>
-                                <td>{{ $row['thoi_gian'] }}</td>
-                                <td>{{ $row['thiet_bi'] }}</td>
-                                <td>{{ $row['dinh_vi'] }}</td>
-                                @foreach ($row['cau_tra_loi'] as $traloi)
-                                    <td>{{ $traloi }}</td>
-                                @endforeach
+                                @if (!$isLoai2)
+                                    <td>{{ $row['email'] }}</td>
+                                    <td>{{ $row['thoi_gian'] }}</td>
+                                    <td>{{ $row['thiet_bi'] }}</td>
+                                    <td>{{ $row['dinh_vi'] }}</td>
+                                    @foreach ($row['cau_tra_loi'] as $traloi)
+                                        <td>{{ $traloi }}</td>
+                                    @endforeach
+                                @else
+                                    @foreach ($labels as $label)
+                                        <td>{{ $row[$label] ?? '' }}</td>
+                                    @endforeach
+                                @endif
                             </tr>
                         @endforeach
                     </tbody>
@@ -79,7 +88,7 @@
             </div>
         </div>
 
-        <!-- Phân trang -->
+        <!-- Phân trang nếu có -->
         @if ($rows instanceof \Illuminate\Pagination\LengthAwarePaginator)
             <div class="d-flex justify-content-center mt-4">
                 {{ $rows->links() }}
