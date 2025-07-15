@@ -146,16 +146,21 @@ class TraloiBieumauController extends Controller
         $bieuMau = BieuMau::with(['cauHois', 'danhSach', 'diemDanhs'])->findOrFail($id);
         $errorMessage = null;
 
-        // Kiểm tra danh sách loại 2
+        // Kiểm tra loại 2
         if ($bieuMau->loai == 2) {
             $emailDangNhap = strtolower(trim(session('email')));
             $duLieu = json_decode(optional($bieuMau->danhSach)->du_lieu_ds, true);
+            $homNay = now()->format('Y-m-d');
             $emailTonTai = false;
+            $daDiemDanh = false;
 
             foreach ($duLieu as $dong) {
-                foreach ($dong as $value) {
+                foreach ($dong as $key => $value) {
                     if (strtolower(trim($value)) === $emailDangNhap) {
                         $emailTonTai = true;
+                        if (isset($dong[$homNay]) && trim($dong[$homNay]) === 'x') {
+                            $daDiemDanh = true;
+                        }
                         break 2;
                     }
                 }
@@ -163,10 +168,12 @@ class TraloiBieumauController extends Controller
 
             if (!$emailTonTai) {
                 $errorMessage = 'Email của bạn không có trong danh sách điểm danh.';
+            } elseif ($daDiemDanh) {
+                $errorMessage = 'Bạn đã điểm danh hôm nay.';
             }
         }
 
-        // Kiểm tra thời hạn biểu mẫu
+        // Kiểm tra thời gian
         if (!$errorMessage && $bieuMau->thoi_luong_diem_danh) {
             $ngayTao = \Carbon\Carbon::parse($bieuMau->ngay_tao);
             $thoiGianHetHan = $ngayTao->addMinutes($bieuMau->thoi_luong_diem_danh);
@@ -175,8 +182,8 @@ class TraloiBieumauController extends Controller
             }
         }
 
-        // Kiểm tra giới hạn người tham gia
-        if (!$errorMessage && $bieuMau->gioi_han_diem_danh) {
+        // Kiểm tra giới hạn số người (chỉ cho loại 1)
+        if (!$errorMessage && $bieuMau->loai == 1 && $bieuMau->gioi_han_diem_danh) {
             $soNguoiDaDiemDanh = $bieuMau->diemDanhs->count();
             if ($soNguoiDaDiemDanh >= $bieuMau->gioi_han_diem_danh) {
                 $errorMessage = 'Biểu mẫu đã đạt giới hạn số người điểm danh.';
@@ -188,8 +195,4 @@ class TraloiBieumauController extends Controller
             'errorMessage' => $errorMessage,
         ]);
     }
-
-    public function edit(string $id) {}
-    public function update(Request $request, string $id) {}
-    public function destroy(string $id) {}
 }

@@ -81,11 +81,10 @@
                 @if (isset($errorMessage))
                     <div
                         class="bg-red-50 border border-red-200 text-red-800 p-4 rounded-xl shadow-lg animate-fade-in-down mt-4 w-full max-w-full mx-auto">
-                        <div class="flex items-start gap-3">
-                            <span class="material-icons text-red-500 text-2xl mt-0.5">error</span>
+                        <div class="flex items-center gap-3">
+                            <span class="material-icons text-red-500 text-xl">error</span>
                             <div>
-                                <p class="font-bold text-lg">Không thể trả lời biểu mẫu</p>
-                                <p class="text-sm">{{ $errorMessage }}</p>
+                                <p class="font-bold text-lg">{{ $errorMessage }}</p>
                             </div>
                         </div>
                     </div>
@@ -105,7 +104,6 @@
                             </div>
                         </div>
                     </div>
-
                     @if ((!isset($hideQuestions) || !$hideQuestions) && !isset($errorMessage))
                         <form method="POST" action="{{ route('traloi-bieumau.store') }}"
                             class="space-y-4 animate-fade-in" id="form-multi-step">
