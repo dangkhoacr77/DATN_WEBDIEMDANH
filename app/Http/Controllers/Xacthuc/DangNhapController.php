@@ -63,6 +63,7 @@ class DangNhapController extends Controller
             'nguoi_dung' => $nguoi_dung,
             'ma_tai_khoan' => $nguoi_dung->ma_tai_khoan,
             'ho_ten' => $nguoi_dung->ho_ten,
+            'email' => $nguoi_dung->mail,
         ]);
         return redirect()->route('trangchu')->with('success', 'Đăng nhập thành công!');
     }

@@ -49,8 +49,8 @@ class TraloiBieumauController extends Controller
             $deviceName = $device;
         }
 
-        $browserInfo = isset($browserData['name']) ? $browserData['name'] : 'Trình duyệt không xác định';
-        $browserVersion = isset($browserData['version']) ? $browserData['version'] : '';
+        $browserInfo = $browserData['name'] ?? 'Trình duyệt không xác định';
+        $browserVersion = $browserData['version'] ?? '';
         $thietBiDiemDanh = "$deviceName - $os - $browserInfo $browserVersion";
         $thietBiDiemDanh = Str::limit($thietBiDiemDanh, 100);
 
@@ -61,18 +61,35 @@ class TraloiBieumauController extends Controller
 
         $maDanhSach = optional($bieuMau->danhSach)->ma_danh_sach;
 
-        // Xử lý riêng cho loại biểu mẫu 2
+        // Xử lý biểu mẫu loại 2
         if ($bieuMau->loai == 2) {
             $emailDangNhap = strtolower(trim(session('email')));
             $homNay = now()->format('Y-m-d');
             $danhSach = $bieuMau->danhSach;
             $duLieu = json_decode($danhSach->du_lieu_ds, true);
 
+            if (empty($duLieu)) {
+                return redirect()->back()->withErrors(['message' => 'Danh sách điểm danh rỗng.']);
+            }
+
+            // ✅ Kiểm tra nếu chưa có cột ngày hôm nay
+            $hasHomNayColumn = false;
+            foreach ($duLieu as $dong) {
+                if (array_key_exists($homNay, $dong)) {
+                    $hasHomNayColumn = true;
+                    break;
+                }
+            }
+
+            if (!$hasHomNayColumn) {
+                return redirect()->back()->withErrors(['message' => 'Chưa có buổi điểm danh cho hôm nay.']);
+            }
+
+            // ✅ Tiếp tục kiểm tra email
             $found = false;
             foreach ($duLieu as &$dong) {
                 foreach ($dong as $key => $value) {
                     if (strtolower(trim($value)) === $emailDangNhap) {
-                        // Kiểm tra đã điểm danh hôm nay chưa
                         if (isset($dong[$homNay]) && trim($dong[$homNay]) === 'x') {
                             return redirect()->back()->withErrors(['message' => 'Bạn đã điểm danh hôm nay.']);
                         }
@@ -146,7 +163,6 @@ class TraloiBieumauController extends Controller
         $bieuMau = BieuMau::with(['cauHois', 'danhSach', 'diemDanhs'])->findOrFail($id);
         $errorMessage = null;
 
-        // Kiểm tra loại 2
         if ($bieuMau->loai == 2) {
             $emailDangNhap = strtolower(trim(session('email')));
             $duLieu = json_decode(optional($bieuMau->danhSach)->du_lieu_ds, true);
@@ -154,26 +170,39 @@ class TraloiBieumauController extends Controller
             $emailTonTai = false;
             $daDiemDanh = false;
 
+            // ✅ Kiểm tra có cột hôm nay không
+            $hasHomNayColumn = false;
             foreach ($duLieu as $dong) {
-                foreach ($dong as $key => $value) {
-                    if (strtolower(trim($value)) === $emailDangNhap) {
-                        $emailTonTai = true;
-                        if (isset($dong[$homNay]) && trim($dong[$homNay]) === 'x') {
-                            $daDiemDanh = true;
-                        }
-                        break 2;
-                    }
+                if (array_key_exists($homNay, $dong)) {
+                    $hasHomNayColumn = true;
+                    break;
                 }
             }
 
-            if (!$emailTonTai) {
-                $errorMessage = 'Email của bạn không có trong danh sách điểm danh.';
-            } elseif ($daDiemDanh) {
-                $errorMessage = 'Bạn đã điểm danh hôm nay.';
+            if (!$hasHomNayColumn) {
+                $errorMessage = 'Chưa có buối điểm danh hôm nay.';
+            } else {
+                foreach ($duLieu as $dong) {
+                    foreach ($dong as $value) {
+                        if (strtolower(trim($value)) === $emailDangNhap) {
+                            $emailTonTai = true;
+                            if (isset($dong[$homNay]) && trim($dong[$homNay]) === 'x') {
+                                $daDiemDanh = true;
+                            }
+                            break 2;
+                        }
+                    }
+                }
+
+                if (!$emailTonTai) {
+                    $errorMessage = 'Email của bạn không có trong danh sách điểm danh.';
+                } elseif ($daDiemDanh) {
+                    $errorMessage = 'Bạn đã điểm danh hôm nay.';
+                }
             }
         }
 
-        // Kiểm tra thời gian
+        // Kiểm tra thời gian hết hạn
         if (!$errorMessage && $bieuMau->thoi_luong_diem_danh) {
             $ngayTao = \Carbon\Carbon::parse($bieuMau->ngay_tao);
             $thoiGianHetHan = $ngayTao->addMinutes($bieuMau->thoi_luong_diem_danh);
@@ -182,7 +211,7 @@ class TraloiBieumauController extends Controller
             }
         }
 
-        // Kiểm tra giới hạn số người (chỉ cho loại 1)
+        // Giới hạn số người (chỉ loại 1)
         if (!$errorMessage && $bieuMau->loai == 1 && $bieuMau->gioi_han_diem_danh) {
             $soNguoiDaDiemDanh = $bieuMau->diemDanhs->count();
             if ($soNguoiDaDiemDanh >= $bieuMau->gioi_han_diem_danh) {
